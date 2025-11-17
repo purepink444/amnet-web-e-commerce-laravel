@@ -1,11 +1,39 @@
-@import 'tailwindcss';
+/* ===================================
+   Master CSS File
+   =================================== */
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Variables */
+@import '_variables.css';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Base */
+@import '_base.css';
+
+/* Components */
+@import 'components/_buttons.css';
+@import 'components/_forms.css';
+@import 'components/_modals.css';
+@import 'components/_cards.css';
+@import 'components/_navbar.css';
+@import 'components/_footer.css';
+
+/* Pages */
+@import 'pages/_home.css';
+@import 'pages/_products.css';
+@import 'pages/_product-detail.css';
+@import 'pages/_auth.css';
+@import 'pages/_profile.css';
+
+/* Utilities */
+@layer utilities {
+    .text-orange {
+        color: var(--orange-primary) !important;
+    }
+    
+    .bg-orange {
+        background: var(--orange-primary) !important;
+    }
+    
+    .border-orange {
+        border-color: var(--orange-primary) !important;
+    }
 }

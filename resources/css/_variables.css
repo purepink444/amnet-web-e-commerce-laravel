@@ -1,0 +1,43 @@
+:root {
+    /* === Colors === */
+    --orange-primary: #ff6b35;
+    --orange-dark: #e85d2a;
+    --orange-light: #ff8c5f;
+    --black-primary: #1a1a1a;
+    --black-secondary: #2d2d2d;
+    --black-tertiary: #3d3d3d;
+    --gray-text: #6c757d;
+    --gray-light: #f8f9fa;
+    
+    /* === Typography === */
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-size-base: 1rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.125rem;
+    
+    /* === Spacing === */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* === Border Radius === */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 15px;
+    
+    /* === Transitions === */
+    --transition-speed: 0.3s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* === Shadows === */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 25px 50px -12px rgba(255, 107, 53, 0.3);
+    
+    /* === Z-index === */
+    --z-dropdown: 1000;
+    --z-modal: 1050;
+    --z-tooltip: 1100;
+}
