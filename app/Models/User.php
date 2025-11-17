@@ -10,69 +10,74 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    // ✅ ต้องระบุ Primary Key ให้ชัดเจน
     protected $primaryKey = 'user_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    
+    // ✅ ถ้า user_id ไม่ใช่ auto-increment ต้องเพิ่มบรรทัดนี้ด้วย
+    // public $incrementing = true;
+    // protected $keyType = 'int';
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'username',
         'email',
         'password',
-        'firstname',
-        'lastname',
-        'address',
-        'subdistrict',
-        'district',
-        'province',
-        'zipcode',
-        'role_id',
+        'role_id', // ✅ เปลี่ยนเป็น role_id
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
-
     /**
-     * Override getAuthIdentifierName เพื่อบอก Laravel ว่าใช้ user_id แทน id
+     * Get the attributes that should be cast.
      */
-    public function getAuthIdentifierName()
+    protected function casts(): array
     {
-        return 'user_id';
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
     /**
-     * Get the orders for the user.
-     */
-    public function orders()
-    {
-        return $this->hasMany(Order::class, 'user_id', 'user_id');
-    }
-
-    /**
-     * Get the wishlist items for the user.
-     */
-    public function wishlist()
-    {
-        return $this->hasMany(Wishlist::class, 'user_id', 'user_id');
-    }
-
-    /**
-     * Get the role of the user.
-     * ระบุ foreign key และ owner key ให้ชัดเจน
+     * ✅ Relationship: User belongsTo Role
      */
     public function role()
     {
-        // ตรวจสอบว่าตาราง roles ใช้ primary key ชื่ออะไร
-        // ถ้าใช้ role_id ให้เปลี่ยนเป็น
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
-        
-        // ถ้าใช้ id ให้ใช้
-        // return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+
+    /**
+     * ✅ Accessor: ดึงชื่อ role ออกมาใช้งาน
+     */
+    public function getRoleNameAttribute(): ?string
+    {
+        return $this->role?->role_name;
+    }
+
+    /**
+     * ✅ Helper Methods สำหรับตรวจสอบ Role
+     */
+    public function isAdmin(): bool
+    {
+        return strtolower($this->role?->role_name ?? '') === 'admin';
+    }
+
+    public function isMember(): bool
+    {
+        return strtolower($this->role?->role_name ?? '') === 'member';
+    }
+
+    // Alias สำหรับ backward compatibility
+    public function isCustomer(): bool
+    {
+        return $this->isMember();
     }
 }

@@ -8,6 +8,19 @@ class Brand extends Model
 {
     protected $table = 'brands';
     protected $primaryKey = 'brand_id';
-    public $timestamps = false;
-    protected $fillable = ['name']; // ปรับตาม column จริง
+    
+    protected $fillable = [
+        'brand_name',
+        'brand_logo',
+        'description',
+        'status',
+    ];
+
+    /**
+     * Get products that belong to this brand
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'brand_id', 'brand_id');
+    }
 }

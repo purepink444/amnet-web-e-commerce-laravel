@@ -13,9 +13,8 @@ class RegisterController extends Controller
     /**
      * Show registration form
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
-        // Redirect if already logged in
         if (Auth::check()) {
             return redirect()->route('home');
         }
@@ -28,49 +27,61 @@ class RegisterController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Validate input
-        $validated = $this->validateRegistration($request);
+        // Debug: Log registration attempt
+        Log::info('=== REGISTRATION ATTEMPT ===', [
+            'email' => $request->email,
+            'username' => $request->username,
+            'has_terms' => $request->has('terms'),
+            'terms_value' => $request->terms,
+            'ip' => $request->ip(),
+        ]);
 
         try {
+            $validated = $this->validateRegistration($request);
+            
+            Log::info('✅ Validation passed', ['email' => $validated['email']]);
+
             DB::beginTransaction();
 
-            // Create user
             $user = $this->createUser($validated);
-
-            // Send welcome email (optional)
-            // $this->sendWelcomeEmail($user);
-
-            DB::commit();
-
-            // Log registration
-            Log::info('New user registered', [
-                'user_id' => $user->user_id,
+            
+            Log::info('✅ User created successfully', [
+                'user_id' => $user->user_id ?? $user->id,
                 'email' => $user->email,
-                'ip' => $request->ip(),
             ]);
 
-            // Auto login option
-            if (config('auth.auto_login_after_register', false)) {
-                Auth::login($user);
-                return redirect()->route('home')
-                    ->with('success', 'สมัครสมาชิกและเข้าสู่ระบบสำเร็จ!');
-            }
+            DB::commit();
+            
+            Log::info('✅ Transaction committed');
 
-            return redirect()->route('login')
-                ->with('success', 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ')
-                ->with('email', $user->email);
+            // Auto login
+            Auth::login($user);
+            
+            Log::info('✅ User logged in');
+            Log::info('=== REGISTRATION COMPLETED ===');
 
+            return redirect()->route('home')
+                ->with('success', 'สมัครสมาชิกและเข้าสู่ระบบสำเร็จ!');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('❌ VALIDATION FAILED', [
+                'errors' => $e->errors(),
+            ]);
+            throw $e;
+            
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('User registration failed', [
-                'error' => $e->getMessage(),
-                'email' => $request->email,
+
+            Log::error('❌ REGISTRATION ERROR', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'email' => $request->email ?? 'unknown',
             ]);
 
             return back()
                 ->withInput($request->except('password', 'password_confirmation'))
-                ->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+                ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
         }
     }
 
@@ -80,17 +91,10 @@ class RegisterController extends Controller
     private function validateRegistration(Request $request): array
     {
         return $request->validate([
-            // Required fields
+            'prefix' => ['required', 'string', 'in:นาย,นาง,นางสาว'],
             'firstname' => ['required', 'string', 'max:100', 'regex:/^[\p{Thai}a-zA-Z\s]+$/u'],
             'lastname' => ['required', 'string', 'max:100', 'regex:/^[\p{Thai}a-zA-Z\s]+$/u'],
-            'email' => [
-                'required',
-                'string',
-                'email:rfc,dns',
-                'max:255',
-                'unique:users,email',
-                'indisposable', // ป้องกัน temporary email (ต้องติดตั้ง package)
-            ],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
             'password' => [
                 'required',
                 'string',
@@ -101,29 +105,17 @@ class RegisterController extends Controller
                     ->symbols()
                     ->uncompromised(),
             ],
-
-            // Optional fields
-            'username' => [
-                'nullable',
-                'string',
-                'max:50',
-                'unique:users,username',
-                'alpha_dash',
-                'regex:/^[a-zA-Z0-9_-]+$/',
-            ],
-            'phone' => ['nullable', 'string', 'regex:/^[0-9]{9,10}$/', 'unique:users,phone'],
-            
-            // Address fields
-            'address' => ['nullable', 'string', 'max:500'],
-            'subdistrict' => ['nullable', 'string', 'max:100'],
-            'district' => ['nullable', 'string', 'max:100'],
-            'province' => ['nullable', 'string', 'max:100'],
-            'zipcode' => ['nullable', 'string', 'regex:/^[0-9]{5}$/'],
-
-            // Terms acceptance
-            'terms' => ['accepted'],
+            'username' => ['required', 'string', 'max:50', 'unique:users,username', 'alpha_dash'],
+            'phone' => ['required', 'string', 'regex:/^0[0-9]{9}$/', 'unique:users,phone'],
+            'address' => ['required', 'string', 'max:500'],
+            'subdistrict' => ['required', 'string', 'max:100'],
+            'district' => ['required', 'string', 'max:100'],
+            'province' => ['required', 'string', 'max:100'],
+            'zipcode' => ['required', 'string', 'regex:/^[0-9]{5}$/'],
+            'terms' => ['required', 'accepted'],
         ], [
-            // Custom error messages
+            'prefix.required' => 'กรุณาเลือกคำนำหน้า',
+            'prefix.in' => 'คำนำหน้าไม่ถูกต้อง',
             'firstname.required' => 'กรุณากรอกชื่อ',
             'firstname.regex' => 'ชื่อต้องเป็นภาษาไทยหรืออังกฤษเท่านั้น',
             'lastname.required' => 'กรุณากรอกนามสกุล',
@@ -133,11 +125,20 @@ class RegisterController extends Controller
             'email.unique' => 'อีเมลนี้ถูกใช้งานแล้ว',
             'password.required' => 'กรุณากรอกรหัสผ่าน',
             'password.confirmed' => 'รหัสผ่านไม่ตรงกัน',
+            'password.min' => 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร',
+            'username.required' => 'กรุณากรอกชื่อผู้ใช้',
             'username.unique' => 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว',
             'username.alpha_dash' => 'ชื่อผู้ใช้ต้องเป็นตัวอักษร ตัวเลข - หรือ _ เท่านั้น',
-            'phone.regex' => 'เบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 9-10 หลัก)',
+            'phone.required' => 'กรุณากรอกเบอร์โทรศัพท์',
+            'phone.regex' => 'เบอร์โทรศัพท์ไม่ถูกต้อง (ต้องขึ้นต้นด้วย 0 และมี 10 หลัก)',
             'phone.unique' => 'เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว',
+            'address.required' => 'กรุณากรอกที่อยู่',
+            'subdistrict.required' => 'กรุณาเลือกตำบล',
+            'district.required' => 'กรุณาเลือกอำเภอ',
+            'province.required' => 'กรุณาเลือกจังหวัด',
+            'zipcode.required' => 'กรุณากรอกรหัสไปรษณีย์',
             'zipcode.regex' => 'รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก',
+            'terms.required' => 'กรุณายอมรับข้อตกลงและเงื่อนไข',
             'terms.accepted' => 'กรุณายอมรับข้อตกลงและเงื่อนไข',
         ]);
     }
@@ -147,53 +148,27 @@ class RegisterController extends Controller
      */
     private function createUser(array $validated): User
     {
-        // Generate username if not provided
-        if (empty($validated['username'])) {
-            $validated['username'] = $this->generateUsername($validated['email']);
-        }
-
-        // Sanitize input
         $validated['firstname'] = $this->sanitizeName($validated['firstname']);
         $validated['lastname'] = $this->sanitizeName($validated['lastname']);
 
         return User::create([
             'username' => $validated['username'],
+            'prefix' => $validated['prefix'],
             'firstname' => $validated['firstname'],
             'lastname' => $validated['lastname'],
-            'email' => strtolower($validated['email']),
+            'email' => strtolower(trim($validated['email'])),
             'password' => Hash::make($validated['password']),
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
-            'subdistrict' => $validated['subdistrict'] ?? null,
-            'district' => $validated['district'] ?? null,
-            'province' => $validated['province'] ?? null,
-            'zipcode' => $validated['zipcode'] ?? null,
-            'role' => 'customer', // default role
-            'status' => 'active',
-            'email_verified_at' => null, // Require email verification
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'subdistrict' => $validated['subdistrict'],
+            'district' => $validated['district'],
+            'province' => $validated['province'],
+            'zipcode' => $validated['zipcode'],
         ]);
     }
 
     /**
-     * Generate unique username from email
-     */
-    private function generateUsername(string $email): string
-    {
-        $base = explode('@', $email)[0];
-        $base = preg_replace('/[^a-zA-Z0-9_]/', '', $base);
-        $username = $base;
-        $counter = 1;
-
-        while (User::where('username', $username)->exists()) {
-            $username = $base . $counter;
-            $counter++;
-        }
-
-        return $username;
-    }
-
-    /**
-     * Sanitize name input
+     * Sanitize name
      */
     private function sanitizeName(string $name): string
     {
@@ -201,43 +176,34 @@ class RegisterController extends Controller
     }
 
     /**
-     * Send welcome email (optional)
-     */
-    private function sendWelcomeEmail(User $user): void
-    {
-        // Implement email sending logic
-        // Mail::to($user->email)->send(new WelcomeEmail($user));
-    }
-
-    /**
-     * Check if username is available (AJAX endpoint)
+     * AJAX check username availability
      */
     public function checkUsername(Request $request)
     {
+        $request->validate(['username' => 'required|string|max:50']);
+        
         $username = $request->input('username');
+        $available = !User::where('username', $username)->exists();
         
-        if (empty($username)) {
-            return response()->json(['available' => false]);
-        }
-
-        $exists = User::where('username', $username)->exists();
-        
-        return response()->json(['available' => !$exists]);
+        return response()->json([
+            'available' => $available,
+            'message' => $available ? 'ชื่อผู้ใช้นี้สามารถใช้งานได้' : 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว'
+        ]);
     }
 
     /**
-     * Check if email is available (AJAX endpoint)
+     * AJAX check email availability
      */
     public function checkEmail(Request $request)
     {
+        $request->validate(['email' => 'required|email']);
+        
         $email = $request->input('email');
+        $available = !User::where('email', strtolower($email))->exists();
         
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json(['available' => false]);
-        }
-
-        $exists = User::where('email', $email)->exists();
-        
-        return response()->json(['available' => !$exists]);
+        return response()->json([
+            'available' => $available,
+            'message' => $available ? 'อีเมลนี้สามารถใช้งานได้' : 'อีเมลนี้ถูกใช้งานแล้ว'
+        ]);
     }
 }

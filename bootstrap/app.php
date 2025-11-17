@@ -11,10 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // ลงทะเบียน middleware aliases
+        // ✅ ลงทะเบียน middleware alias
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'customer' => \App\Http\Middleware\CustomerMiddleware::class,
+            'role' => \App\Http\Middleware\RolesMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -5,267 +5,323 @@
 @section('content')
 <div class="bg-gradient-register py-5">
     <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Card Header -->
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h3 class="mb-0">
-                        <i class="bi bi-person-plus-fill me-2"></i>สมัครสมาชิก
-                    </h3>
-                    <p class="mb-0 mt-2">กรอกข้อมูลเพื่อสมัครสมาชิกกับเรา</p>
-                </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Card Header -->
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h3 class="mb-0">
+                            <i class="bi bi-person-plus-fill me-2"></i>สมัครสมาชิก
+                        </h3>
+                        <p class="mb-0 mt-2">กรอกข้อมูลเพื่อสมัครสมาชิกกับเรา</p>
+                    </div>
 
-                <div class="card-body p-4">
-                    <form action="{{ route('register.store') }}" method="POST">
-                        @csrf
-
-                        <!-- ข้อมูลบัญชี -->
-                        <div class="mb-4">
-                            <h5 class="section-title">
-                                <i class="bi bi-shield-lock text-primary me-2"></i>ข้อมูลบัญชี
-                            </h5>
-                            <hr>
-                        </div>
-
-                        <!-- ชื่อผู้ใช้ -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                ชื่อผู้ใช้ <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" 
-                                   class="form-control @error('username') is-invalid @enderror" 
-                                   name="username" 
-                                   value="{{ old('username') }}" 
-                                   placeholder="ชื่อผู้ใช้สำหรับเข้าสู่ระบบ"
-                                   required>
-                            @error('username')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- อีเมล -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                อีเมล <span class="text-danger">*</span>
-                            </label>
-                            <input type="email" 
-                                   class="form-control @error('email') is-invalid @enderror" 
-                                   name="email" 
-                                   value="{{ old('email') }}" 
-                                   placeholder="example@email.com"
-                                   required>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- รหัสผ่าน -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    รหัสผ่าน <span class="text-danger">*</span>
-                                </label>
-                                <input type="password" 
-                                       class="form-control @error('password') is-invalid @enderror" 
-                                       name="password" 
-                                       placeholder="อย่างน้อย 6 ตัวอักษร"
-                                       required>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    <div class="card-body p-4">
+                        <!-- แสดง Error Message -->
+                        @if($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <strong>พบข้อผิดพลาด!</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    ยืนยันรหัสผ่าน <span class="text-danger">*</span>
-                                </label>
-                                <input type="password" 
-                                       class="form-control" 
-                                       name="password_confirmation" 
-                                       placeholder="กรอกรหัสผ่านอีกครั้ง"
-                                       required>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        </div>
+                        @endif
 
-                        <!-- ข้อมูลส่วนตัว -->
-                        <div class="mb-4 mt-4">
-                            <h5 class="section-title">
-                                <i class="bi bi-person text-orange me-2"></i>ข้อมูลส่วนตัว
-                            </h5>
-                            <hr>
-                        </div>
+                        <form action="{{ route('register.store') }}" method="POST" id="registerForm">
+                            @csrf
 
-                        <!-- คำนำหน้า -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                คำนำหน้าชื่อ <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select @error('prefix') is-invalid @enderror" 
-                                    name="prefix" 
-                                    required>
-                                <option value="">-- เลือกคำนำหน้า --</option>
-                                <option value="นาย" {{ old('prefix') == 'นาย' ? 'selected' : '' }}>นาย</option>
-                                <option value="นาง" {{ old('prefix') == 'นาง' ? 'selected' : '' }}>นาง</option>
-                                <option value="นางสาว" {{ old('prefix') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
-                            </select>
-                            @error('prefix')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                            <!-- ข้อมูลบัญชี -->
+                            <div class="mb-4">
+                                <h5 class="section-title">
+                                    <i class="bi bi-shield-lock text-primary me-2"></i>ข้อมูลบัญชี
+                                </h5>
+                                <hr>
+                            </div>
 
-                        <!-- ชื่อ-นามสกุล -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <!-- ชื่อผู้ใช้ -->
+                            <div class="mb-3">
                                 <label class="form-label">
-                                    ชื่อ <span class="text-danger">*</span>
+                                    ชื่อผู้ใช้ <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" 
-                                       class="form-control @error('firstname') is-invalid @enderror" 
-                                       name="firstname" 
-                                       value="{{ old('firstname') }}" 
-                                       placeholder="ชื่อจริง"
+                                       class="form-control @error('username') is-invalid @enderror" 
+                                       name="username" 
+                                       value="{{ old('username') }}" 
+                                       placeholder="ชื่อผู้ใช้สำหรับเข้าสู่ระบบ (ภาษาอังกฤษและตัวเลข)"
                                        required>
-                                @error('firstname')
+                                <small class="text-muted">ตัวอักษรภาษาอังกฤษ ตัวเลข - หรือ _ เท่านั้น</small>
+                                @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
+
+                            <!-- อีเมล -->
+                            <div class="mb-3">
                                 <label class="form-label">
-                                    นามสกุล <span class="text-danger">*</span>
+                                    อีเมล <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" 
-                                       class="form-control @error('lastname') is-invalid @enderror" 
-                                       name="lastname" 
-                                       value="{{ old('lastname') }}" 
-                                       placeholder="นามสกุล"
+                                <input type="email" 
+                                       class="form-control @error('email') is-invalid @enderror" 
+                                       name="email" 
+                                       value="{{ old('email') }}" 
+                                       placeholder="example@email.com"
                                        required>
-                                @error('lastname')
+                                @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <!-- เบอร์โทรศัพท์ -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                เบอร์โทรศัพท์ <span class="text-danger">*</span>
-                            </label>
-                            <input type="tel" 
-                                   class="form-control @error('phone') is-invalid @enderror" 
-                                   name="phone" 
-                                   value="{{ old('phone') }}" 
-                                   placeholder="0812345678"
-                                   pattern="[0-9]{10}"
-                                   maxlength="10"
-                                   required>
-                            <small class="text-muted">กรอกเบอร์โทร 10 หลัก</small>
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                            <!-- รหัสผ่าน -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        รหัสผ่าน <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" 
+                                           class="form-control @error('password') is-invalid @enderror" 
+                                           name="password" 
+                                           placeholder="อย่างน้อย 8 ตัวอักษร"
+                                           required>
+                                    <small class="text-muted">ต้องมีตัวพิมพ์ใหญ่ พิมพ์เล็ก ตัวเลข และอักขระพิเศษ</small>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        ยืนยันรหัสผ่าน <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           name="password_confirmation" 
+                                           placeholder="กรอกรหัสผ่านอีกครั้ง"
+                                           required>
+                                </div>
+                            </div>
 
-                        <!-- ที่อยู่ -->
-                        <div class="mb-4 mt-4">
-                            <h5 class="section-title">
-                                <i class="bi bi-geo-alt text-orange me-2"></i>ที่อยู่
-                            </h5>
-                            <hr>
-                        </div>
+                            <!-- ข้อมูลส่วนตัว -->
+                            <div class="mb-4 mt-4">
+                                <h5 class="section-title">
+                                    <i class="bi bi-person text-orange me-2"></i>ข้อมูลส่วนตัว
+                                </h5>
+                                <hr>
+                            </div>
 
-                        <!-- ที่อยู่เต็ม -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                ที่อยู่ <span class="text-danger">*</span>
-                            </label>
-                            <textarea class="form-control @error('address') is-invalid @enderror" 
-                                      name="address" 
-                                      rows="3"
-                                      placeholder="บ้านเลขที่ หมู่ที่ ซอย ถนน"
-                                      required>{{ old('address') }}</textarea>
-                            @error('address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <!-- คำนำหน้า -->
+                            <div class="mb-3">
                                 <label class="form-label">
-                                    จังหวัด <span class="text-danger">*</span>
+                                    คำนำหน้าชื่อ <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select @error('province') is-invalid @enderror" 
-                                        id="province" 
-                                        name="province" 
+                                <select class="form-select @error('prefix') is-invalid @enderror" 
+                                        name="prefix" 
                                         required>
-                                    <option value="">-- เลือกจังหวัด --</option>
+                                    <option value="">-- เลือกคำนำหน้า --</option>
+                                    <option value="นาย" {{ old('prefix') == 'นาย' ? 'selected' : '' }}>นาย</option>
+                                    <option value="นาง" {{ old('prefix') == 'นาง' ? 'selected' : '' }}>นาง</option>
+                                    <option value="นางสาว" {{ old('prefix') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
                                 </select>
-                                @error('province')
+                                @error('prefix')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    อำเภอ <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-select @error('district') is-invalid @enderror" 
-                                        id="amphur" 
-                                        name="district" 
-                                        required>
-                                    <option value="">-- เลือกอำเภอ --</option>
-                                </select>
-                                @error('district')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <!-- ชื่อ-นามสกุล -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        ชื่อ <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control @error('firstname') is-invalid @enderror" 
+                                           name="firstname" 
+                                           value="{{ old('firstname') }}" 
+                                           placeholder="ชื่อจริง"
+                                           required>
+                                    @error('firstname')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        นามสกุล <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control @error('lastname') is-invalid @enderror" 
+                                           name="lastname" 
+                                           value="{{ old('lastname') }}" 
+                                           placeholder="นามสกุล"
+                                           required>
+                                    @error('lastname')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <!-- เบอร์โทรศัพท์ -->
+                            <div class="mb-3">
                                 <label class="form-label">
-                                    ตำบล <span class="text-danger">*</span>
+                                    เบอร์โทรศัพท์ <span class="text-danger">*</span>
                                 </label>
-                                <select class="form-select @error('subdistrict') is-invalid @enderror" 
-                                        id="district" 
-                                        name="subdistrict" 
-                                        required>
-                                    <option value="">-- เลือกตำบล --</option>
-                                </select>
-                                @error('subdistrict')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    รหัสไปรษณีย์ <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control @error('zipcode') is-invalid @enderror" 
-                                       id="postal_code" 
-                                       name="zipcode" 
-                                       value="{{ old('zipcode') }}" 
-                                       placeholder="รหัสไปรษณีย์ 5 หลัก"
-                                       pattern="[0-9]{5}"
-                                       maxlength="5"
-                                       readonly
+                                <input type="tel" 
+                                       class="form-control @error('phone') is-invalid @enderror" 
+                                       name="phone" 
+                                       value="{{ old('phone') }}" 
+                                       placeholder="0812345678"
+                                       pattern="0[0-9]{9}"
+                                       maxlength="10"
                                        required>
-                                @error('zipcode')
+                                <small class="text-muted">กรอกเบอร์โทร 10 หลัก (ขึ้นต้นด้วย 0)</small>
+                                @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <!-- ปุ่มส่งฟอร์ม -->
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-check-circle me-2"></i>สมัครสมาชิก
-                            </button>
-                            <a href="{{ route('login') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
-                            </a>
-                        </div>
-                    </form>
+                            <!-- ที่อยู่ -->
+                            <div class="mb-4 mt-4">
+                                <h5 class="section-title">
+                                    <i class="bi bi-geo-alt text-orange me-2"></i>ที่อยู่
+                                </h5>
+                                <hr>
+                            </div>
+
+                            <!-- ที่อยู่เต็ม -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    ที่อยู่ <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control @error('address') is-invalid @enderror" 
+                                          name="address" 
+                                          rows="3"
+                                          placeholder="บ้านเลขที่ หมู่ที่ ซอย ถนน"
+                                          required>{{ old('address') }}</textarea>
+                                @error('address')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        จังหวัด <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select @error('province') is-invalid @enderror" 
+                                            id="province" 
+                                            name="province" 
+                                            required>
+                                        <option value="">-- เลือกจังหวัด --</option>
+                                    </select>
+                                    @error('province')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        อำเภอ <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select @error('district') is-invalid @enderror" 
+                                            id="amphur" 
+                                            name="district" 
+                                            required
+                                            disabled>
+                                        <option value="">-- เลือกอำเภอ --</option>
+                                    </select>
+                                    @error('district')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        ตำบล <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select @error('subdistrict') is-invalid @enderror" 
+                                            id="district" 
+                                            name="subdistrict" 
+                                            required
+                                            disabled>
+                                        <option value="">-- เลือกตำบล --</option>
+                                    </select>
+                                    @error('subdistrict')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        รหัสไปรษณีย์ <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control @error('zipcode') is-invalid @enderror" 
+                                           id="postal_code" 
+                                           name="zipcode" 
+                                           value="{{ old('zipcode') }}" 
+                                           placeholder="รหัสไปรษณีย์ 5 หลัก"
+                                           pattern="[0-9]{5}"
+                                           maxlength="5"
+                                           readonly
+                                           required>
+                                    @error('zipcode')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- ยอมรับข้อตกลงและเงื่อนไข -->
+                            <div class="mb-4 mt-4">
+                                <div class="form-check p-3 bg-light rounded border">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-check-input @error('terms') is-invalid @enderror" 
+                                        id="terms" 
+                                        name="terms" 
+                                        value="1"
+                                        {{ old('terms') ? 'checked' : '' }}
+                                        required
+                                    >
+                                    <label class="form-check-label" for="terms">
+                                        ฉันยอมรับ 
+                                        <a href="{{ route('pages.terms') }}" target="_blank" class="text-decoration-none fw-semibold">
+                                            <i class="bi bi-file-text"></i> ข้อตกลงและเงื่อนไข
+                                        </a> 
+                                        และ 
+                                        <a href="{{ route('pages.privacy') }}" target="_blank" class="text-decoration-none fw-semibold">
+                                            <i class="bi bi-shield-check"></i> นโยบายความเป็นส่วนตัว
+                                        </a>
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    @error('terms')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- ปุ่มส่งฟอร์ม -->
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle me-2"></i>สมัครสมาชิก
+                                </button>
+                                <a href="{{ route('login') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -371,6 +427,46 @@ body {
     background-color: #fff;
 }
 
+/* Checkbox Styling */
+.form-check {
+    padding: 1rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.15rem;
+    cursor: pointer;
+    border: 2px solid #dee2e6;
+}
+
+.form-check-input:checked {
+    background-color: var(--orange-primary);
+    border-color: var(--orange-primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--orange-primary);
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--black-secondary);
+    margin-left: 0.5rem;
+}
+
+.form-check-label a {
+    color: var(--orange-primary) !important;
+    font-weight: 600;
+}
+
+.form-check-label a:hover {
+    color: var(--orange-dark) !important;
+    text-decoration: underline !important;
+}
+
 .btn-primary {
     background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
     border: none;
@@ -378,6 +474,7 @@ body {
     font-weight: 600;
     color: #ffffff;
     border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -417,6 +514,7 @@ small.text-muted {
 
 .invalid-feedback {
     color: var(--orange-dark);
+    font-size: 0.875rem;
 }
 
 .is-invalid {
@@ -426,13 +524,24 @@ small.text-muted {
 .shadow-lg {
     box-shadow: 0 25px 50px -12px rgba(255, 107, 53, 0.3) !important;
 }
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-danger {
+    background-color: #fee;
+    color: var(--orange-dark);
+    border-left: 4px solid var(--orange-dark);
+}
 </style>
 @endsection
 
 @section('scripts')
 <script>
 $(document).ready(function () {
-    console.log("เริ่มโหลดข้อมูลประเทศไทย...");
+    console.log("🚀 เริ่มโหลดข้อมูลที่อยู่...");
 
     Promise.all([
         $.getJSON("/json/src/provinces.json"),
@@ -454,45 +563,43 @@ $(document).ready(function () {
         // โหลดจังหวัด
         $province.empty().append('<option value="">-- เลือกจังหวัด --</option>');
         provinces.forEach(p => {
-            $province.append(`<option value="${p.provinceCode}">${p.provinceNameTh}</option>`);
+            $province.append(`<option value="${p.provinceNameTh}" data-code="${p.provinceCode}">${p.provinceNameTh}</option>`);
         });
 
         // เลือกจังหวัด
         $province.on('change', function () {
-            const provinceCode = $(this).val();
+            const provinceCode = $(this).find(':selected').data('code');
 
-            $amphur.html('<option value="">-- เลือกอำเภอ --</option>').prop('disabled', true);
+            $amphur.html('<option value="">-- เลือกอำเภอ --</option>').prop('disabled', !provinceCode);
             $district.html('<option value="">-- เลือกตำบล --</option>').prop('disabled', true);
             $postal.val('');
 
             if (provinceCode) {
                 const filteredAmphur = districts.filter(d => d.provinceCode == provinceCode);
                 filteredAmphur.forEach(a => {
-                    $amphur.append(`<option value="${a.districtCode}">${a.districtNameTh}</option>`);
+                    $amphur.append(`<option value="${a.districtNameTh}" data-code="${a.districtCode}">${a.districtNameTh}</option>`);
                 });
-                $amphur.prop('disabled', false);
             }
         });
 
         // เลือกอำเภอ
         $amphur.on('change', function () {
-            const districtCode = $(this).val();
+            const districtCode = $(this).find(':selected').data('code');
 
-            $district.html('<option value="">-- เลือกตำบล --</option>').prop('disabled', true);
+            $district.html('<option value="">-- เลือกตำบล --</option>').prop('disabled', !districtCode);
             $postal.val('');
 
             if (districtCode) {
                 const filteredSub = subdistricts.filter(s => s.districtCode == districtCode);
                 filteredSub.forEach(s => {
                     $district.append(
-                        `<option value="${s.subdistrictCode}" data-postal="${s.postalCode}">${s.subdistrictNameTh}</option>`
+                        `<option value="${s.subdistrictNameTh}" data-postal="${s.postalCode}">${s.subdistrictNameTh}</option>`
                     );
                 });
-                $district.prop('disabled', false);
             }
         });
 
-        // เลือกตำบล
+        // เลือกตำบล - อัพเดทรหัสไปรษณีย์
         $district.on('change', function () {
             const postal = $(this).find(':selected').data('postal');
             $postal.val(postal || '');
@@ -501,6 +608,20 @@ $(document).ready(function () {
     .catch(err => {
         console.error("❌ โหลดข้อมูลไม่สำเร็จ:", err);
         alert("ไม่สามารถโหลดข้อมูลจังหวัดได้ กรุณารีเฟรชหน้าใหม่");
+    });
+
+    // Form validation
+    $('#registerForm').on('submit', function(e) {
+        const termsChecked = $('#terms').is(':checked');
+        
+        if (!termsChecked) {
+            e.preventDefault();
+            alert('กรุณายอมรับข้อตกลงและเงื่อนไขก่อนสมัครสมาชิก');
+            $('#terms').focus();
+            return false;
+        }
+
+        console.log("✅ ส่งฟอร์มสมัครสมาชิก");
     });
 });
 </script>
