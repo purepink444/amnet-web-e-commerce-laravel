@@ -10,13 +10,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // บอก Laravel ว่า primary key คือ user_id
     protected $primaryKey = 'user_id';
-
-    // ถ้าใช้ sequence/auto-increment
     public $incrementing = true;
-
-    // ถ้า primary key เป็น integer (BIGINT)
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -69,9 +64,15 @@ class User extends Authenticatable
 
     /**
      * Get the role of the user.
+     * ระบุ foreign key และ owner key ให้ชัดเจน
      */
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        // ตรวจสอบว่าตาราง roles ใช้ primary key ชื่ออะไร
+        // ถ้าใช้ role_id ให้เปลี่ยนเป็น
+        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+        
+        // ถ้าใช้ id ให้ใช้
+        // return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }
