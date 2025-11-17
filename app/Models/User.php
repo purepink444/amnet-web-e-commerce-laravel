@@ -42,4 +42,36 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Override getAuthIdentifierName เพื่อบอก Laravel ว่าใช้ user_id แทน id
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
+
+    /**
+     * Get the orders for the user.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the wishlist items for the user.
+     */
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the role of the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
 }

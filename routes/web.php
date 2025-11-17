@@ -8,7 +8,12 @@ use App\Http\Controllers\{
     ClientProductController,
     DashboardController,
 };
-use App\Http\Controllers\Account\ProfileController;
+use App\Http\Controllers\Account\{
+    ProfileController,
+    OrderController,
+    WishlistController,
+    SettingsController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -114,17 +119,22 @@ Route::middleware('auth')->group(function () {
     | Customer Routes (Profile + Account Pages)
     |----------------------------------------------------------------------
     */
-    // ปิด middleware 'customer' ชั่วคราวเพื่อดูหน้าโปรไฟล์
     Route::prefix('account')->name('account.')->group(function () {
-    // Route::middleware('customer')->prefix('account')->name('account.')->group(function () {
         // Profile
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-        // Orders, Wishlist, Settings
-        Route::view('/orders', 'account.orders')->name('orders');
-        Route::view('/wishlist', 'account.wishlist')->name('wishlist');
-        Route::view('/settings', 'account.settings')->name('settings');
+        // Orders - ใช้ Controller แทน Route::view()
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+        Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
+        // Wishlist - ใช้ Controller แทน Route::view()
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+        Route::post('/wishlist/{productId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+        // Settings - ใช้ Controller แทน Route::view()
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+        Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
     });
 });
 
