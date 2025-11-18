@@ -1,0 +1,227 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+// ✅ Use Statements ที่แก้แล้ว - จัดกลุ่มตาม Namespace
+use App\Http\Controllers\{
+    RegisterController,
+    LoginController,
+    DashboardController,
+};
+
+use App\Http\Controllers\Admin\{
+    AdminProductController,
+    AdminOrderController,
+    AdminUserController,
+    AdminReportController,
+    AdminCategoryController,
+    AdminBrandController,
+};
+
+use App\Http\Controllers\Client\{
+    ClientProductController,
+    CartController,
+    CheckoutController,
+    ReviewController,
+};
+
+use App\Http\Controllers\Account\{
+    ProfileController,
+    OrderController,
+    WishlistController,
+    SettingsController,
+};
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', fn() => view('home'))->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Guest Routes (ผู้ที่ยังไม่ได้ Login)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('guest')->group(function () {
+    // Authentication
+    Route::controller(LoginController::class)->group(function () {
+        Route::get('/login', 'showLoginForm')->name('login');
+        Route::post('/login', 'login')->name('login.post');
+    });
+    
+    // Registration
+    Route::controller(RegisterController::class)->group(function () {
+        Route::get('/register', 'create')->name('register');
+        Route::post('/register', 'store')->name('register.store');
+        Route::post('/check-username', 'checkUsername')->name('check.username');
+        Route::post('/check-email', 'checkEmail')->name('check.email');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Client Routes (ไม่ต้อง Login ก็เข้าได้)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('product')->name('client.products.')->group(function () {
+    Route::get('/', [ClientProductController::class, 'index'])->name('index');
+    Route::get('/search', [ClientProductController::class, 'quickSearch'])->name('search');
+    Route::get('/{id}', [ClientProductController::class, 'show'])->name('show');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Static Pages (ไม่ต้อง Login ก็เข้าได้)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('pages')->name('pages.')->group(function () {
+    Route::view('/payment', 'pages.payment')->name('payment');
+    Route::view('/contact', 'pages.contact')->name('contact');
+    Route::view('/news', 'pages.news')->name('news');
+    Route::view('/about', 'pages.about')->name('about');
+    Route::view('/terms', 'pages.terms')->name('terms');
+    Route::view('/privacy', 'pages.privacy')->name('privacy');
+});
+
+// Legacy redirects
+Route::permanentRedirect('/payment', '/pages/payment');
+Route::permanentRedirect('/contact', '/pages/contact');
+Route::permanentRedirect('/news', '/pages/news');
+Route::permanentRedirect('/profile', '/account/profile');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes (ต้อง Login ก่อน)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+    // Logout (ทุกคนใช้ได้)
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    /*
+    |----------------------------------------------------------------------
+    | 🔴 Admin Routes (เฉพาะ Admin เท่านั้น)
+    |----------------------------------------------------------------------
+    */
+    Route::middleware(\App\Http\Middleware\RolesMiddleware::class . ':admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            
+            // Dashboard
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+            // 📦 Product Management
+            Route::resource('products', AdminProductController::class);
+
+            // 🚚 Order Management
+            Route::prefix('orders')->name('orders.')->group(function () {
+                Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+                Route::get('/{id}', [AdminOrderController::class, 'show'])->name('show');
+                Route::patch('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('update-status');
+            });
+
+            // 👥 User Management
+            Route::resource('users', AdminUserController::class);
+
+            // 🏷️ Category Management
+            Route::resource('categories', AdminCategoryController::class);
+
+            // 🔖 Brand Management
+            Route::resource('brands', AdminBrandController::class);
+
+            // 📊 Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [AdminReportController::class, 'index'])->name('index');
+                Route::get('/sales', [AdminReportController::class, 'sales'])->name('sales');
+                Route::get('/products', [AdminReportController::class, 'products'])->name('products');
+                Route::get('/customers', [AdminReportController::class, 'customers'])->name('customers');
+            });
+        });
+
+    /*
+    |----------------------------------------------------------------------
+    | 🟢 Member/Customer Routes (Member + Admin เข้าได้)
+    |----------------------------------------------------------------------
+    */
+    Route::middleware(\App\Http\Middleware\RolesMiddleware::class . ':member,admin')
+        ->prefix('account')
+        ->name('account.')
+        ->group(function () {
+            
+            // 👤 Profile
+            Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+            Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+            // 📋 Orders
+            Route::prefix('orders')->name('orders.')->group(function () {
+                Route::get('/', [OrderController::class, 'index'])->name('index');
+                Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+                Route::delete('/{id}', [OrderController::class, 'cancel'])->name('cancel');
+            });
+
+            // ❤️ Wishlist
+            Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+            Route::post('/wishlist/{productId}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+            // ⚙️ Settings
+            Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+            Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+            // 🛒 Cart
+            Route::prefix('cart')->name('cart.')->group(function () {
+                Route::get('/', [CartController::class, 'index'])->name('index');
+                Route::post('/add/{productId}', [CartController::class, 'add'])->name('add');
+                Route::patch('/update/{itemId}', [CartController::class, 'update'])->name('update');
+                Route::delete('/remove/{itemId}', [CartController::class, 'remove'])->name('remove');
+            });
+
+            // 💳 Checkout
+            Route::prefix('checkout')->name('checkout.')->group(function () {
+                Route::get('/', [CheckoutController::class, 'index'])->name('index');
+                Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+                Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
+            });
+        });
+
+    /*
+    |----------------------------------------------------------------------
+    | 📊 Dashboard Redirect (Auto-redirect ตาม Role)
+    |----------------------------------------------------------------------
+    */
+    Route::get('/dashboard', function () {
+        $roleName = strtolower(auth()->user()->role?->role_name ?? 'member');
+        
+        return match($roleName) {
+            'admin' => redirect()->route('admin.dashboard'),
+            default => redirect()->route('account.profile')
+        };
+    })->name('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| API Routes (Optional)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/products/featured', [ClientProductController::class, 'getFeatured'])->name('products.featured');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Fallback Route (404 Page)
+|--------------------------------------------------------------------------
+*/
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
