@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\{Product, Category, Brand};
 use Illuminate\Http\{Request, JsonResponse};
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,9 +17,9 @@ class AdminProductController extends Controller
     {
         $products = Product::with(['category', 'brand'])
             ->latest()
-            ->paginate(15);
+            ->get();
 
-        return view('admin.product.adm_product', compact('products'));
+        return view('admin.products.index', compact('products'));
     }
 
     /**
@@ -26,7 +27,7 @@ class AdminProductController extends Controller
      */
     public function create()
     {
-        return view('admin.product.create', [
+        return view('admin.products.create', [
             'categories' => Category::select('category_id', 'category_name')->get(),
             'brands' => Brand::select('brand_id', 'brand_name')->get()
         ]);
@@ -88,8 +89,8 @@ class AdminProductController extends Controller
     public function edit(int $id)
     {
         $product = Product::findOrFail($id);
-        
-        return view('admin.product.edit', [
+
+        return view('admin.products.edit', [
             'product' => $product,
             'categories' => Category::select('category_id', 'category_name')->get(),
             'brands' => Brand::select('brand_id', 'brand_name')->get()

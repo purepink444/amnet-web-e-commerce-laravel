@@ -10,11 +10,21 @@
         <div class="row align-items-center min-vh-75">
             <div class="col-lg-6 hero-content">
                 <h1 class="display-3 fw-bold text-white mb-4 animate-fade-in">
-                    ยินดีต้อนรับสู่
-                    <span class="text-orange"></span>
+                    ยินดีต้อนรับ
+                    <span class="text-orange">
+                        @auth
+                            {{ auth()->user()->username }}
+                        @else
+                            Amnet Web
+                        @endauth
+                    </span>
                 </h1>
                 <p class="lead text-white mb-4 animate-fade-in-delay">
-                    เราพร้อมให้บริการที่ดีที่สุดเพื่อตอบสนองทุกความต้องการของคุณ
+                    @auth
+                        ยินดีต้อนรับกลับ! เลือกสินค้าที่คุณต้องการ
+                    @else
+                        เราพร้อมให้บริการที่ดีที่สุดเพื่อตอบสนองทุกความต้องการของคุณ
+                    @endauth
                 </p>
                 <div class="d-flex gap-3 animate-fade-in-delay-2">
                     <a href="/product" class="btn btn-orange btn-lg px-4">
@@ -159,6 +169,7 @@
     --orange-dark: #e85d2a;
     --black-primary: #1a1a1a;
     --black-secondary: #2d2d2d;
+    --gray-light: #f8f9fa;
 }
 
 /* Hero Section */

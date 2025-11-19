@@ -12,14 +12,22 @@ class User extends Authenticatable
 
     protected $primaryKey = 'user_id';
 
+    protected $with = ['role'];
+
     protected $fillable = [
         'username',
         'email',
         'password',
         'role_id',
-        'full_name',
+        'prefix',
+        'firstname',
+        'lastname',
         'phone',
         'address',
+        'province',
+        'district',
+        'subdistrict',
+        'zipcode',
     ];
 
     protected $hidden = [
@@ -42,11 +50,16 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return strtolower($this->role?->role_name ?? '' === 'admin';
+        return strtolower($this->role?->role_name ?? '') === 'admin';
     }
 
     public function isMember(): bool
     {
-        return strtolower($this->role?->role_name ?? '' === 'member';
+        return strtolower($this->role?->role_name ?? '') === 'member';
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
 }
