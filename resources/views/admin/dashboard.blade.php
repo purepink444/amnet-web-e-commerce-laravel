@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard')
+@section('title', '')
 
 @section('content')
 <!-- Info boxes -->
-<div class="row">
-    <div class="col-lg-3 col-6">
+<div class="row g-3">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
         <div class="small-box bg-info">
             <div class="inner">
-                <h3>{{ $stats['total_products'] }}</h3>
-                <p>สินค้าทั้งหมด</p>
+                <h3 class="mb-1">{{ $stats['total_products'] }}</h3>
+                <p class="mb-0">สินค้าทั้งหมด</p>
             </div>
             <div class="icon">
                 <i class="fas fa-box-seam"></i>
@@ -20,11 +20,11 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
         <div class="small-box bg-success">
             <div class="inner">
-                <h3>{{ $stats['total_orders'] }}</h3>
-                <p>คำสั่งซื้อ</p>
+                <h3 class="mb-1">{{ $stats['total_orders'] }}</h3>
+                <p class="mb-0">คำสั่งซื้อ</p>
             </div>
             <div class="icon">
                 <i class="fas fa-shopping-cart"></i>
@@ -35,11 +35,11 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
         <div class="small-box bg-warning">
             <div class="inner">
-                <h3>{{ $stats['total_users'] }}</h3>
-                <p>ผู้ใช้</p>
+                <h3 class="mb-1">{{ $stats['total_users'] }}</h3>
+                <p class="mb-0">ผู้ใช้</p>
             </div>
             <div class="icon">
                 <i class="fas fa-users"></i>
@@ -50,11 +50,11 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
         <div class="small-box bg-danger">
             <div class="inner">
-                <h3>฿{{ number_format($stats['total_sales'], 2) }}</h3>
-                <p>ยอดขาย</p>
+                <h3 class="mb-1">฿{{ number_format($stats['total_sales'], 2) }}</h3>
+                <p class="mb-0">ยอดขาย</p>
             </div>
             <div class="icon">
                 <i class="fas fa-money-bill-wave"></i>
@@ -67,13 +67,13 @@
 </div>
 
 <!-- Charts row -->
-<div class="row">
-    <div class="col-md-8">
+<div class="row g-3">
+    <div class="col-lg-8 col-md-7 col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">สถิติรายเดือน</h3>
+                <h3 class="card-title mb-0">สถิติรายเดือน</h3>
                 <div class="card-tools">
-                    <div class="btn-group" role="group">
+                    <div class="btn-group btn-group-sm" role="group">
                         <input type="radio" class="btn-check" name="chartType" id="combined" autocomplete="off" checked>
                         <label class="btn btn-outline-primary btn-sm" for="combined">รวม</label>
 
@@ -86,31 +86,43 @@
                 </div>
             </div>
             <div class="card-body">
-                <canvas id="combinedChart" style="max-height: 400px;"></canvas>
+                <div class="chart-container" style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="combinedChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-lg-4 col-md-5 col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">สรุปข้อมูล</h3>
+                <h3 class="card-title mb-0">สรุปข้อมูล</h3>
             </div>
             <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>คำสั่งซื้อทั้งหมด:</span>
-                    <strong>{{ $stats['total_orders'] }}</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>สินค้าทั้งหมด:</span>
-                    <strong>{{ $stats['total_products'] }}</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>ผู้ใช้ทั้งหมด:</span>
-                    <strong>{{ $stats['total_users'] }}</strong>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span>ยอดขายรวม:</span>
-                    <strong>฿{{ number_format($stats['total_sales'], 2) }}</strong>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                            <span class="fw-semibold">คำสั่งซื้อทั้งหมด:</span>
+                            <strong class="text-primary">{{ $stats['total_orders'] }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                            <span class="fw-semibold">สินค้าทั้งหมด:</span>
+                            <strong class="text-success">{{ $stats['total_products'] }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                            <span class="fw-semibold">ผู้ใช้ทั้งหมด:</span>
+                            <strong class="text-info">{{ $stats['total_users'] }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-warning rounded text-white">
+                            <span class="fw-semibold">ยอดขายรวม:</span>
+                            <strong>฿{{ number_format($stats['total_sales'], 2) }}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,19 +130,146 @@
 </div>
 
 <!-- Main row -->
-<div class="row">
-    <div class="col-md-12">
+<div class="row g-3">
+    <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">ยินดีต้อนรับสู่ระบบจัดการ Admin Dashboard</h3>
+            <div class="card-header bg-gradient-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    ยินดีต้อนรับสู่ระบบจัดการ Admin Dashboard
+                </h3>
             </div>
             <div class="card-body">
-                <p>👋 สวัสดี, {{ auth()->user()->username }}!</p>
-                <p>คุณสามารถจัดการระบบต่างๆ ได้จากเมนูด้านซ้าย</p>
+                <div class="row align-items-center">
+                    <div class="col-md-8 col-12">
+                        <h4 class="mb-2">👋 สวัสดี, {{ auth()->user()->username }}!</h4>
+                        <p class="mb-0 text-muted">คุณสามารถจัดการระบบต่างๆ ได้จากเมนูด้านซ้าย รวมถึงจัดการสินค้า คำสั่งซื้อ ผู้ใช้ และดูรายงานต่างๆ</p>
+                    </div>
+                    <div class="col-md-4 col-12 text-md-end text-center mt-3 mt-md-0">
+                        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-box-seam me-1"></i>จัดการสินค้า
+                            </a>
+                            <a href="{{ route('admin.orders.index') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-shopping-cart me-1"></i>จัดการคำสั่งซื้อ
+                            </a>
+                            <a href="{{ route('admin.reports.index') }}" class="btn btn-info btn-sm">
+                                <i class="fas fa-chart-line me-1"></i>ดูรายงาน
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+<style>
+/* Admin Dashboard Responsive Improvements */
+@media (max-width: 768px) {
+    .small-box .inner h3 {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    .small-box .inner p {
+        font-size: 0.85rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    .card-header h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    .chart-container {
+        height: 250px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .small-box {
+        margin-bottom: 1rem !important;
+    }
+
+    .card-body .row .col-12 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .d-flex.flex-column.flex-md-row.gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .btn-group-sm {
+        flex-wrap: wrap;
+    }
+
+    .chart-container {
+        height: 200px !important;
+    }
+}
+
+/* Enhanced card styling */
+.card {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08) !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+    transform: translateY(-1px);
+}
+
+/* Small box improvements */
+.small-box {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease !important;
+}
+
+.small-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+
+.small-box .inner {
+    padding: 1.2rem !important;
+}
+
+.small-box .icon {
+    font-size: 3rem !important;
+    opacity: 0.8;
+}
+
+/* Stats summary improvements */
+.bg-light.rounded {
+    transition: all 0.3s ease;
+}
+
+.bg-light.rounded:hover {
+    background-color: rgba(0,0,0,0.05) !important;
+    transform: scale(1.02);
+}
+
+/* Welcome section gradient */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Chart improvements */
+.chart-container {
+    position: relative;
+    margin: auto;
+    width: 100%;
+}
+</style>
 @endsection
 
 @section('scripts')
@@ -224,8 +363,26 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                scales: scales
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: scales,
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    },
+                    line: {
+                        borderWidth: 2
+                    }
+                }
             }
         });
     }
