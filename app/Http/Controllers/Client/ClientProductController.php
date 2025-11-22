@@ -5,12 +5,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\{Product, Category, Brand};
+use App\Services\SearchService;
 use Illuminate\Support\Facades\{Cache, Log};
 
 class ClientProductController extends Controller
 {
+    protected SearchService $searchService;
+
+    public function __construct(SearchService $searchService)
+    {
+        $this->searchService = $searchService;
+    }
+
     /**
-     * Display all active products with filters and pagination
+     * Display all active products with DSA-optimized filters and pagination
      */
     public function index(Request $request): View
     {
@@ -19,42 +27,40 @@ class ClientProductController extends Controller
             ->where('status', 'active')
             ->where('stock_quantity', '>', 0);
 
-        // Search
+        // DSA-optimized search
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('product_name', 'ILIKE', "%{$search}%")
-                  ->orWhere('description', 'ILIKE', "%{$search}%");
-            });
+            $query = $this->searchService->searchProducts($query, $search, [
+                'fuzzy' => $request->boolean('fuzzy', false)
+            ]);
         }
 
-        // Filter by Category
+        // Advanced filtering with DSA principles
+        $filters = [];
         if ($categoryId = $request->input('category')) {
-            $query->where('category_id', $categoryId);
+            $filters['categories'] = [$categoryId];
         }
-
-        // Filter by Brand
         if ($brandId = $request->input('brand')) {
-            $query->where('brand_id', $brandId);
+            $filters['brands'] = [$brandId];
         }
-
-        // Price Range Filter
         if ($minPrice = $request->input('min_price')) {
-            $query->where('price', '>=', $minPrice);
+            $filters['price_min'] = $minPrice;
         }
         if ($maxPrice = $request->input('max_price')) {
-            $query->where('price', '<=', $maxPrice);
+            $filters['price_max'] = $maxPrice;
+        }
+        if ($request->boolean('in_stock')) {
+            $filters['in_stock'] = true;
         }
 
-        // Sorting
-        $sortBy = $request->input('sort', 'latest');
-        match ($sortBy) {
-            'price_low' => $query->orderBy('price', 'asc'),
-            'price_high' => $query->orderBy('price', 'desc'),
-            'name_asc' => $query->orderBy('product_name', 'asc'),
-            'name_desc' => $query->orderBy('product_name', 'desc'),
-            'popular' => $query->orderBy('product_id', 'desc'), // Temporarily use product_id instead of view_count
-            default => $query->latest(),
-        };
+        $query = $this->searchService->advancedFilter($query, $filters);
+
+        // Efficient sorting using DSA algorithms
+        $sortBy = $request->input('sort', 'newest');
+        $query = $this->searchService->efficientSort($query, $sortBy);
+
+        // Cache results for better performance
+        $cacheKey = 'products_' . md5(serialize($request->all()));
+        $products = $this->searchService->cacheSearchResults($cacheKey, $query->paginate(12)->withQueryString(), 300);
 
         $products = $query->paginate(12)->withQueryString();
 
@@ -158,22 +164,41 @@ class ClientProductController extends Controller
     }
 
     /**
-     * Quick search API endpoint (AJAX)
+     * Quick search API endpoint with Trie-based autocomplete (AJAX)
      */
     public function quickSearch(Request $request)
     {
         $query = $request->input('q');
-        
+
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $products = Product::where('status', 'active')
-            ->where('product_name', 'ILIKE', "%{$query}%")
-            ->select('product_id', 'product_name', 'price', 'image_url')
-            ->limit(5)
-            ->get();
+        // Build Trie for autocomplete if not cached
+        $cacheKey = 'autocomplete_trie';
+        $trieBuilt = Cache::get($cacheKey . '_built', false);
 
-        return response()->json($products);
+        if (!$trieBuilt) {
+            $products = Cache::remember('autocomplete_products', 3600, function () {
+                return Product::where('status', 'active')
+                    ->select('product_id', 'product_name', 'price', 'image_url')
+                    ->get();
+            });
+
+            $this->searchService->buildAutocompleteTrie($products, 'product_name');
+            Cache::put($cacheKey . '_built', true, 3600);
+        }
+
+        // Use Trie for fast autocomplete
+        $suggestions = $this->searchService->autocomplete($query, 5);
+
+        return response()->json($suggestions->map(function ($product) {
+            return [
+                'product_id' => $product->product_id,
+                'product_name' => $product->product_name,
+                'price' => $product->price,
+                'image_url' => $product->image_url,
+            ];
+        }));
     }
 }
