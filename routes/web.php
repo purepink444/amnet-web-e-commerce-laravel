@@ -12,6 +12,13 @@ require __DIR__.'/client.php';
 require __DIR__.'/account.php';
 require __DIR__.'/admin.php';
 
+// Checkout Routes (redirect to account checkout)
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', function () {
+        return redirect()->route('account.checkout.index');
+    })->name('checkout');
+});
+
 // Public Routes (Login/Register)
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

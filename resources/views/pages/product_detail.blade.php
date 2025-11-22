@@ -9,7 +9,7 @@
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('shop') }}">สินค้า</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('client.products.index') }}">สินค้า</a></li>
                 <li class="breadcrumb-item active">{{ $product->product_name }}</li>
             </ol>
         </nav>
@@ -153,15 +153,27 @@
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary btn-lg py-3 fw-semibold">
-                            <i class="bi bi-cart-plus me-2"></i>เพิ่มลงตะกร้า
-                        </button>
-                        <button class="btn btn-outline-danger btn-lg py-3 fw-semibold">
-                            <i class="bi bi-lightning-fill me-2"></i>ซื้อเลย
-                        </button>
-                        <button class="btn btn-outline-secondary">
-                            <i class="bi bi-heart me-2"></i>เพิ่มในรายการโปรด
-                        </button>
+                        @auth
+                            <button class="btn btn-primary btn-lg py-3 fw-semibold" onclick="addToCart({{ $product->product_id }})">
+                                <i class="bi bi-cart-plus me-2"></i>เพิ่มลงตะกร้า
+                            </button>
+                            <a href="{{ route('checkout.index') }}" class="btn btn-outline-danger btn-lg py-3 fw-semibold">
+                                <i class="bi bi-lightning-fill me-2"></i>ซื้อเลย
+                            </a>
+                            <button class="btn btn-outline-secondary" onclick="addToWishlist({{ $product->product_id }})">
+                                <i class="bi bi-heart me-2"></i>เพิ่มในรายการโปรด
+                            </button>
+                        @else
+                            <button class="btn btn-primary btn-lg py-3 fw-semibold" onclick="showLoginModal()">
+                                <i class="bi bi-cart-plus me-2"></i>เพิ่มลงตะกร้า
+                            </button>
+                            <button class="btn btn-outline-danger btn-lg py-3 fw-semibold" onclick="showLoginModal()">
+                                <i class="bi bi-lightning-fill me-2"></i>ซื้อเลย
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="showLoginModal()">
+                                <i class="bi bi-heart me-2"></i>เพิ่มในรายการโปรด
+                            </button>
+                        @endauth
                     </div>
 
                     <!-- Features -->
@@ -241,6 +253,67 @@ function decreaseQty() {
 
 function zoomImage() {
     alert('Zoom feature coming soon!');
+}
+
+function addToCart(productId) {
+    const quantity = document.getElementById('quantity').value;
+
+    fetch(`/account/cart/add/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update cart counter if exists
+            const cartCounter = document.getElementById('cart-counter');
+            if (cartCounter) {
+                cartCounter.textContent = data.cart_count;
+            }
+
+            // Show success message
+            showToast('เพิ่มสินค้าลงตะกร้าแล้ว!', 'success');
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
+    });
+}
+
+function addToWishlist(productId) {
+    // TODO: Implement wishlist functionality
+    showToast('ฟีเจอร์รายการโปรดกำลังพัฒนา', 'info');
+}
+
+function showLoginModal() {
+    // Redirect to login page
+    window.location.href = '{{ route("login") }}';
+}
+
+function showToast(message, type) {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    document.body.appendChild(toast);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 3000);
 }
 </script>
 @endsection

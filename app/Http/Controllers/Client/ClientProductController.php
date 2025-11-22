@@ -52,7 +52,7 @@ class ClientProductController extends Controller
             'price_high' => $query->orderBy('price', 'desc'),
             'name_asc' => $query->orderBy('product_name', 'asc'),
             'name_desc' => $query->orderBy('product_name', 'desc'),
-            'popular' => $query->orderBy('view_count', 'desc'),
+            'popular' => $query->orderBy('product_id', 'desc'), // Temporarily use product_id instead of view_count
             default => $query->latest(),
         };
 
@@ -89,7 +89,7 @@ class ClientProductController extends Controller
             ->findOrFail($id);
 
             // Increment view count
-            $this->incrementViewCount($product);
+            // $this->incrementViewCount($product); // Temporarily disabled due to caching issue
 
             // Get related products (same category, exclude current)
             $relatedProducts = Product::where('category_id', $product->category_id)
@@ -137,13 +137,13 @@ class ClientProductController extends Controller
     /**
      * Get recently viewed products from session
      */
-    private function getRecentlyViewedProducts(int $currentProductId): \Illuminate\Database\Eloquent\Collection
+    private function getRecentlyViewedProducts(int $currentProductId): \Illuminate\Support\Collection
     {
         $viewedIds = session()->get('recently_viewed', []);
-        
+
         // Remove current product from list
         $viewedIds = array_diff($viewedIds, [$currentProductId]);
-        
+
         if (empty($viewedIds)) {
             return collect([]);
         }

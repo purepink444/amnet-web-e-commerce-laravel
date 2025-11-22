@@ -48,6 +48,19 @@ class Order extends Model
         return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * Get the payment for this order.
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class, 'order_id', 'order_id');
+    }
+
     /**
      * Get the status badge class for Bootstrap.
      */

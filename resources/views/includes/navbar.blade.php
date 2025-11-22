@@ -80,6 +80,25 @@
             </ul>
         </div>
 
+
+        <!-- Cart Icon (for authenticated users) -->
+        @auth
+            <ul class="navbar-nav me-3">
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold px-3 position-relative" href="{{ route('account.cart.index') }}">
+                        <i class="bi bi-cart3 me-1"></i>
+                        <span class="visually-hidden">ตะกร้าสินค้า</span>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="cart-counter">
+                            @php
+                                $cartCount = \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity');
+                                echo $cartCount ?: 0;
+                            @endphp
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        @endauth
+
         <!-- User Menu (always visible) -->
         <ul class="navbar-nav">
             @auth

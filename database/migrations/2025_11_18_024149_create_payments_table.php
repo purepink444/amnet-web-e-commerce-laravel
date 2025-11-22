@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->decimal('amount', 10, 2);
+            $table->string('payment_method'); // credit, qr, cod
+            $table->string('status')->default('pending'); // pending, completed, failed, cancelled
+            $table->json('payment_data')->nullable(); // สำหรับเก็บข้อมูลเพิ่มเติม เช่น transaction_id
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
     }

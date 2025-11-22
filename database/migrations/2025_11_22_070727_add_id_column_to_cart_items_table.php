@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('cart_items', function (Blueprint $table) {
+            $table->id()->first(); // Add id column as primary key at the beginning
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carts');
+        Schema::table('cart_items', function (Blueprint $table) {
+            //
+        });
     }
 };

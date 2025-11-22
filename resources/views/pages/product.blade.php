@@ -100,12 +100,18 @@
                 }
             @endphp
 
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="product-card">
-                    <div class="product-badge">
-                        <span class="badge bg-danger">Hot</span>
-                    </div>
-                    
+                    @if($product->stock_quantity <= 0)
+                        <div class="stock-badge out-of-stock">
+                            <span class="badge bg-danger">สินค้าหมด</span>
+                        </div>
+                    @elseif($product->stock_quantity <= 5)
+                        <div class="stock-badge low-stock">
+                            <span class="badge bg-warning text-dark">เหลือน้อย</span>
+                        </div>
+                    @endif
+
                     <div class="product-image">
                         <img src="{{ $imageUrl }}" alt="{{ $product->product_name }}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image';">
                         <div class="product-overlay">
@@ -114,26 +120,35 @@
                             </a>
                         </div>
                     </div>
-                    
+
                     <div class="product-body">
-                        <h5 class="product-title">{{ $product->product_name }}</h5>
-                        <p class="product-description">{{ \Illuminate\Support\Str::limit($product->description, 60) }}</p>
-                        
-                        @if(!empty($product->specification))
-                            <div class="product-spec">
-                                <small class="text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>{{ \Illuminate\Support\Str::limit($product->specification, 40) }}
-                                </small>
-                            </div>
-                        @endif
-                        
+                        <h5 class="product-title">{{ \Illuminate\Support\Str::limit($product->product_name, 45) }}</h5>
+                        <p class="product-description">{{ \Illuminate\Support\Str::limit($product->description, 80) }}</p>
+
+                        <div class="product-meta">
+                            <small class="text-muted">
+                                <i class="bi bi-box-seam me-1"></i>เหลือ {{ $product->stock_quantity }} ชิ้น
+                            </small>
+                        </div>
+
                         <div class="product-footer">
                             <div class="product-price">
                                 <span class="price">฿{{ number_format($product->price, 2) }}</span>
                             </div>
-                            <button class="btn btn-orange btn-sm add-to-cart">
-                                <i class="bi bi-cart-plus"></i>
-                            </button>
+                            <div class="product-actions">
+                                @if($product->stock_quantity > 0)
+                                    <a href="{{ route('client.products.show', $product->getKey()) }}" class="btn btn-green btn-sm">
+                                        <i class="bi bi-bag-check me-1"></i>ซื้อสินค้า
+                                    </a>
+                                    <button class="btn btn-orange btn-sm add-to-cart" onclick="addToCart({{ $product->getKey() }})">
+                                        <i class="bi bi-cart-plus me-1"></i>เพิ่มสินค้า
+                                    </button>
+                                @else
+                                    <button class="btn btn-secondary btn-sm w-100" disabled>
+                                        <i class="bi bi-x-circle me-1"></i>สินค้าหมด
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -150,6 +165,42 @@
         </div>
     @endif
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function addToCart(productId) {
+    // Basic add to cart functionality - you can enhance this
+    fetch('/account/cart/add/' + productId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update cart counter
+            const counter = document.getElementById('cart-counter');
+            if (counter) {
+                counter.textContent = data.cart_count || '0';
+            }
+            // Show success message
+            alert('เพิ่มสินค้าในตะกร้าแล้ว!');
+        } else {
+            alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มสินค้าได้'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    });
+}
+</script>
 @endsection
 
 @section('styles')
@@ -268,7 +319,7 @@
     box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
 }
 
-.product-badge {
+.stock-badge {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -325,7 +376,7 @@
 }
 
 .product-body {
-    padding: 1.2rem;
+    padding: 1.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -350,20 +401,29 @@
     flex: 1;
 }
 
-.product-spec {
+.product-meta {
     margin-bottom: 1rem;
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: 0.4rem 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.product-meta small {
+    font-size: 0.8rem;
 }
 
 .product-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 0.8rem;
+    padding-top: 1.2rem;
     border-top: 1px solid #e9ecef;
     margin-top: auto;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.8rem;
 }
 
 .product-price .price {
@@ -377,7 +437,8 @@
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
     transition: all 0.3s ease;
 }
 
@@ -386,6 +447,26 @@
     transform: translateY(-2px);
     box-shadow: 0 5px 10px rgba(255, 107, 53, 0.3);
     color: white;
+}
+
+.btn-green {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-green:hover {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(40, 167, 69, 0.3);
+    color: white;
+    text-decoration: none;
 }
 
 .add-to-cart {

@@ -36,9 +36,10 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':membe
         Route::prefix('cart')->name('cart.')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('index');
             Route::post('/add/{productId}', [CartController::class, 'add'])->name('add');
-            Route::patch('/update/{itemId}', [CartController::class, 'update'])->name('update');
-            Route::delete('/remove/{itemId}', [CartController::class, 'remove'])->name('remove');
+            Route::patch('/update', [CartController::class, 'update'])->name('update');
+            Route::delete('/remove', [CartController::class, 'remove'])->name('remove');
         });
+
 
         // Checkout
         Route::prefix('checkout')->name('checkout.')->group(function () {

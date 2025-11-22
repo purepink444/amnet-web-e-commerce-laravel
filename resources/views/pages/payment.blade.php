@@ -7,10 +7,13 @@
     <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 600px;">
         <div class="card-header text-white text-center" style="background-color: #ff7f32;">
             <h4 class="mt-2 mb-2">การชำระเงิน</h4>
+            @if(isset($order))
+                <p class="mb-0">ออเดอร์ #{{ $order->order_id }} - ยอดรวม: {{ number_format($order->total_amount, 2) }} บาท</p>
+            @endif
         </div>
         <div class="card-body p-4">
 
-            <form id="paymentForm">
+            <form id="paymentForm" action="{{ route('payment.process', $order->order_id ?? '') }}" method="POST">
                 @csrf
 
                 <!-- วิธีการชำระเงิน -->
@@ -52,7 +55,7 @@
                     <div id="qr-container" class="d-flex justify-content-center mb-2">
                         <img id="qrImage" src="" width="180" alt="QR Payment" class="border p-2 rounded shadow-sm">
                     </div>
-                    <small>ยอดชำระ 99.00 บาท (ตัวอย่าง)</small>
+                    <small>ยอดชำระ {{ isset($order) ? number_format($order->total_amount, 2) : '0.00' }} บาท</small>
                 </div>
 
                 <!-- ชำระปลายทาง -->
