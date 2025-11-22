@@ -20,7 +20,11 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin
 
         Route::resource('products', AdminProductController::class);
         Route::resource('categories', AdminCategoryController::class);
+        Route::post('categories/bulk-delete', [AdminCategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
+        Route::patch('categories/bulk-update-status', [AdminCategoryController::class, 'bulkUpdateStatus'])->name('categories.bulk-update-status');
         Route::resource('brands', AdminBrandController::class);
+        Route::post('brands/bulk-delete', [AdminBrandController::class, 'bulkDelete'])->name('brands.bulk-delete');
+        Route::patch('brands/bulk-update-status', [AdminBrandController::class, 'bulkUpdateStatus'])->name('brands.bulk-update-status');
         Route::resource('users', AdminUserController::class);
 
         // Orders
