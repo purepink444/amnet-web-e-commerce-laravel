@@ -58,8 +58,23 @@ class User extends Authenticatable
         return strtolower($this->role?->role_name ?? '') === 'member';
     }
 
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'user_id', 'user_id');
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class, 'user_id', 'user_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'user_id', 'user_id');
     }
 }

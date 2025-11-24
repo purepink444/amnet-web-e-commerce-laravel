@@ -82,14 +82,39 @@
                     <!-- Rating -->
                     <div class="d-flex align-items-center mb-3">
                         <div class="text-warning me-2">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-half"></i>
+                            {!! $product->rating_stars !!}
                         </div>
-                        <span class="text-muted">(4.5/5 จาก 128 รีวิว)</span>
+                        <span class="text-muted">
+                            ({{ number_format($product->average_rating, 1) }}/5 จาก {{ $product->total_reviews }} รีวิว)
+                        </span>
+                        @if($product->hasReviews())
+                            <a href="{{ route('products.reviews.index', $product->product_id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="bi bi-chat-dots me-1"></i>ดูรีวิวทั้งหมด
+                            </a>
+                        @endif
                     </div>
+
+                    <!-- Rating Distribution -->
+                    @if($product->hasReviews())
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-3">การให้คะแนน</h6>
+                        <div class="row g-2">
+                            @foreach($product->rating_distribution as $stars => $count)
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-2" style="min-width: 30px;">{{ $stars }}★</span>
+                                    <div class="progress flex-grow-1" style="height: 8px;">
+                                        <div class="progress-bar bg-warning"
+                                             style="width: {{ $product->total_reviews > 0 ? ($count / $product->total_reviews) * 100 : 0 }}%">
+                                        </div>
+                                    </div>
+                                    <span class="text-muted ms-2" style="min-width: 30px;">{{ $count }}</span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Price -->
                     <div class="price-section mb-4">
@@ -134,6 +159,73 @@
                     </div>
                     @endif
 
+                    <!-- Reviews Section -->
+                    @if($product->hasReviews())
+                    <div class="mb-4">
+                        <h5 class="fw-semibold mb-3">
+                            <i class="bi bi-chat-dots text-primary me-2"></i>รีวิวล่าสุด
+                        </h5>
+                        <div class="card bg-light border-0 p-3">
+                            @foreach($product->getLatestReviews(3) as $review)
+                            <div class="d-flex mb-3 pb-3 border-bottom">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; font-weight: bold;">
+                                        {{ substr($review->member->user->firstname, 0, 1) . substr($review->member->user->lastname, 0, 1) }}
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <strong class="me-2">{{ $review->member->full_name }}</strong>
+                                        <div class="text-warning">
+                                            {!! $review->rating_stars !!}
+                                        </div>
+                                        <small class="text-muted ms-2">{{ $review->created_at->diffForHumans() }}</small>
+                                    </div>
+                                    <p class="mb-0 text-muted">{{ Str::limit($review->comment, 150) }}</p>
+                                </div>
+                            </div>
+                            @endforeach
+                            <div class="text-center">
+                                <a href="{{ route('products.reviews.index', $product->product_id) }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i>ดูรีวิวทั้งหมด ({{ $product->total_reviews }})
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Write Review Button -->
+                    @auth
+                        @php
+                            $member = auth()->user()->member;
+                            $canReview = $member && $member->canReviewProduct($product->product_id) && !$member->hasReviewedProduct($product->product_id);
+                        @endphp
+                        @if($canReview)
+                        <div class="mb-4">
+                            <a href="{{ route('products.reviews.create', $product->product_id) }}" class="btn btn-success btn-lg w-100">
+                                <i class="bi bi-pencil-square me-2"></i>เขียนรีวิวสำหรับสินค้านี้
+                            </a>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>คุณสามารถเขียนรีวิวได้หลังจากได้รับสินค้าแล้ว
+                            </small>
+                        </div>
+                        @elseif($member && $member->hasReviewedProduct($product->product_id))
+                        <div class="mb-4">
+                            <div class="alert alert-info">
+                                <i class="bi bi-check-circle me-2"></i>คุณได้เขียนรีวิวสำหรับสินค้านี้แล้ว
+                                <a href="{{ route('products.reviews.index', $product->product_id) }}" class="alert-link">ดูรีวิวของคุณ</a>
+                            </div>
+                        </div>
+                        @endif
+                    @else
+                        <div class="mb-4">
+                            <button class="btn btn-outline-success btn-lg w-100" onclick="showLoginModal()">
+                                <i class="bi bi-pencil-square me-2"></i>เข้าสู่ระบบเพื่อเขียนรีวิว
+                            </button>
+                        </div>
+                    @endauth
+
                     <!-- Quantity Selector -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold mb-3">จำนวน</label>
@@ -157,11 +249,13 @@
                             <button class="btn btn-primary btn-lg py-3 fw-semibold" onclick="addToCart({{ $product->product_id }})">
                                 <i class="bi bi-cart-plus me-2"></i>เพิ่มลงตะกร้า
                             </button>
-                            <a href="{{ route('checkout.index') }}" class="btn btn-outline-danger btn-lg py-3 fw-semibold">
+                            <a href="{{ route('account.checkout.index') }}" class="btn btn-outline-danger btn-lg py-3 fw-semibold">
                                 <i class="bi bi-lightning-fill me-2"></i>ซื้อเลย
                             </a>
-                            <button class="btn btn-outline-secondary" onclick="addToWishlist({{ $product->product_id }})">
-                                <i class="bi bi-heart me-2"></i>เพิ่มในรายการโปรด
+                            <button class="btn {{ $isInWishlist ? 'btn-danger' : 'btn-outline-secondary' }}"
+                                    onclick="addToWishlist({{ $product->product_id }})">
+                                <i class="bi {{ $isInWishlist ? 'bi-heart-fill text-white' : 'bi-heart' }} me-2"></i>
+                                {{ $isInWishlist ? 'อยู่ในรายการโปรด' : 'เพิ่มในรายการโปรด' }}
                             </button>
                         @else
                             <button class="btn btn-primary btn-lg py-3 fw-semibold" onclick="showLoginModal()">
@@ -288,8 +382,37 @@ function addToCart(productId) {
 }
 
 function addToWishlist(productId) {
-    // TODO: Implement wishlist functionality
-    showToast('ฟีเจอร์รายการโปรดกำลังพัฒนา', 'info');
+    fetch(`/account/wishlist/toggle/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update button text/icon based on action
+            const button = document.querySelector('button[onclick*="addToWishlist"]');
+            if (data.action === 'added') {
+                button.innerHTML = '<i class="bi bi-heart-fill text-danger me-2"></i>อยู่ในรายการโปรด';
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-danger');
+            } else {
+                button.innerHTML = '<i class="bi bi-heart me-2"></i>เพิ่มในรายการโปรด';
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-secondary');
+            }
+
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'error');
+    });
 }
 
 function showLoginModal() {

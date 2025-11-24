@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\{ClientProductController, CheckoutController};
+use App\Http\Controllers\Client\{ClientProductController, CheckoutController, ReviewController};
 
 Route::get('/', fn() => view('home'))->name('home');
 
@@ -10,6 +10,17 @@ Route::prefix('product')->name('client.products.')->group(function () {
     Route::get('/', [ClientProductController::class, 'index'])->name('index');
     Route::get('/search', [ClientProductController::class, 'quickSearch'])->name('search');
     Route::get('/{id}', [ClientProductController::class, 'show'])->name('show');
+});
+
+// Product Reviews
+Route::prefix('product/{productId}/reviews')->name('products.reviews.')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('index');
+    Route::get('/create', [ReviewController::class, 'create'])->name('create');
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::get('/{reviewId}', [ReviewController::class, 'show'])->name('show');
+    Route::get('/{reviewId}/edit', [ReviewController::class, 'edit'])->name('edit');
+    Route::put('/{reviewId}', [ReviewController::class, 'update'])->name('update');
+    Route::delete('/{reviewId}', [ReviewController::class, 'destroy'])->name('destroy');
 });
 
 // Checkout

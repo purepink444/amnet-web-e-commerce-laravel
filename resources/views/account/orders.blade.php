@@ -156,7 +156,7 @@
                                                     <strong>{{ number_format($order->total_amount, 2) }} บาท</strong>
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('account.order.show', $order->id) }}"
+                                                    <a href="{{ route('account.orders.show', $order->order_id) }}"
                                                        class="btn btn-outline-primary btn-sm">
                                                         <i class="bi bi-eye me-1"></i> ดู
                                                     </a>

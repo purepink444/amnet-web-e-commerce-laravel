@@ -109,10 +109,17 @@ class ClientProductController extends Controller
             // Get recently viewed products from session
             $recentlyViewed = $this->getRecentlyViewedProducts($id);
 
+            // Check if product is in user's wishlist
+            $isInWishlist = false;
+            if (auth()->check() && auth()->user()->member) {
+                $isInWishlist = auth()->user()->member->wishlists()->where('product_id', $product->product_id)->exists();
+            }
+
             return view('pages.product_detail', compact(
                 'product',
                 'relatedProducts',
-                'recentlyViewed'
+                'recentlyViewed',
+                'isInWishlist'
             ));
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

@@ -6,18 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
+    protected $primaryKey = 'payment_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = null; // ตาราง payments ไม่มี updated_at
+
     protected $fillable = [
         'order_id',
         'amount',
         'payment_method',
-        'status',
-        'payment_data',
-        'paid_at',
+        'payment_status',
+        'payment_date',
+        'transaction_id',
+        'payment_proof_url',
     ];
 
     protected $casts = [
-        'payment_data' => 'array',
-        'paid_at' => 'datetime',
+        'amount' => 'decimal:2',
+        'payment_date' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function order()
@@ -28,19 +36,36 @@ class Payment extends Model
     // Helper methods
     public function isPending()
     {
-        return $this->status === 'pending';
+        return $this->payment_status === 'pending';
     }
 
     public function isCompleted()
     {
-        return $this->status === 'completed';
+        return $this->payment_status === 'completed';
     }
 
     public function markAsCompleted()
     {
         $this->update([
-            'status' => 'completed',
-            'paid_at' => now(),
+            'payment_status' => 'completed',
+            'payment_date' => now(),
+        ]);
+    }
+
+    public function canRetry()
+    {
+        return $this->status === 'failed' &&
+               (!isset($this->payment_data['retry_count']) || $this->payment_data['retry_count'] < 3);
+    }
+
+    public function incrementRetryCount()
+    {
+        $retryCount = ($this->payment_data['retry_count'] ?? 0) + 1;
+        $this->update([
+            'payment_data' => array_merge($this->payment_data ?? [], [
+                'retry_count' => $retryCount,
+                'last_retry_at' => now(),
+            ])
         ]);
     }
 }

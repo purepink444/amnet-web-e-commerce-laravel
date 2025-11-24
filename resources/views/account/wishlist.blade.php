@@ -150,20 +150,20 @@
                             <div class="product-grid">
                                 @foreach($wishlist as $item)
                                     <div class="product-item">
-                                        <img src="{{ $item->product->image ?? 'https://via.placeholder.com/300x200' }}"
-                                             alt="{{ $item->product->name }}">
-                                        <h6>{{ $item->product->name }}</h6>
+                                        <img src="{{ $item->product->image_url ?: 'https://via.placeholder.com/300x200' }}"
+                                             alt="{{ $item->product->product_name }}">
+                                        <h6>{{ $item->product->product_name }}</h6>
                                         <div class="price">฿{{ number_format($item->product->price, 2) }}</div>
                                         <div class="d-flex gap-2">
-                                            @if($item->product->stock > 0)
-                                                <form action="{{ route('account.cart.add', $item->product_id) }}" method="POST" class="d-inline">
+                                            @if($item->product->stock_quantity > 0)
+                                                <form action="{{ route('account.cart.add', $item->product->product_id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn btn-primary btn-small">
                                                         <i class="bi bi-cart-plus me-1"></i>เพิ่ม
                                                     </button>
                                                 </form>
                                             @endif
-                                            <form action="{{ route('account.wishlist.toggle', $item->product_id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('account.wishlist.toggle', $item->product->product_id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-danger btn-small"

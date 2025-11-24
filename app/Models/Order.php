@@ -16,16 +16,17 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
-        'order_number',
+        'member_id',
         'total_amount',
-        'status',
-        'notes',
+        'order_status',
         'shipping_address',
-        'payment_method',
+        'shipping_method',
+        'tracking_number',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'member_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -37,6 +38,14 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the member that owns the order.
+     */
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id', 'member_id');
     }
 
     /**
@@ -66,10 +75,11 @@ class Order extends Model
      */
     public function getStatusBadgeAttribute()
     {
-        return match($this->status) {
+        return match($this->order_status) {
             'pending' => 'warning',
-            'processing' => 'info',
-            'completed' => 'success',
+            'paid' => 'info',
+            'shipped' => 'primary',
+            'delivered' => 'success',
             'cancelled' => 'danger',
             default => 'secondary',
         };
@@ -80,12 +90,13 @@ class Order extends Model
      */
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match($this->order_status) {
             'pending' => 'รอดำเนินการ',
-            'processing' => 'กำลังดำเนินการ',
-            'completed' => 'สำเร็จ',
+            'paid' => 'ชำระเงินแล้ว',
+            'shipped' => 'จัดส่งแล้ว',
+            'delivered' => 'ส่งสำเร็จ',
             'cancelled' => 'ยกเลิก',
-            default => $this->status,
+            default => $this->order_status,
         };
     }
 }

@@ -17,6 +17,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', function () {
         return redirect()->route('account.checkout.index');
     })->name('checkout');
+
+    // Alias for checkout.index to maintain compatibility
+    Route::get('/checkout/index', function () {
+        return redirect()->route('account.checkout.index');
+    })->name('checkout.index');
 });
 
 // Public Routes (Login/Register)

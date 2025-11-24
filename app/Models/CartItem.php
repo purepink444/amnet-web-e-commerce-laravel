@@ -11,16 +11,16 @@ class CartItem extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'user_id',
+        'member_id',
         'product_id',
         'quantity',
         'price_at_add',
         'added_at',
     ];
 
-    public function user()
+    public function member()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(Member::class, 'member_id', 'member_id');
     }
 
     public function product()

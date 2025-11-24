@@ -6,6 +6,25 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Advanced Search Service implementing Data Structures and Algorithms principles
+ *
+ * This service provides efficient search functionality using:
+ * - Trie data structure for autocomplete
+ * - Levenshtein distance algorithm for fuzzy search
+ * - Binary search principles for range filtering
+ * - Hash-based lookups for category/brand filtering
+ * - Caching for performance optimization
+ *
+ * Time Complexity Analysis:
+ * - Trie operations: O(m) where m is word length
+ * - Levenshtein distance: O(m*n) for string comparison
+ * - Database queries: Optimized with proper indexing
+ *
+ * Space Complexity:
+ * - Trie: O(N) where N is total characters in all words
+ * - Cache: Configurable TTL-based storage
+ */
 class SearchService
 {
     /**
@@ -14,7 +33,20 @@ class SearchService
     private array $trie = [];
 
     /**
-     * Search products with DSA-optimized algorithms
+     * Search products using optimized DSA algorithms
+     *
+     * Strategy Pattern Implementation:
+     * - Short terms (< 3 chars): Exact match with wildcards
+     * - Long terms with fuzzy option: Levenshtein distance algorithm
+     * - Default: Full-text search with relevance ranking
+     *
+     * @param Builder $query Base product query builder
+     * @param string $searchTerm User's search input
+     * @param array $options Search configuration options
+     * @return Builder Modified query with search conditions
+     *
+     * @timeComplexity O(m*n) for fuzzy search, O(1) for exact search
+     * @spaceComplexity O(1) additional space for exact, O(N) for fuzzy
      */
     public function searchProducts(Builder $query, string $searchTerm, array $options = []): Builder
     {
@@ -92,7 +124,16 @@ class SearchService
     }
 
     /**
-     * Build Trie for autocomplete functionality
+     * Build Trie data structure for efficient autocomplete
+     *
+     * Trie Implementation for O(m) prefix search where m is prefix length.
+     * Each node represents a character, with terminal nodes marked by '__end__'.
+     *
+     * @param Collection $items Items to index in Trie
+     * @param string $field Field name to extract words from
+     *
+     * @timeComplexity O(N) where N is total characters in all items
+     * @spaceComplexity O(N) for Trie storage
      */
     public function buildAutocompleteTrie(Collection $items, string $field = 'product_name'): void
     {
@@ -170,7 +211,20 @@ class SearchService
     }
 
     /**
-     * Levenshtein distance algorithm implementation
+     * Calculate Levenshtein distance between two strings
+     *
+     * Dynamic Programming implementation of edit distance algorithm.
+     * Computes minimum operations (insert, delete, substitute) to transform str1 to str2.
+     *
+     * Uses 2D matrix where dp[i][j] represents distance between first i chars of str1
+     * and first j chars of str2.
+     *
+     * @param string $str1 First string
+     * @param string $str2 Second string
+     * @return int Minimum edit distance
+     *
+     * @timeComplexity O(m*n) where m=strlen(str1), n=strlen(str2)
+     * @spaceComplexity O(m*n) for distance matrix
      */
     private function levenshtein(string $str1, string $str2): int
     {
