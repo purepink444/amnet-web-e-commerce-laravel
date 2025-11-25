@@ -104,6 +104,26 @@
     </div>
 </div>
 
+<!-- ================================
+     Brand Logos Section
+================================ -->
+<div class="brand-section py-5">
+    <div class="container">
+
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">แบรนด์ที่เราให้บริการ</h2>
+            <p class="text-muted">เราคัดสรรสินค้าคุณภาพจากแบรนด์ชั้นนำ</p>
+        </div>
+
+        <div class="brand-logos text-center">
+            <img src="{{ asset('images/brands.png') }}"
+                 alt="Brand Logos"
+                 class="img-fluid brand-img">
+        </div>
+
+    </div>
+</div>
+
 <!-- Features Section -->
 <div class="features-section py-5">
     <div class="container py-5">
