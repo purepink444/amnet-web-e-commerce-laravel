@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Order, Payment};
+use App\Notifications\OrderStatusUpdated;
 use App\Services\QRCodeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,11 +55,11 @@ class PaymentController extends Controller
     public function process(Request $request, $orderId)
     {
         $request->validate([
-            'payment_method' => 'required|in:credit,qr,cod',
-            'card_name' => 'required_if:payment_method,credit|string|max:255',
-            'card_number' => 'required_if:payment_method,credit|string|digits_between:13,19',
-            'card_exp' => 'required_if:payment_method,credit|string|size:5',
-            'card_cvv' => 'required_if:payment_method,credit|string|digits_between:3,4',
+            'payment_method' => 'required|in:credit_card,bank_transfer,qr_code,cod',
+            'card_name' => 'required_if:payment_method,credit_card|string|max:255',
+            'card_number' => 'required_if:payment_method,credit_card|string|digits_between:13,19',
+            'card_exp' => 'required_if:payment_method,credit_card|string|size:5',
+            'card_cvv' => 'required_if:payment_method,credit_card|string|digits_between:3,4',
         ]);
 
         $order = Order::findOrFail($orderId);
@@ -77,7 +78,7 @@ class PaymentController extends Controller
                 [
                     'amount' => $order->total_amount,
                     'payment_method' => $request->payment_method,
-                    'status' => 'pending',
+                    'payment_status' => 'pending',
                     'payment_data' => $this->getPaymentData($request),
                 ]
             );
@@ -86,17 +87,21 @@ class PaymentController extends Controller
             $result = $this->processPayment($request, $payment);
 
             if ($result['success']) {
+                $oldStatus = $order->order_status;
                 $payment->markAsCompleted();
-                $order->update(['status' => 'paid']);
+                $order->update(['order_status' => 'paid']);
 
                 DB::commit();
+
+                // Send notification for payment completion
+                $order->user->notify(new OrderStatusUpdated($order, $oldStatus, 'paid'));
 
                 return redirect()->route('account.checkout.success', $order->order_id)
                     ->with('success', 'การชำระเงินสำเร็จ');
             } else {
                 // จัดการ payment ที่ล้มเหลว
                 $payment->update([
-                    'status' => 'failed',
+                    'payment_status' => 'failed',
                     'payment_data' => array_merge($payment->payment_data ?? [], [
                         'error_message' => $result['message'],
                         'failed_at' => now(),
@@ -122,7 +127,7 @@ class PaymentController extends Controller
     {
         $data = [];
 
-        if ($request->payment_method === 'credit') {
+        if ($request->payment_method === 'credit_card') {
             // เข้ารหัสข้อมูลบัตรเครดิต (ในระบบจริงควรใช้ encryption ที่ปลอดภัย)
             $data = [
                 'card_name' => encrypt($request->card_name),
@@ -162,10 +167,10 @@ class PaymentController extends Controller
     private function processPayment(Request $request, Payment $payment): array
     {
         switch ($request->payment_method) {
-            case 'credit':
+            case 'credit_card':
                 return $this->processCreditCard($request, $payment);
 
-            case 'qr':
+            case 'qr_code':
                 return $this->processQRPayment($request, $payment);
 
             case 'cod':
@@ -295,8 +300,12 @@ class PaymentController extends Controller
         $payment = Payment::where('payment_data->transaction_id', $transactionId)->first();
 
         if ($payment && $status === 'completed') {
+            $oldStatus = $payment->order->order_status;
             $payment->markAsCompleted();
-            $payment->order->update(['status' => 'paid']);
+            $payment->order->update(['order_status' => 'paid']);
+
+            // Send notification for payment completion
+            $payment->order->user->notify(new OrderStatusUpdated($payment->order, $oldStatus, 'paid'));
 
             return response()->json(['status' => 'success']);
         }
@@ -351,9 +360,13 @@ class PaymentController extends Controller
 
         $payment = $order->payment;
 
-        if ($payment && $payment->payment_method === 'qr' && $payment->status === 'pending') {
+        if ($payment && $payment->payment_method === 'qr_code' && $payment->payment_status === 'pending') {
+            $oldStatus = $order->order_status;
             $payment->markAsCompleted();
-            $order->update(['status' => 'paid']);
+            $order->update(['order_status' => 'paid']);
+
+            // Send notification for payment completion
+            $order->user->notify(new OrderStatusUpdated($order, $oldStatus, 'paid'));
 
             return redirect()->route('account.checkout.success', $order->order_id)
                 ->with('success', 'การชำระเงินด้วย QR สำเร็จแล้ว');
@@ -384,7 +397,7 @@ class PaymentController extends Controller
 
         // Reset payment status และ increment retry count
         $payment->incrementRetryCount();
-        $payment->update(['status' => 'pending']);
+        $payment->update(['payment_status' => 'pending']);
 
         return redirect()->route('payment.show', $orderId)
             ->with('info', 'กรุณาลองชำระเงินใหม่อีกครั้ง');

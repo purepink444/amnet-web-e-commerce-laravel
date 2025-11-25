@@ -17,6 +17,7 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin
     ->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/refresh-cache', [DashboardController::class, 'refreshCache'])->name('dashboard.refresh-cache');
 
         Route::resource('products', AdminProductController::class);
         Route::resource('categories', AdminCategoryController::class);

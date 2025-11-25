@@ -133,22 +133,22 @@
                                             <tr>
                                                 <td class="d-none d-md-table-cell">{{ $loop->iteration }}</td>
                                                 <td>
-                                                    <strong class="text-primary">{{ $order->order_number }}</strong>
+                                                    <strong class="text-primary">#{{ $order->order_id }}</strong>
                                                     <div class="d-block d-sm-none small text-muted">{{ $order->created_at->format('d/m/Y') }}</div>
                                                 </td>
                                                 <td class="d-none d-sm-table-cell">{{ $order->created_at->format('d/m/Y') }}</td>
                                                 <td>
-                                                    <span class="badge 
-                                                        @if($order->status == 'pending') bg-warning
-                                                        @elseif($order->status == 'processing') bg-info
-                                                        @elseif($order->status == 'shipped') bg-primary
-                                                        @elseif($order->status == 'delivered') bg-success
+                                                    <span class="badge
+                                                        @if($order->order_status == 'pending') bg-warning
+                                                        @elseif($order->order_status == 'paid') bg-info
+                                                        @elseif($order->order_status == 'shipped') bg-primary
+                                                        @elseif($order->order_status == 'delivered') bg-success
                                                         @else bg-secondary @endif">
-                                                        @if($order->status == 'pending') รอดำเนินการ
-                                                        @elseif($order->status == 'processing') กำลังดำเนินการ
-                                                        @elseif($order->status == 'shipped') จัดส่งแล้ว
-                                                        @elseif($order->status == 'delivered') รับสินค้าแล้ว
-                                                        @else {{ $order->status }}
+                                                        @if($order->order_status == 'pending') รอดำเนินการ
+                                                        @elseif($order->order_status == 'paid') ชำระเงินแล้ว
+                                                        @elseif($order->order_status == 'shipped') จัดส่งแล้ว
+                                                        @elseif($order->order_status == 'delivered') รับสินค้าแล้ว
+                                                        @else {{ $order->order_status }}
                                                         @endif
                                                     </span>
                                                 </td>

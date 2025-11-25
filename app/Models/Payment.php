@@ -20,6 +20,7 @@ class Payment extends Model
         'payment_date',
         'transaction_id',
         'payment_proof_url',
+        'payment_data',
     ];
 
     protected $casts = [
@@ -54,7 +55,7 @@ class Payment extends Model
 
     public function canRetry()
     {
-        return $this->status === 'failed' &&
+        return $this->payment_status === 'failed' &&
                (!isset($this->payment_data['retry_count']) || $this->payment_data['retry_count'] < 3);
     }
 

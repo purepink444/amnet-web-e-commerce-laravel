@@ -5,88 +5,60 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\{Product, Category, Brand};
-use App\Services\SearchService;
+use App\Services\{SearchService, ProductSearchService, CacheService};
 use Illuminate\Support\Facades\{Cache, Log};
 
 class ClientProductController extends Controller
 {
     protected SearchService $searchService;
+    protected ProductSearchService $productSearchService;
+    protected CacheService $cacheService;
 
-    public function __construct(SearchService $searchService)
-    {
+    public function __construct(
+        SearchService $searchService,
+        ProductSearchService $productSearchService,
+        CacheService $cacheService
+    ) {
         $this->searchService = $searchService;
+        $this->productSearchService = $productSearchService;
+        $this->cacheService = $cacheService;
     }
 
     /**
-     * Display all active products with DSA-optimized filters and pagination
+     * Display all active products with optimized search algorithms
+     * Time Complexity: O(log n) for indexed operations, O(n) for search
      */
     public function index(Request $request): View
     {
-        $query = Product::query()
-            ->with(['category:category_id,category_name', 'brand:brand_id,brand_name'])
-            ->where('status', 'active')
-            ->where('stock_quantity', '>', 0);
+        // Build filters array for ProductSearchService
+        $filters = [
+            'search' => $request->input('search'),
+            'category_id' => $request->input('category'),
+            'brand_id' => $request->input('brand'),
+            'min_price' => $request->input('min_price'),
+            'max_price' => $request->input('max_price'),
+            'in_stock' => $request->boolean('in_stock'),
+            'sort' => $request->input('sort', 'relevance')
+        ];
 
-        // DSA-optimized search
-        if ($search = $request->input('search')) {
-            $query = $this->searchService->searchProducts($query, $search, [
-                'fuzzy' => $request->boolean('fuzzy', false)
-            ]);
-        }
+        // Use optimized ProductSearchService
+        $products = $this->productSearchService->search($filters, 12);
 
-        // Advanced filtering with DSA principles
-        $filters = [];
-        if ($categoryId = $request->input('category')) {
-            $filters['categories'] = [$categoryId];
-        }
-        if ($brandId = $request->input('brand')) {
-            $filters['brands'] = [$brandId];
-        }
-        if ($minPrice = $request->input('min_price')) {
-            $filters['price_min'] = $minPrice;
-        }
-        if ($maxPrice = $request->input('max_price')) {
-            $filters['price_max'] = $maxPrice;
-        }
-        if ($request->boolean('in_stock')) {
-            $filters['in_stock'] = true;
-        }
-
-        $query = $this->searchService->advancedFilter($query, $filters);
-
-        // Efficient sorting using DSA algorithms
-        $sortBy = $request->input('sort', 'newest');
-        $query = $this->searchService->efficientSort($query, $sortBy);
-
-        // Cache results for better performance
-        $cacheKey = 'products_' . md5(serialize($request->all()));
-        $products = $this->searchService->cacheSearchResults($cacheKey, $query->paginate(12)->withQueryString(), 300);
-
-        $products = $query->paginate(12)->withQueryString();
-
-        // Get filter options (cached for 1 hour)
-        $categories = Cache::remember('active_categories', 3600, fn() => 
-            Category::whereHas('products', fn($q) => $q->where('status', 'active'))
-                ->select('category_id', 'category_name')
-                ->get()
-        );
-
-        $brands = Cache::remember('active_brands', 3600, fn() => 
-            Brand::whereHas('products', fn($q) => $q->where('status', 'active'))
-                ->select('brand_id', 'brand_name')
-                ->get()
-        );
+        // Get cached filter options using CacheService
+        $categories = $this->cacheService->getCategories();
+        $brands = $this->cacheService->getBrands();
 
         return view('pages.product', compact('products', 'categories', 'brands'));
     }
 
     /**
-     * Display single product with related products
+     * Display single product with optimized related products algorithm
+     * Time Complexity: O(log n) for product lookup, O(k) for related products
      */
     public function show(int $id): View
     {
         try {
-            // Get product with relationships
+            // Get product with optimized eager loading
             $product = Product::with([
                 'category:category_id,category_name',
                 'brand:brand_id,brand_name'
@@ -94,25 +66,21 @@ class ClientProductController extends Controller
             ->where('status', 'active')
             ->findOrFail($id);
 
-            // Increment view count
-            // $this->incrementViewCount($product); // Temporarily disabled due to caching issue
+            // Increment view count using optimized caching
+            $this->cacheService->incrementProductView($id);
 
-            // Get related products (same category, exclude current)
-            $relatedProducts = Product::where('category_id', $product->category_id)
-                ->where('product_id', '!=', $id)
-                ->where('status', 'active')
-                ->where('stock_quantity', '>', 0)
-                ->inRandomOrder()
-                ->limit(4)
-                ->get();
+            // Get related products using collaborative filtering algorithm
+            $relatedProducts = $this->productSearchService->getRelatedProducts($id, 4);
 
             // Get recently viewed products from session
             $recentlyViewed = $this->getRecentlyViewedProducts($id);
 
-            // Check if product is in user's wishlist
+            // Check if product is in user's wishlist (optimized query)
             $isInWishlist = false;
-            if (auth()->check() && auth()->user()->member) {
-                $isInWishlist = auth()->user()->member->wishlists()->where('product_id', $product->product_id)->exists();
+            if (auth()->check()) {
+                $isInWishlist = auth()->user()->wishlists()
+                    ->where('product_id', $product->product_id)
+                    ->exists();
             }
 
             return view('pages.product_detail', compact(
@@ -171,41 +139,33 @@ class ClientProductController extends Controller
     }
 
     /**
-     * Quick search API endpoint with Trie-based autocomplete (AJAX)
+     * Quick search API endpoint with optimized prefix matching
+     * Time Complexity: O(m) where m is prefix length
      */
     public function quickSearch(Request $request)
     {
-        $query = $request->input('q');
+        $query = trim($request->input('q', ''));
 
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        // Build Trie for autocomplete if not cached
-        $cacheKey = 'autocomplete_trie';
-        $trieBuilt = Cache::get($cacheKey . '_built', false);
+        // Use optimized ProductSearchService for suggestions
+        $suggestions = $this->productSearchService->getSuggestions($query, 5);
 
-        if (!$trieBuilt) {
-            $products = Cache::remember('autocomplete_products', 3600, function () {
-                return Product::where('status', 'active')
-                    ->select('product_id', 'product_name', 'price', 'image_url')
-                    ->get();
-            });
+        return response()->json($suggestions->map(function ($productName) {
+            // Get full product data for the suggestion
+            $product = Product::where('product_name', $productName)
+                             ->where('status', 'active')
+                             ->select('product_id', 'product_name', 'price', 'image_url')
+                             ->first();
 
-            $this->searchService->buildAutocompleteTrie($products, 'product_name');
-            Cache::put($cacheKey . '_built', true, 3600);
-        }
-
-        // Use Trie for fast autocomplete
-        $suggestions = $this->searchService->autocomplete($query, 5);
-
-        return response()->json($suggestions->map(function ($product) {
-            return [
+            return $product ? [
                 'product_id' => $product->product_id,
                 'product_name' => $product->product_name,
                 'price' => $product->price,
                 'image_url' => $product->image_url,
-            ];
-        }));
+            ] : null;
+        })->filter()->values());
     }
 }

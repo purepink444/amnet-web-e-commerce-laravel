@@ -55,7 +55,7 @@ class OrderController extends Controller
 
         // ตรวจสอบว่าสามารถยกเลิกได้หรือไม่
         if (!in_array($order->order_status, ['pending', 'paid'])) {
-            return back()->with('error', 'ไม่สามารถยกเลิกคำสั่งซื้อนี้ได้ เนื่องจากสถานะปัจจุบันคือ: ' . $order->status_label);
+            return back()->with('error', 'ไม่สามารถยกเลิกคำสั่งซื้อนี้ได้ เนื่องจากสถานะปัจจุบันคือ: ' . $order->getStatusLabelAttribute());
         }
 
         // ตรวจสอบเวลายกเลิก (ยกเลิกได้ภายใน 24 ชั่วโมงหลังสั่งซื้อ)

@@ -11,6 +11,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $primaryKey = 'user_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $with = ['role'];
 
@@ -76,5 +78,10 @@ class User extends Authenticatable
     public function reviews()
     {
         return $this->hasMany(Review::class, 'user_id', 'user_id');
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'user_id', 'user_id');
     }
 }

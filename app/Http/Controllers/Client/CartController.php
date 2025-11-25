@@ -16,19 +16,8 @@ class CartController extends Controller
     public function index(): View
     {
         $user = auth()->user();
-        $member = $user->member;
 
-        if (!$member) {
-            // สร้าง member record ถ้ายังไม่มี
-            $member = $user->member()->create([
-                'first_name' => $user->firstname ?? 'Unknown',
-                'last_name' => $user->lastname ?? 'User',
-                'membership_level' => 'bronze',
-                'points' => 0,
-            ]);
-        }
-
-        $cartItems = CartItem::with('product')->where('member_id', $member->member_id)->get();
+        $cartItems = CartItem::with('product')->where('user_id', $user->user_id)->get();
 
         // Create a simple cart-like object for the view
         $cart = (object) [
@@ -74,17 +63,6 @@ class CartController extends Controller
                 ], 401);
             }
 
-            $member = $user->member;
-            if (!$member) {
-                // สร้าง member record ถ้ายังไม่มี
-                $member = $user->member()->create([
-                    'first_name' => $user->firstname ?? 'Unknown',
-                    'last_name' => $user->lastname ?? 'User',
-                    'membership_level' => 'bronze',
-                    'points' => 0,
-                ]);
-            }
-
             $quantity = $request->quantity ?? 1;
 
             // ตรวจสอบสินค้า
@@ -98,7 +76,7 @@ class CartController extends Controller
             }
 
             // ตรวจสอบว่ามีสินค้านี้ในตะกร้าแล้วหรือไม่
-            $existingItem = CartItem::where('member_id', $member->member_id)
+            $existingItem = CartItem::where('user_id', $user->user_id)
                 ->where('product_id', $productId)
                 ->first();
 
@@ -115,7 +93,7 @@ class CartController extends Controller
                 $existingItem->update(['quantity' => $newQuantity]);
             } else {
                 CartItem::create([
-                    'member_id' => $member->member_id,
+                    'user_id' => $user->user_id,
                     'product_id' => $productId,
                     'quantity' => $quantity,
                     'price_at_add' => $product->price,
@@ -123,7 +101,7 @@ class CartController extends Controller
                 ]);
             }
 
-            $cartCount = CartItem::where('member_id', $member->member_id)->sum('quantity');
+            $cartCount = CartItem::where('user_id', $user->user_id)->sum('quantity');
             return response()->json([
                 'success' => true,
                 'message' => 'เพิ่มสินค้าลงตะกร้าแล้ว',
@@ -157,16 +135,8 @@ class CartController extends Controller
                 ], 401);
             }
 
-            $member = $user->member;
-            if (!$member) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'ไม่พบข้อมูลสมาชิก',
-                ], 400);
-            }
-
             $cartItem = CartItem::with('product')
-                ->where('member_id', $member->member_id)
+                ->where('user_id', $user->user_id)
                 ->where('product_id', $request->product_id)
                 ->firstOrFail();
 
@@ -211,15 +181,7 @@ class CartController extends Controller
                 ], 401);
             }
 
-            $member = $user->member;
-            if (!$member) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'ไม่พบข้อมูลสมาชิก',
-                ], 400);
-            }
-
-            $cartItem = CartItem::where('member_id', $member->member_id)
+            $cartItem = CartItem::where('user_id', $user->user_id)
                 ->where('product_id', $request->product_id)
                 ->firstOrFail();
 
@@ -250,14 +212,7 @@ class CartController extends Controller
                 ]);
             }
 
-            $member = $user->member;
-            if (!$member) {
-                return response()->json([
-                    'count' => 0,
-                ]);
-            }
-
-            $count = CartItem::where('member_id', $member->member_id)->sum('quantity');
+            $count = CartItem::where('user_id', $user->user_id)->sum('quantity');
 
             return response()->json([
                 'count' => $count,

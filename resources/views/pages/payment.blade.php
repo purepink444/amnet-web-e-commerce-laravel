@@ -47,8 +47,8 @@
                     <label for="payment_method" class="form-label">เลือกวิธีการชำระเงิน:</label>
                     <select class="form-select" id="payment_method" name="payment_method" required>
                         <option value="">-- กรุณาเลือก --</option>
-                        <option value="credit">บัตรเครดิต / เดบิต</option>
-                        <option value="qr">QR พร้อมเพย์</option>
+                        <option value="credit_card">บัตรเครดิต / เดบิต</option>
+                        <option value="qr_code">QR พร้อมเพย์</option>
                         <option value="cod">ชำระปลายทาง</option>
                     </select>
                 </div>
@@ -125,10 +125,10 @@ document.getElementById("payment_method").addEventListener("change", function() 
     document.getElementById("qr-section").style.display = "none";
     document.getElementById("cod-section").style.display = "none";
 
-    if (method === "credit") {
+    if (method === "credit_card") {
         document.getElementById("card-section").style.display = "block";
     }
-    else if (method === "qr") {
+    else if (method === "qr_code") {
         // แสดง loading
         document.getElementById("qr-loading").classList.remove("d-none");
         document.getElementById("qrImage").style.display = "none";

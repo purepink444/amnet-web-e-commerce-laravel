@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // ✅ ลงทะเบียน middleware alias
         $middleware->alias([
             'role' => \App\Http\Middleware\RolesMiddleware::class,
+            'overclock' => \App\Http\Middleware\OverclockMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
