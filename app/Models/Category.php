@@ -2,26 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    use HasFactory;
-
-    // ถ้า primary key เป็น category_id แทน id
+    protected $table = 'categories';
     protected $primaryKey = 'category_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
-
+    
     protected $fillable = [
         'category_name',
+        'category_image',
         'description',
         'status',
     ];
 
     /**
-     * Get the products for the category.
+     * Get products that belong to this category
      */
     public function products()
     {

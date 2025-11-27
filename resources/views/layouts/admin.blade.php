@@ -1,1122 +1,877 @@
-<!DOCTYPE html>
+า<!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="@yield('meta_description', 'ระบบจัดการร้านค้าออนไลน์')">
-    <meta name="keywords" content="@yield('meta_keywords', 'admin, dashboard, shop management')">
-    <meta name="author" content="Shop Admin">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <title>@yield('title', 'Dashboard') - Admin Panel</title>
-
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
-    
-    <!-- AdminLTE CSS -->
+    <title>@yield('title', 'Admin Panel')</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
+
+    <!-- Google Fonts - Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Vite Assets -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @yield('styles')
+
     <style>
-        :root {
-            --orange-primary: #ff6b35;
-            --orange-dark: #e85d2a;
-            --orange-light: #ff8c5e;
-            --black-primary: #1a1a1a;
-            --black-secondary: #2d2d2d;
-            --black-tertiary: #3d3d3d;
-            --transition-speed: 0.3s;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 4.6rem;
-        }
-        
+        /* Aggressive reset for AdminLTE */
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-        
-        html {
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+
+        html, body, #app, .app, .wrapper, .layout-fixed {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            min-height: 100vh;
+            font-family: 'Kanit', sans-serif !important;
         }
-        
-        body {
-            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            overflow-x: hidden;
+
+        /* AdminLTE specific resets */
+        .hold-transition, .sidebar-mini, .layout-fixed {
+            margin: 0 !important;
+            padding: 0 !important;
         }
-        
-        /* ==================== NAVBAR ==================== */
-        .main-header {
-            background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%) !important;
-            border-bottom: 3px solid var(--black-primary);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+        /* Custom AdminLTE Orange Theme */
+        :root {
+            --admin-orange: #ff6b35;
+            --admin-orange-dark: #e85d2a;
+            --admin-orange-light: #ff8c5f;
         }
-        
+
+        /* Navbar - Completely Stable */
+        .main-header.navbar {
+            background: linear-gradient(135deg, var(--admin-orange) 0%, var(--admin-orange-dark) 100%) !important;
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            z-index: 1035 !important;
+            height: 57px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+            transition: none !important;
+            will-change: auto !important;
+            backface-visibility: hidden !important;
+        }
+
+        /* Ensure navbar stays above sidebar */
+        .main-header.navbar {
+            z-index: 1035 !important;
+        }
+
+        /* Prevent any layout shifts that could affect navbar */
+        .main-header.navbar * {
+            transform: none !important;
+            transition: none !important;
+        }
+
         .main-header .navbar-nav .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
-            transition: all var(--transition-speed) ease;
+            padding: 0.5rem 1rem;
         }
-        
+
         .main-header .navbar-nav .nav-link:hover {
             color: #fff !important;
-            transform: translateY(-2px);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
         }
-        
-        .navbar-badge {
-            font-size: 0.65rem;
-            padding: 0.25rem 0.4rem;
+
+        .main-header .navbar-nav .nav-link i {
+            font-size: 1.1rem;
         }
-        
-        /* ==================== SIDEBAR ==================== */
+
+        /* Sidebar */
         .main-sidebar {
-            background: var(--black-primary) !important;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-            transition: width var(--transition-speed) ease, margin var(--transition-speed) ease;
+            background: linear-gradient(180deg, var(--admin-orange-dark) 0%, var(--admin-orange) 100%);
+            box-shadow: 2px 0 10px rgba(255, 107, 53, 0.2);
+            position: fixed !important;
+            top: 57px !important;
+            left: 0 !important;
+            height: calc(100vh - 57px) !important;
+            width: 250px !important;
+            z-index: 1000 !important;
+            transition: transform 0.3s ease !important;
+            /* Default hidden state for hover-to-show */
+            transform: translateX(-250px) !important;
         }
-        
+
+        /* Expanded state on hover */
+        .main-sidebar.sidebar-expanded {
+            transform: translateX(0) !important;
+        }
+
+        /* Ensure sidebar stays below navbar */
+        .main-sidebar {
+            z-index: 1000 !important;
+        }
+
         .brand-link {
-            background: var(--black-secondary) !important;
-            border-bottom: 2px solid var(--orange-primary) !important;
-            transition: all var(--transition-speed) ease;
-        }
-        
-        .brand-link:hover {
-            background: var(--black-tertiary) !important;
-        }
-        
-        .brand-text {
+            background: var(--admin-orange) !important;
             color: #fff !important;
-            font-weight: 600 !important;
-            letter-spacing: 0.5px;
+            border-bottom: none !important;
         }
-        
-        /* User Panel */
-        .user-panel {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem 0.5rem !important;
-        }
-        
-        .user-panel .image i {
-            color: var(--orange-primary);
-            font-size: 2.2rem;
-            transition: all var(--transition-speed) ease;
-        }
-        
-        .user-panel:hover .image i {
-            color: var(--orange-light);
-            transform: scale(1.1);
-        }
-        
-        .user-panel .info a {
-            color: #fff !important;
-            font-weight: 500;
-        }
-        
-        /* Sidebar Menu */
-        .nav-sidebar .nav-item .nav-link {
+
+        .nav-sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8) !important;
             border-radius: 8px;
-            margin: 0.2rem 0.5rem;
-            padding: 0.7rem 1rem;
-            transition: all var(--transition-speed) ease;
+            margin: 2px 8px;
+            transition: all 0.3s ease;
         }
-        
-        .nav-sidebar .nav-item .nav-link:hover {
-            background-color: var(--black-secondary) !important;
+
+        .nav-sidebar .nav-link:hover {
+            background-color: rgba(255, 107, 53, 0.2) !important;
             color: #fff !important;
             transform: translateX(5px);
         }
-        
-        .nav-sidebar .nav-item .nav-link.active {
-            background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%) !important;
+
+        .nav-sidebar .nav-link.active {
+            background: linear-gradient(135deg, var(--admin-orange) 0%, var(--admin-orange-dark) 100%) !important;
             color: #fff !important;
-            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
         }
-        
-        .nav-sidebar .nav-item .nav-link .nav-icon {
-            margin-right: 0.5rem;
+
+        /* Wrapper and body fixes */
+        .wrapper {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            overflow-x: hidden;
         }
-        
-        .nav-header {
-            color: rgba(255, 255, 255, 0.5) !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            padding: 1rem 1rem 0.5rem 1rem;
-        }
-        
-        /* Treeview */
-        .nav-treeview .nav-link {
-            padding-left: 2.5rem !important;
-        }
-        
-        .nav-treeview .nav-link .nav-icon {
-            font-size: 0.7rem;
-        }
-        
-        /* Sidebar Collapse Animation */
-        .sidebar-mini-md.sidebar-collapse .main-sidebar {
-            width: var(--sidebar-collapsed-width) !important;
-        }
-        
-        .sidebar-mini-md.sidebar-collapse .main-sidebar:hover {
-            width: var(--sidebar-width) !important;
-        }
-        
-        .sidebar-mini-md.sidebar-collapse .content-wrapper,
-        .sidebar-mini-md.sidebar-collapse .main-footer {
-            margin-left: var(--sidebar-collapsed-width) !important;
-            transition: margin-left var(--transition-speed) ease;
-        }
-        
-        .sidebar-mini-md.sidebar-collapse .main-sidebar:hover ~ .content-wrapper,
-        .sidebar-mini-md.sidebar-collapse .main-sidebar:hover ~ .main-footer {
-            margin-left: var(--sidebar-width) !important;
-        }
-        
-        /* ==================== CONTENT WRAPPER ==================== */
+
+        /* Content */
         .content-wrapper {
-            background: #f4f6f9;
-            min-height: calc(100vh - 57px - 60px);
-            transition: margin-left var(--transition-speed) ease;
+            background-color: #f4f6f9;
+            margin-top: 57px !important;
+            min-height: calc(100vh - 57px);
+            margin-left: 0 !important;
+            transition: margin-left 0.3s ease !important;
+            position: relative !important;
+            z-index: 800 !important;
         }
-        
+
+        /* Content stays in place for hover-to-show (no shifting) */
+        .content-wrapper {
+            margin-left: 0 !important;
+        }
+
         .content-header {
-            padding: 1.5rem 1rem;
-            background: #fff;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem 0 1rem 0;
         }
-        
+
         .content-header h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--black-primary);
+            color: #2d3748;
+            font-weight: 700;
+            margin: 0;
         }
-        
-        .breadcrumb {
-            background: transparent;
-            margin-bottom: 0;
-            padding: 0;
-        }
-        
-        .breadcrumb-item a {
-            color: var(--orange-primary);
-            text-decoration: none;
-        }
-        
-        .breadcrumb-item a:hover {
-            color: var(--orange-dark);
-            text-decoration: underline;
-        }
-        
-        .breadcrumb-item.active {
-            color: #6c757d;
-        }
-        
-        /* ==================== CARDS ==================== */
+
+        /* Cards */
         .card {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
             border: none;
-            border-radius: 10px;
-            transition: all var(--transition-speed) ease;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
-        
+
         .card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
-        
-        .card-primary.card-outline {
-            border-top: 3px solid var(--orange-primary);
+
+        .card-header {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-bottom: 2px solid var(--admin-orange);
+            border-radius: 15px 15px 0 0 !important;
         }
-        
-        /* Info Box */
-        .info-box {
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        }
-        
-        .info-box-icon {
-            background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%) !important;
-            border-radius: 10px 0 0 10px;
-        }
-        
-        /* ==================== BUTTONS ==================== */
+
+        /* Buttons */
         .btn-primary {
-            background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+            background: linear-gradient(135deg, var(--admin-orange) 0%, var(--admin-orange-dark) 100%);
             border: none;
             border-radius: 8px;
-            padding: 0.5rem 1.5rem;
-            font-weight: 500;
-            transition: all var(--transition-speed) ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--orange-dark) 0%, var(--orange-primary) 100%);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, var(--admin-orange-dark) 0%, var(--admin-orange) 100%);
+            transform: translateY(-1px);
             box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
         }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        /* ==================== DROPDOWN MENU ==================== */
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
+
+        /* Small boxes */
+        .small-box {
+            border-radius: 15px;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
-        
-        .dropdown-item {
-            padding: 0.7rem 1.5rem;
-            transition: all 0.2s ease;
+
+        .small-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: var(--orange-primary);
-            padding-left: 1.8rem;
-        }
-        
-        .dropdown-item i {
-            width: 20px;
-            text-align: center;
-        }
-        
-        /* ==================== FOOTER ==================== */
-        .main-footer {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #3d3d3d 100%);
-            border-top: 3px solid var(--orange-primary);
-            margin: 0 !important;
-            padding: 0;
-            margin-top: auto;
-            transition: margin-left var(--transition-speed) ease;
-        }
-        
-        .footer-content {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem 0;
-        }
-        
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .footer-logo i {
-            font-size: 1.5rem;
-            color: var(--orange-primary);
-        }
-        
-        .footer-logo h6 {
-            margin: 0;
-            color: #fff;
+
+        .small-box .inner h3 {
+            font-size: 2.5rem;
             font-weight: 700;
-            font-size: 1.1rem;
         }
-        
-        .footer-description {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            margin: 0;
-        }
-        
-        .footer-section-title {
-            color: #fff;
+
+        /* Tables */
+        .table thead th {
+            background: linear-gradient(135deg, var(--admin-orange) 0%, var(--admin-orange-dark) 100%);
+            color: white;
+            border: none;
             font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
             text-transform: uppercase;
+            font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
-        
-        .footer-link {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all var(--transition-speed) ease;
-            display: block;
-            padding: 0.3rem 0;
+
+        .table tbody tr:hover {
+            background-color: rgba(255, 107, 53, 0.05);
         }
-        
-        .footer-link:hover {
-            color: var(--orange-primary);
-            padding-left: 0.5rem;
-            text-decoration: none;
-        }
-        
-        .footer-link i {
-            margin-right: 0.5rem;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .footer-bottom {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 1rem 0;
-        }
-        
-        .footer-bottom-text {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        
-        .footer-bottom-text a {
-            color: var(--orange-primary);
-            text-decoration: none;
-        }
-        
-        .footer-bottom-text a:hover {
-            color: var(--orange-light);
-            text-decoration: underline;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        
-        .social-link {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.7);
-            transition: all var(--transition-speed) ease;
-            text-decoration: none;
-        }
-        
-        .social-link:hover {
-            background: var(--orange-primary);
-            color: #fff;
-            transform: translateY(-3px);
-        }
-        
-        /* ==================== ALERTS & FLASH MESSAGES ==================== */
-        .alert {
-            border: none;
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
+
+        /* Alerts */
         .alert-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
         }
-        
+
         .alert-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #ff6b35 0%, #e85d2a 100%);
+            color: white;
+            border: none;
         }
-        
-        .alert-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            color: #fff;
+
+        /* Form controls */
+        .form-control:focus {
+            border-color: var(--admin-orange);
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
         }
-        
-        .alert-info {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: #fff;
+
+        /* Hover Sidebar Functionality */
+        .sidebar-hover-zone {
+            position: fixed;
+            top: 57px;
+            left: 0;
+            width: 15px;
+            height: calc(100vh - 57px);
+            z-index: 999;
+            background: transparent;
+            cursor: pointer;
         }
-        
-        /* ==================== LOADING OVERLAY ==================== */
-        #page-loader {
+
+        /* Mobile sidebar backdrop */
+        .sidebar-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity var(--transition-speed) ease;
-        }
-        
-        #page-loader.fade-out {
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
             opacity: 0;
-            pointer-events: none;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
-        
-        .loader-content {
+
+        /* Ensure proper z-index hierarchy */
+        .sidebar-backdrop {
+            z-index: 1040 !important;
+        }
+
+        .sidebar-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== MOBILE NAVIGATION ===== */
+
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 57px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 57px);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile Quick Menu */
+        .mobile-quick-menu {
+            position: fixed;
+            top: 57px;
+            right: -300px;
+            width: 280px;
+            height: calc(100vh - 57px);
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1041;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-quick-menu.show {
+            right: 0;
+        }
+
+        .mobile-quick-menu .menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            background: var(--admin-orange);
+            color: white;
+        }
+
+        .mobile-quick-menu .menu-body {
+            padding: 0;
+        }
+
+        .mobile-quick-menu .quick-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #495057;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-quick-menu .quick-link:hover {
+            background: #f8f9fa;
+            color: var(--admin-orange);
+            padding-left: 1.5rem;
+        }
+
+        .mobile-quick-menu .quick-link i {
+            width: 20px;
+            margin-right: 0.5rem;
             text-align: center;
         }
-        
-        .loader-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--orange-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        
-        .loader-text {
-            color: var(--black-primary);
-            font-weight: 500;
-            font-size: 1rem;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* ==================== RESPONSIVE ==================== */
+
+        /* Mobile override */
         @media (max-width: 768px) {
-            .content-header h1 {
-                font-size: 1.5rem;
+            .sidebar-mini.sidebar-collapse .main-sidebar {
+                transform: translateX(-100%);
             }
-            
-            .footer-content {
-                padding: 1.5rem 0;
+
+            .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-open {
+                transform: translateX(0);
             }
-            
-            .footer-section-title {
-                margin-top: 1rem;
+
+            /* Hide sidebar hover zone on mobile */
+            .sidebar-hover-zone {
+                display: none !important;
             }
-            
-            .card:hover {
-                transform: none;
+
+            /* Adjust navbar for mobile */
+            .main-header.navbar {
+                padding: 0 1rem;
+            }
+
+            .navbar-nav.ml-auto {
+                margin-left: auto !important;
+            }
+
+            /* Better mobile dropdown positioning */
+            .dropdown-menu {
+                min-width: 200px;
             }
         }
-        
-        /* ==================== UTILITY CLASSES ==================== */
-        .text-orange {
-            color: var(--orange-primary) !important;
+
+        /* Extra small screens */
+        @media (max-width: 576px) {
+            .main-header.navbar {
+                height: 50px !important;
+            }
+
+            .main-sidebar {
+                top: 50px !important;
+                height: calc(100vh - 50px) !important;
+            }
+
+            .content-wrapper {
+                margin-top: 50px !important;
+            }
+
+            .mobile-menu-overlay {
+                top: 50px !important;
+                height: calc(100vh - 50px) !important;
+            }
+
+            .mobile-quick-menu {
+                top: 50px !important;
+                height: calc(100vh - 50px) !important;
+                width: 250px;
+            }
+
+            .sidebar-hover-zone {
+                height: calc(100vh - 50px) !important;
+            }
         }
-        
-        .bg-orange {
-            background: var(--orange-primary) !important;
+
+        /* AdminLTE overrides */
+        .layout-fixed .wrapper,
+        .layout-fixed .wrapper > .content-wrapper,
+        .layout-fixed .wrapper > .content-wrapper > .content,
+        .layout-fixed .wrapper > .content-wrapper > .content > .container-fluid {
+            margin: 0 !important;
+            padding: 0 !important;
         }
-        
-        .border-orange {
-            border-color: var(--orange-primary) !important;
+
+        body.hold-transition {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Content area specific */
+        .content {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .content-header {
+            padding: 1.5rem 1rem 1rem 1rem !important;
+            margin: 0 !important;
+        }
+
+        /* Bootstrap container overrides */
+        .container-fluid {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            margin: 0 !important;
+        }
+
+        /* Page content padding */
+        .content > .container-fluid {
+            padding: 1rem !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar-hover-zone {
+                display: none;
+            }
+
+            /* Mobile sidebar behavior - let AdminLTE handle it */
+            .sidebar-open .main-sidebar {
+                transform: translateX(0) !important;
+            }
+
+            /* Ensure proper overlay on mobile */
+            .main-sidebar {
+                box-shadow: 2px 0 20px rgba(0,0,0,0.3) !important;
+                z-index: 1050 !important;
+            }
+
+            .content-wrapper {
+                z-index: 800 !important;
+            }
         }
     </style>
-    
-    @yield('styles')
 </head>
-<body class="hold-transition sidebar-mini-md layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="sidebar-hover-zone"></div>
+    <!-- Mobile sidebar backdrop -->
+    <div class="sidebar-backdrop"></div>
 
-<!-- Loading Overlay -->
-<div id="page-loader">
-    <div class="loader-content">
-        <div class="loader-spinner"></div>
-        <p class="loader-text">กำลังโหลด...</p>
+    <!-- Mobile Quick Menu -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-quick-menu" id="mobileQuickMenu">
+        <div class="menu-header">
+            <h6 class="mb-0">
+                <i class="fas fa-bars me-2"></i>เมนูหลัก
+            </h6>
+        </div>
+        <div class="menu-body">
+            <a href="{{ route('admin.dashboard') }}" class="quick-link">
+                <i class="fas fa-tachometer-alt"></i>Dashboard
+            </a>
+            <a href="{{ route('admin.products.index') }}" class="quick-link">
+                <i class="fas fa-box-seam"></i>จัดการสินค้า
+            </a>
+            <a href="{{ route('admin.categories.index') }}" class="quick-link">
+                <i class="fas fa-tags"></i>จัดการหมวดหมู่
+            </a>
+            <a href="{{ route('admin.brands.index') }}" class="quick-link">
+                <i class="fas fa-copyright"></i>จัดการแบรนด์
+            </a>
+            <a href="{{ route('admin.orders.index') }}" class="quick-link">
+                <i class="fas fa-receipt"></i>จัดการคำสั่งซื้อ
+            </a>
+            <a href="{{ route('admin.users.index') }}" class="quick-link">
+                <i class="fas fa-users"></i>จัดการผู้ใช้
+            </a>
+            <a href="{{ route('admin.reports.index') }}" class="quick-link">
+                <i class="fas fa-chart-line"></i>รายงาน
+            </a>
+            <hr class="my-2">
+            <a href="{{ route('home') }}" class="quick-link">
+                <i class="fas fa-home"></i>กลับหน้าหลัก
+            </a>
+            <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">
+                @csrf
+                <button type="submit" class="quick-link w-100 text-start border-0 bg-transparent">
+                    <i class="fas fa-sign-out-alt"></i>ออกจากระบบ
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
-<div class="wrapper">
-    <!-- ==================== NAVBAR ==================== -->
-    <nav class="main-header navbar navbar-expand navbar-dark">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-                    <i class="fas fa-bars"></i>
-                </a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/" class="nav-link">
-                    <i class="bi bi-house me-1"></i>หน้าแรก
-                </a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/dashboard" class="nav-link">
-                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                </a>
-            </li>
-        </ul>
+    <div class="wrapper">
+        {{-- Navbar - Mobile Optimized --}}
+        <nav class="main-header navbar navbar-expand">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-label="เปิดเมนู">
+                        <i class="fas fa-bars text-white"></i>
+                    </a>
+                </li>
+            </ul>
 
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-            <!-- Search -->
-            <li class="nav-item">
-                <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                    <i class="fas fa-search"></i>
-                </a>
-                <div class="navbar-search-block">
-                    <form class="form-inline">
-                        <div class="input-group input-group-sm">
-                            <input class="form-control form-control-navbar" type="search" placeholder="ค้นหา..." aria-label="Search">
-                            <div class="input-group-append">
-                                <button class="btn btn-navbar" type="submit">
-                                    <i class="fas fa-search"></i>
+            <ul class="navbar-nav ml-auto">
+                <!-- Mobile Menu Toggle for Small Screens -->
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="#" onclick="toggleMobileMenu()" aria-label="เมนูหลัก">
+                        <i class="fas fa-ellipsis-v text-white"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="เมนูผู้ใช้">
+                        <i class="fas fa-user me-1"></i>
+                        <span class="d-none d-sm-inline">{{ auth()->user()->username }}</span>
+                        <span class="d-sm-none">ผู้ใช้</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">
+                            <i class="fas fa-box-seam me-2"></i>จัดการสินค้า
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">
+                            <i class="fas fa-users me-2"></i>จัดการผู้ใช้
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">
+                            <i class="fas fa-receipt me-2"></i>จัดการคำสั่งซื้อ
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button class="dropdown-item" type="submit">
+                                    <i class="fas fa-sign-out-alt me-2"></i>ออกจากระบบ
                                 </button>
-                                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </li>
-            
-            <!-- Notifications -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-bell"></i>
-                    <span class="badge badge-warning navbar-badge">3</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-item dropdown-header">3 การแจ้งเตือน</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-envelope mr-2"></i> ข้อความใหม่ 1 รายการ
-                        <span class="float-right text-muted text-sm">3 นาที</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-users mr-2"></i> คำสั่งซื้อใหม่ 2 รายการ
-                        <span class="float-right text-muted text-sm">12 นาที</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">ดูทั้งหมด</a>
-                </div>
-            </li>
-            
-            <!-- User Menu -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-user"></i>
-                    <span class="d-none d-md-inline ml-1">{{ Auth::user()->firstname }}</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <div class="dropdown-divider"></div>
-                    <a href="/profile" class="dropdown-item">
-                        <i class="fas fa-user mr-2"></i> โปรไฟล์
-                    </a>
-                    <a href="/settings" class="dropdown-item">
-                        <i class="fas fa-cog mr-2"></i> ตั้งค่า
-                    </a>
-                    <a href="/help" class="dropdown-item">
-                        <i class="fas fa-question-circle mr-2"></i> ช่วยเหลือ
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="dropdown-item text-danger">
-                            <i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบ
-                        </button>
-                    </form>
-                </div>
-            </li>
-            
-            <li class="nav-item">
-                <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                    <i class="fas fa-expand-arrows-alt"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- ==================== SIDEBAR ==================== -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <!-- Brand Logo -->
-        <a href="/dashboard" class="brand-link">
-            <i class="bi bi-shop brand-image ml-3" style="font-size: 2rem;"></i>
-            <span class="brand-text">........</span>
-        </a>
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- User Panel -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="image">
-                    <i class="bi bi-person-circle"></i>
-                </div>
-                <div class="info">
-                    <a href="/profile" class="d-block">
-                        {{ Auth::user()->firstname }} {{ Auth::user()->lastname }}
-                    </a>
-                    <small class="text-muted">Administrator</small>
-                </div>
-            </div>
-
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    
-                    <!-- Dashboard -->
-                    <li class="nav-item">
-                        <a href="/dashboard" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
-                    
-                    <!-- Profile -->
-                    <li class="nav-item">
-                        <a href="/profile" class="nav-link {{ Request::is('profile') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>โปรไฟล์</p>
-                        </a>
-                    </li>
-                    
-                    <!-- Orders -->
-                    <li class="nav-item">
-                        <a href="/orders" class="nav-link {{ Request::is('orders*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>
-                                คำสั่งซื้อ
-                                <span class="badge badge-info right">5</span>
-                            </p>
-                        </a>
-                    </li>
-                    
-                    <!-- Products -->
-                    <li class="nav-item {{ Request::is('products*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ Request::is('products*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-box"></i>
-                            <p>
-                                สินค้า
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/products" class="nav-link {{ Request::is('products') && !Request::is('products/create') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>รายการสินค้า</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/products/create" class="nav-link {{ Request::is('products/create') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>เพิ่มสินค้า</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/products/categories" class="nav-link {{ Request::is('products/categories') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>หมวดหมู่</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <!-- Customers -->
-                    <li class="nav-item">
-                        <a href="/customers" class="nav-link {{ Request::is('customers*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>ลูกค้า</p>
-                        </a>
-                    </li>
-                    
-                    <!-- Reports -->
-                    <li class="nav-item">
-                        <a href="/reports" class="nav-link {{ Request::is('reports*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-chart-bar"></i>
-                            <p>รายงาน</p>
-                        </a>
-                    </li>
-                    
-                    <!-- Settings -->
-                    <li class="nav-item">
-                        <a href="/settings" class="nav-link {{ Request::is('settings*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-cog"></i>
-                            <p>ตั้งค่า</p>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-header">ระบบ</li>
-                    
-                    <!-- Help -->
-                    <li class="nav-item">
-                        <a href="/help" class="nav-link">
-                            <i class="nav-icon fas fa-question-circle"></i>
-                            <p>ช่วยเหลือ</p>
-                        </a>
-                    </li>
-                    
-                    <!-- Logout -->
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="nav-link btn btn-link text-left w-100 text-danger">
-                                <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <p>ออกจากระบบ</p>
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </aside>
-
-    <!-- ==================== CONTENT WRAPPER ==================== -->
-    <div class="content-wrapper">
-        <!-- Content Header -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">@yield('page-title', 'Dashboard')</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="/dashboard"><i class="bi bi-house-door"></i> Home</a></li>
-                            @yield('breadcrumb')
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Flash Messages -->
-        <div class="container-fluid">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>
-                    <strong>สำเร็จ!</strong> {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>ผิดพลาด!</strong> {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-            
-            @if(session('warning'))
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-circle me-2"></i>
-                    <strong>คำเตือน!</strong> {{ session('warning') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-            
-            @if(session('info'))
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <strong>ข้อมูล:</strong> {{ session('info') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-            
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>กรุณาแก้ไขข้อผิดพลาดต่อไปนี้:</strong>
-                    <ul class="mb-0 mt-2">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                            </form>
+                        </li>
                     </ul>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-        </div>
+                </li>
+            </ul>
+        </nav>
 
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                @yield('content')
+        {{-- Sidebar - Mobile Optimized --}}
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="{{ route('admin.dashboard') }}" class="brand-link d-flex align-items-center">
+                <span class="brand-text font-weight-light ms-2">Admin Panel</span>
+            </a>
+
+            <div class="sidebar">
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p class="mb-0">Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-box-seam"></i>
+                                <p class="mb-0">จัดการสินค้า</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p class="mb-0">จัดการหมวดหมู่</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-copyright"></i>
+                                <p class="mb-0">จัดการแบรนด์</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-receipt"></i>
+                                <p class="mb-0">จัดการคำสั่งซื้อ</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p class="mb-0">จัดการผู้ใช้</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p class="mb-0">รายงาน</p>
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a href="{{ route('home') }}" class="nav-link">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p class="mb-0">กลับหน้าหลัก</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-        </section>
+        </aside>
+
+        {{-- Content Wrapper --}}
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">@yield('title', 'Dashboard')</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content">
+                <div class="container-fluid">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    @yield('content')
+                </div>
+            </section>
+        </div>
     </div>
 
-    <!-- ==================== FOOTER ==================== -->
-    <footer class="main-footer">
-        <!-- Footer Content -->
-        <div class="footer-content">
-            <div class="container-fluid px-4">
-                <div class="row">
-                    <!-- Logo & Description -->
-                    <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                        <div class="footer-logo">
-                            <i class="bi bi-shop"></i>
-                            <h6>Shop Admin</h6>
-                        </div>
-                        <p class="footer-description">
-                            ระบบจัดการร้านค้าออนไลน์ครบวงจร<br>
-                            สำหรับผู้ประกอบการยุคใหม่
-                        </p>
-                        
-                        <!-- Social Links -->
-                        <div class="social-links mt-3">
-                            <a href="#" class="social-link" title="Facebook">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="#" class="social-link" title="Twitter">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                            <a href="#" class="social-link" title="Instagram">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                            <a href="#" class="social-link" title="Line">
-                                <i class="bi bi-line"></i>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Links -->
-                    <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
-                        <h6 class="footer-section-title">เมนูหลัก</h6>
-                        <a href="/dashboard" class="footer-link">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                        <a href="/products" class="footer-link">
-                            <i class="bi bi-box"></i> สินค้า
-                        </a>
-                        <a href="/orders" class="footer-link">
-                            <i class="bi bi-cart"></i> คำสั่งซื้อ
-                        </a>
-                        <a href="/customers" class="footer-link">
-                            <i class="bi bi-people"></i> ลูกค้า
-                        </a>
-                        <a href="/reports" class="footer-link">
-                            <i class="bi bi-graph-up"></i> รายงาน
-                        </a>
-                    </div>
-                    
-                    <!-- Support Links -->
-                    <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                        <h6 class="footer-section-title">การสนับสนุน</h6>
-                        <a href="/help" class="footer-link">
-                            <i class="bi bi-question-circle"></i> ศูนย์ช่วยเหลือ
-                        </a>
-                        <a href="/documentation" class="footer-link">
-                            <i class="bi bi-file-text"></i> เอกสารคู่มือ
-                        </a>
-                        <a href="/contact" class="footer-link">
-                            <i class="bi bi-envelope"></i> ติดต่อเรา
-                        </a>
-                        <a href="/faq" class="footer-link">
-                            <i class="bi bi-chat-dots"></i> คำถามที่พบบ่อย
-                        </a>
-                        <a href="/terms" class="footer-link">
-                            <i class="bi bi-file-earmark-text"></i> ข้อตกลง
-                        </a>
-                    </div>
-                    
-                    <!-- Contact Info -->
-                    <div class="col-lg-3 col-md-6">
-                        <h6 class="footer-section-title">ติดต่อเรา</h6>
-                        <div class="footer-link">
-                            <i class="bi bi-geo-alt"></i> 
-                        </div>
-                        <div class="footer-link">
-                            <i class="bi bi-telephone"></i> 
-                        </div>
-                        <div class="footer-link">
-                            <i class="bi bi-envelope"></i> 
-                        </div>
-                        <div class="footer-link">
-                            <i class="bi bi-clock"></i> 
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <div class="container-fluid px-4">
-                <div class="row align-items-center">
-                    <div class="col-md-6 text-center text-md-start">
-                        <p class="footer-bottom-text">
-                            <i class="bi bi-c-circle me-1"></i>2025 <strong>Shop Admin</strong>. All Rights Reserved.
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                        <p class="footer-bottom-text">
-                            Made with <i class="bi bi-heart-fill text-danger"></i> in Thailand | 
-                            <a href="/privacy">Privacy Policy</a> | 
-                            <strong>Version</strong> 1.0.0
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-</div>
+    {{-- SweetAlert2 Integration --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for SweetAlert configuration from server
+        @if(session('sweetalert'))
+            const config = @json(session('sweetalert'));
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
-<!-- Bootstrap 4 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
-
-<!-- AdminLTE App -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-
-<!-- Custom Admin Scripts -->
-<script>
-    $(document).ready(function() {
-        // Setup CSRF token for AJAX requests
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            // Handle auto-redirect
+            if (config.redirect) {
+                Swal.fire(config).then(() => {
+                    window.location.href = config.redirect;
+                });
+            } else {
+                Swal.fire(config);
             }
-        });
-        
-        // Hide page loader
-        setTimeout(function() {
-            $('#page-loader').addClass('fade-out');
-            setTimeout(function() {
-                $('#page-loader').hide();
-            }, 300);
-        }, 500);
-        
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut('slow', function() {
-                $(this).remove();
-            });
-        }, 5000);
-        
-        // Tooltip initialization
-        $('[data-toggle="tooltip"]').tooltip();
-        
-        // Popover initialization
-        $('[data-toggle="popover"]').popover();
-        
-        // Sidebar menu state persistence
-        var activeMenu = localStorage.getItem('activeMenu');
-        if (activeMenu) {
-            $('.nav-sidebar .nav-link').removeClass('active');
-            $('[href="' + activeMenu + '"]').addClass('active');
-            $('[href="' + activeMenu + '"]').closest('.nav-item').addClass('menu-open');
-        }
-        
-        $('.nav-sidebar .nav-link').on('click', function() {
-            localStorage.setItem('activeMenu', $(this).attr('href'));
-        });
-        
-        // Confirm before logout
-        $('form[action*="logout"] button').on('click', function(e) {
-            if (!confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+        @endif
+
+        // Enhanced delete confirmations
+        document.querySelectorAll('[data-confirm-delete]').forEach(button => {
+            button.addEventListener('click', function(e) {
                 e.preventDefault();
+
+                const title = this.getAttribute('data-confirm-title') || 'คุณแน่ใจหรือไม่?';
+                const text = this.getAttribute('data-confirm-text') || 'การดำเนินการนี้ไม่สามารถยกเลิกได้';
+                const form = this.closest('form');
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ใช่, ลบเลย!',
+                    cancelButtonText: 'ยกเลิก',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed && form) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Auto-hide Bootstrap alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            if (!alert.classList.contains('alert-permanent')) {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
             }
         });
-        
-        // Sidebar collapse state persistence
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-            $('body').addClass('sidebar-collapse');
+
+        // Sidebar functionality
+        const sidebar = document.querySelector('.main-sidebar');
+        const hoverZone = document.querySelector('.sidebar-hover-zone');
+        const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+        const body = document.body;
+        let hoverTimeout;
+
+        // Hover-to-show functionality (desktop only)
+        if (window.innerWidth > 768) {
+            function expandSidebar() {
+                clearTimeout(hoverTimeout);
+                sidebar.classList.add('sidebar-expanded');
+                body.classList.add('sidebar-expanded');
+            }
+
+            function collapseSidebar() {
+                hoverTimeout = setTimeout(() => {
+                    if (!sidebar.matches(':hover') && !hoverZone.matches(':hover')) {
+                        sidebar.classList.remove('sidebar-expanded');
+                        body.classList.remove('sidebar-expanded');
+                    }
+                }, 300);
+            }
+
+            // Hover zone events
+            if (hoverZone) {
+                hoverZone.addEventListener('mouseenter', expandSidebar);
+                hoverZone.addEventListener('mouseleave', collapseSidebar);
+            }
+
+            // Sidebar events
+            if (sidebar) {
+                sidebar.addEventListener('mouseenter', expandSidebar);
+                sidebar.addEventListener('mouseleave', collapseSidebar);
+            }
         }
-        
-        $('[data-widget="pushmenu"]').on('collapsed.lte.pushmenu', function() {
-            localStorage.setItem('sidebarCollapsed', 'true');
-        });
-        
-        $('[data-widget="pushmenu"]').on('shown.lte.pushmenu', function() {
-            localStorage.setItem('sidebarCollapsed', 'false');
-        });
-    });
-    
-    // Notification count update (example function)
-    function updateNotificationCount() {
-        // You can implement AJAX call here to get real notification count
-        // Example:
-        /*
-        $.ajax({
-            url: '/api/notifications/count',
-            method: 'GET',
-            success: function(data) {
-                if (data.count > 0) {
-                    $('.navbar-badge').text(data.count).show();
-                } else {
-                    $('.navbar-badge').hide();
+
+        // Handle mobile backdrop clicks
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', function() {
+                // Close sidebar by triggering AdminLTE's close mechanism
+                const pushMenuBtn = document.querySelector('[data-widget="pushmenu"]');
+                if (pushMenuBtn && window.innerWidth <= 768) {
+                    // Simulate click to close
+                    document.body.classList.remove('sidebar-open');
+                    sidebarBackdrop.classList.remove('show');
                 }
+            });
+        }
+
+        // Listen for AdminLTE sidebar events and manage expanded state
+        $(document).on('collapsed.lte.pushmenu', function() {
+            body.classList.remove('sidebar-expanded');
+            sidebarBackdrop.classList.remove('show');
+        });
+
+        $(document).on('shown.lte.pushmenu', function() {
+            body.classList.add('sidebar-expanded');
+            if (window.innerWidth <= 768) {
+                sidebarBackdrop.classList.add('show');
             }
         });
-        */
-    }
-    
-    // Call notification update every 60 seconds
-    setInterval(updateNotificationCount, 60000);
-    
-    // Prevent multiple form submissions
-    $('form').on('submit', function() {
-        $(this).find('button[type="submit"]').prop('disabled', true);
-        $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...');
-    });
-    
-    // Add smooth scrolling to all links
-    $('a[href^="#"]').on('click', function(e) {
-        var target = $(this.getAttribute('href'));
-        if (target.length) {
-            e.preventDefault();
-            $('html, body').stop().animate({
-                scrollTop: target.offset().top - 100
-            }, 1000);
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                // Reset mobile state on desktop
+                document.body.classList.remove('sidebar-open');
+                sidebarBackdrop.classList.remove('show');
+                // Close mobile menu if open
+                closeMobileMenu();
+                // Re-enable hover functionality
+                location.reload(); // Simple way to re-initialize hover listeners
+            } else {
+                // Disable hover on mobile
+                sidebar.classList.remove('sidebar-expanded');
+                body.classList.remove('sidebar-expanded');
+            }
+        });
+
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileQuickMenu');
+
+            if (menu.classList.contains('show')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
         }
+
+        function openMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileQuickMenu');
+
+            overlay.classList.add('show');
+            menu.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const menu = document.getElementById('mobileQuickMenu');
+
+            overlay.classList.remove('show');
+            menu.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close mobile menu when clicking overlay
+        document.getElementById('mobileMenuOverlay').addEventListener('click', closeMobileMenu);
+
+        // Close mobile menu when clicking menu links
+        document.querySelectorAll('.mobile-quick-menu .quick-link').forEach(link => {
+            link.addEventListener('click', function() {
+                // Only close if it's not a form submit button
+                if (!this.hasAttribute('type') || this.getAttribute('type') !== 'submit') {
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+            }
+        });
     });
-    
-    // Print functionality
-    function printContent() {
-        window.print();
-    }
-    
-    // Export to PDF (requires additional library)
-    function exportToPDF() {
-        alert('Export to PDF functionality - Please implement with jsPDF or similar library');
-    }
-    
-    // Console warning for developers
-    console.log('%cShop Admin Panel', 'color: #ff6b35; font-size: 20px; font-weight: bold;');
-    console.log('%cVersion 1.0.0', 'color: #1a1a1a; font-size: 12px;');
-    console.log('%c⚠️ Warning: Do not paste any code here unless you understand what it does!', 'color: red; font-size: 14px; font-weight: bold;');
 </script>
 
-<!-- Page Specific Scripts -->
-@yield('scripts')
-
-<!-- Additional Scripts Stack -->
-@stack('page-scripts')
-
+    @yield('scripts')
 </body>
 </html>

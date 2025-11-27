@@ -6,5 +6,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    //
+    protected $primaryKey = 'order_item_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false; // ตาราง order_items ไม่มี timestamps
+
+    protected $fillable = [
+        'order_id',
+        'product_id',
+        'quantity',
+        'price_at_purchase',
+        'subtotal',
+    ];
+
+    protected $casts = [
+        'price_at_purchase' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+        'quantity' => 'integer',
+    ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'order_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'product_id');
+    }
 }
