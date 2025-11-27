@@ -261,7 +261,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- **Developer**: Amnet Development Team
 - **Tech Stack**: Laravel, PostgreSQL, Redis, Bootstrap
 - **Architecture**: MVC with DSA principles
 
@@ -304,7 +303,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Redis for high-performance caching
 
 ---
-
-**⭐ Star this repository if you find it helpful!**
-
-**📧 Contact**: dev@amnet.com | 🌐 https://amnet.com**
