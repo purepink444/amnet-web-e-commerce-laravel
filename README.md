@@ -265,6 +265,37 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tech Stack**: Laravel, PostgreSQL, Redis, Bootstrap
 - **Architecture**: MVC with DSA principles
 
+## 🔄 การอัปเดตล่าสุด (Latest Updates)
+
+### **Database Schema Overhaul (27 พฤศจิกายน 2025)**
+- ✅ **ปรับปรุงโครงสร้างฐานข้อมูล**: อัปเดต migrations, models และ seeders ให้ตรงกับ SQL schema ใหม่ที่ครบครัน
+- ✅ **ตารางฐานข้อมูลหลัก**:
+  - `roles` - จัดการบทบาทผู้ใช้
+  - `users` - ข้อมูลผู้ใช้พร้อมระบบสิทธิ์
+  - `members` - ข้อมูลสมาชิกแบบครบถ้วน
+  - `categories` - หมวดหมู่สินค้าพร้อมโครงสร้างลำดับชั้น
+  - `brands` - แบรนด์สินค้าพร้อมข้อมูลเพิ่มเติม
+  - `products` - สินค้าพร้อม SKU, specifications และ views
+  - `product_images` - จัดการรูปภาพสินค้าหลายรูป
+  - `cart_items` - ตะกร้าสินค้าที่เชื่อมโยงกับสมาชิก
+  - `reviews` - รีวิวสินค้าพร้อมระบบ verified purchase
+  - `orders` - คำสั่งซื้อพร้อม discount และ payment status
+  - `order_items` - รายการสินค้าในคำสั่งซื้อ
+  - `payments` - ข้อมูลการชำระเงินครบถ้วน
+  - `shipping` - ข้อมูลการจัดส่ง
+  - `wishlists` - รายการโปรด
+  - `promotions` - ระบบโปรโมชั่นและคูปองส่วนลด
+- ✅ **ฟีเจอร์เพิ่มเติม**:
+  - ระบบ indexes สำหรับประสิทธิภาพการค้นหา
+  - Triggers สำหรับอัปเดต timestamps อัตโนมัติ
+  - Foreign key constraints ที่สมบูรณ์
+  - Data validation และ constraints
+- ✅ **การปรับปรุงระบบ**:
+  - ลบตารางที่ไม่จำเป็นออก (cache, jobs, password_reset_tokens, sessions)
+  - อัปเดต models ให้รองรับ primary keys แบบกำหนดเอง
+  - ปรับปรุง seeders ให้ตรงกับโครงสร้างใหม่
+  - จัดการ conflicts และ merge กับ remote repository
+
 ## 🎉 Acknowledgments
 
 - Laravel Framework for robust backend
