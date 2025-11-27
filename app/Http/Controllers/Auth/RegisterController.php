@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Member;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
@@ -18,6 +19,8 @@ class RegisterController extends Controller
     // ประมวลผลสมัครสมาชิก
     public function register(Request $request)
     {
+        \Log::info('Registration attempt', $request->all());
+
         // Validate ข้อมูล
         $request->validate([
             'username' => 'required|string|max:255|unique:users,username|regex:/^[A-Za-z0-9_-]+$/',
@@ -41,25 +44,36 @@ class RegisterController extends Controller
             'terms' => 'accepted',
         ]);
 
+        \Log::info('Validation passed');
+
         // สร้างผู้ใช้ใหม่
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'prefix' => $request->prefix,
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
             'phone' => $request->phone,
-            'address' => $request->address,
-            'province' => $request->province,
-            'district' => $request->district,
-            'subdistrict' => $request->subdistrict,
-            'zipcode' => $request->zipcode,
             'role_id' => 2, // สมมติเป็น member
         ]);
 
+        \Log::info('User created', ['user_id' => $user->user_id]);
+
+        // สร้าง Member profile
+        $member = Member::create([
+            'user_id' => $user->user_id,
+            'first_name' => $request->firstname,
+            'last_name' => $request->lastname,
+            'address' => $request->address,
+            'district' => $request->district,
+            'province' => $request->province,
+            'postal_code' => $request->zipcode,
+        ]);
+
+        \Log::info('Member created', ['member_id' => $member->member_id]);
+
         // Login อัตโนมัติ
         auth()->login($user);
+
+        \Log::info('User logged in');
 
         return redirect()->route('home')->with('success', 'สมัครสมาชิกสำเร็จ');
     }

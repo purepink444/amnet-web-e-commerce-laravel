@@ -133,6 +133,13 @@
                         <label class="form-label mt-3 mb-1">ยืนยันรหัสผ่าน</label>
                         <input type="password" name="password_confirmation" class="form-input mb-3">
 
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" name="terms" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                ยอมรับ <a href="#" target="_blank">เงื่อนไขการใช้งาน</a>
+                            </label>
+                        </div>
+
                         <div class="text-center mt-4">
                             <button type="submit" class="register-btn">สมัครสมาชิก</button>
                         </div>
