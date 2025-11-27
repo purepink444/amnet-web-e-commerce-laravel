@@ -77,8 +77,8 @@ class ClientProductController extends Controller
 
             // Check if product is in user's wishlist (optimized query)
             $isInWishlist = false;
-            if (auth()->check()) {
-                $isInWishlist = auth()->user()->wishlists()
+            if (auth()->check() && auth()->user()->member) {
+                $isInWishlist = auth()->user()->member->wishlists()
                     ->where('product_id', $product->product_id)
                     ->exists();
             }

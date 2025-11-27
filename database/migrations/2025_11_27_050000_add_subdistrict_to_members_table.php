@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id('role_id');
-            $table->enum('role_name', ['admin', 'member'])->unique();
-            $table->text('description')->nullable();
-            $table->timestamps();
+        Schema::table('members', function (Blueprint $table) {
+            $table->string('subdistrict', 100)->nullable()->after('district');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::table('members', function (Blueprint $table) {
+            $table->dropColumn('subdistrict');
+        });
     }
 };

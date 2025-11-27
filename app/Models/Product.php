@@ -115,4 +115,69 @@ class Product extends Model
     {
         return $query->where('stock_quantity', '>', 0);
     }
+
+    /**
+     * Check if product has reviews.
+     */
+    public function hasReviews()
+    {
+        return $this->reviews()->exists();
+    }
+
+    /**
+     * Get average rating.
+     */
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    /**
+     * Get total reviews count.
+     */
+    public function getTotalReviewsAttribute()
+    {
+        return $this->reviews()->count();
+    }
+
+    /**
+     * Get rating stars HTML.
+     */
+    public function getRatingStarsAttribute()
+    {
+        $rating = $this->average_rating;
+        $stars = '';
+
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $rating) {
+                $stars .= '<i class="bi bi-star-fill text-warning"></i>';
+            } elseif ($i - 0.5 <= $rating) {
+                $stars .= '<i class="bi bi-star-half text-warning"></i>';
+            } else {
+                $stars .= '<i class="bi bi-star text-warning"></i>';
+            }
+        }
+
+        return $stars;
+    }
+
+    /**
+     * Get rating distribution.
+     */
+    public function getRatingDistributionAttribute()
+    {
+        $distribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $distribution[$i] = $this->reviews()->where('rating', $i)->count();
+        }
+        return $distribution;
+    }
+
+    /**
+     * Get latest reviews.
+     */
+    public function getLatestReviews($limit = 3)
+    {
+        return $this->reviews()->with('member.user')->latest()->limit($limit)->get();
+    }
 }

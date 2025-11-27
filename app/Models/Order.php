@@ -15,6 +15,7 @@ class Order extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
+        'user_id',
         'member_id',
         'order_date',
         'total_amount',
@@ -46,17 +47,17 @@ class Order extends Model
     /**
      * Get the order items.
      */
-    public function items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
     }
 
     /**
-     * Get the payments for the order.
+     * Get the payment for the order.
      */
-    public function payments()
+    public function payment()
     {
-        return $this->hasMany(Payment::class, 'order_id', 'order_id');
+        return $this->hasOne(Payment::class, 'order_id', 'order_id');
     }
 
     /**

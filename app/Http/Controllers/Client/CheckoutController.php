@@ -55,7 +55,29 @@ class CheckoutController extends Controller
             }),
         ];
 
-        return view('checkout.index', compact('cart'));
+        // เตรียมข้อมูลที่อยู่สำหรับแสดงผล
+        $memberAddress = null;
+        if ($member) {
+            $provinceName = is_numeric($member->province) ? $this->getProvinceName($member->province) : $member->province;
+            $districtName = is_numeric($member->district) ? $this->getDistrictName($member->district) : $member->district;
+
+            $memberAddress = [
+                'full_name' => $member->first_name . ' ' . $member->last_name,
+                'address' => $member->address,
+                'subdistrict' => $member->subdistrict,
+                'district' => $districtName,
+                'province' => $provinceName,
+                'postal_code' => $member->postal_code,
+                'formatted' => trim($member->first_name . ' ' . $member->last_name . "\n" .
+                                   $member->address . "\n" .
+                                   ($member->subdistrict ? $member->subdistrict . ' ' : '') .
+                                   ($districtName ? $districtName . ' ' : '') .
+                                   ($provinceName ? $provinceName . ' ' : '') .
+                                   ($member->postal_code ?: ''))
+            ];
+        }
+
+        return view('checkout.index', compact('cart', 'memberAddress'));
     }
 
     /**
@@ -63,12 +85,28 @@ class CheckoutController extends Controller
      */
     public function process(Request $request): RedirectResponse
     {
-        // Validation ตามวิธีการชำระเงิน
+        \Log::info('Checkout process started', ['method' => $request->method(), 'all' => $request->all()]);
+
+        // Validation พื้นฐาน
         $rules = [
             'payment_method' => 'required|in:credit,qr,cod',
-            'shipping_address' => 'required|string|max:500',
+            'address_type' => 'required|in:registered,new',
         ];
 
+        // Validation สำหรับที่อยู่ใหม่
+        if ($request->address_type === 'new') {
+            $rules = array_merge($rules, [
+                'new_first_name' => 'required|string|max:255',
+                'new_last_name' => 'required|string|max:255',
+                'new_address' => 'required|string|max:500',
+                'new_subdistrict' => 'nullable|string|max:255',
+                'new_district' => 'nullable|string|max:255',
+                'new_province' => 'required|string|max:255',
+                'new_postal_code' => 'required|string|size:5',
+            ]);
+        }
+
+        // Validation ตามวิธีการชำระเงิน
         if ($request->payment_method === 'credit') {
             $rules = array_merge($rules, [
                 'card_name' => 'required|string|max:255',
@@ -78,20 +116,78 @@ class CheckoutController extends Controller
             ]);
         }
 
-        $request->validate($rules);
+        // Clean card number by removing spaces if credit payment
+        if ($request->payment_method === 'credit' && $request->has('card_number')) {
+            $original = $request->card_number;
+            $request->card_number = str_replace(' ', '', $request->card_number);
+            \Log::info('Card number cleaned', ['original' => $original, 'cleaned' => $request->card_number]);
+        }
+
+        \Log::info('Validation rules prepared', ['rules' => $rules, 'request_data' => $request->all()]);
+
+        try {
+            $request->validate($rules);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', ['errors' => $e->errors(), 'input' => $request->all()]);
+            throw $e;
+        }
+
+        \Log::info('Checkout validation passed', $request->all());
 
         $user = auth()->user();
+        \Log::info('User retrieved', ['user_id' => $user->user_id ?? null]);
         $member = $user->member;
+        \Log::info('Member retrieved', ['member_id' => $member->member_id ?? null]);
         if (!$member) {
+            \Log::warning('No member found for user', ['user_id' => $user->user_id]);
             return redirect()->route('account.cart.index')
                 ->with('error', 'ไม่พบข้อมูลสมาชิก');
         }
 
         $cartItems = CartItem::with('product')->where('member_id', $member->member_id)->get();
+        \Log::info('Cart items retrieved', ['count' => $cartItems->count()]);
 
         if ($cartItems->isEmpty()) {
+            \Log::warning('Cart is empty for member', ['member_id' => $member->member_id]);
             return redirect()->route('account.cart.index')
                 ->with('error', 'ตะกร้าของคุณว่างเปล่า');
+        }
+
+        // จัดการที่อยู่จัดส่ง
+        $shippingAddress = '';
+        if ($request->address_type === 'registered') {
+            // ใช้ที่อยู่ที่ลงทะเบียนไว้ - แปลงรหัสเป็นชื่อถ้าจำเป็น
+            $provinceName = is_numeric($member->province) ? $this->getProvinceName($member->province) : $member->province;
+            $districtName = is_numeric($member->district) ? $this->getDistrictName($member->district) : $member->district;
+
+            $shippingAddress = trim($member->first_name . ' ' . $member->last_name . "\n" .
+                                   $member->address . "\n" .
+                                   ($member->subdistrict ? $member->subdistrict . ' ' : '') .
+                                   ($districtName ? $districtName . ' ' : '') .
+                                   ($provinceName ? $provinceName . ' ' : '') .
+                                   ($member->postal_code ?: ''));
+        } else {
+            // ใช้ที่อยู่ใหม่ - แปลงรหัสจังหวัดและอำเภอเป็นชื่อ
+            $provinceName = $this->getProvinceName($request->new_province);
+            $districtName = $this->getDistrictName($request->new_district);
+
+            $shippingAddress = trim($request->new_first_name . ' ' . $request->new_last_name . "\n" .
+                                   $request->new_address . "\n" .
+                                   ($request->new_subdistrict ? $request->new_subdistrict . ' ' : '') .
+                                   ($districtName ? $districtName . ' ' : '') .
+                                   ($provinceName ? $provinceName . ' ' : '') .
+                                   ($request->new_postal_code ?: ''));
+
+            // อัปเดตข้อมูล member ด้วยที่อยู่ใหม่ (ถ้าต้องการ)
+            $member->update([
+                'first_name' => $request->new_first_name,
+                'last_name' => $request->new_last_name,
+                'address' => $request->new_address,
+                'subdistrict' => $request->new_subdistrict,
+                'district' => $districtName,
+                'province' => $provinceName,
+                'postal_code' => $request->new_postal_code,
+            ]);
         }
 
         // คำนวณราคารวม
@@ -110,9 +206,12 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
+            \Log::info('Starting database transaction');
+
             // หา member_id ของ user ถ้าไม่มีให้สร้าง
             $member = $user->member;
             if (!$member) {
+                \Log::info('Creating member record');
                 // สร้าง member record ถ้ายังไม่มี
                 $member = \App\Models\Member::create([
                     'user_id' => $user->user_id,
@@ -123,6 +222,7 @@ class CheckoutController extends Controller
                     'province' => $user->province,
                     'postal_code' => $user->zipcode,
                 ]);
+                \Log::info('Member created: ' . $member->member_id);
             }
 
             // สร้างคำสั่งซื้อ
@@ -132,10 +232,12 @@ class CheckoutController extends Controller
                 'total_amount' => $totalPrice,
                 'order_status' => 'pending',
                 'shipping_method' => $request->payment_method, // ใช้ shipping_method แทน payment_method
-                'shipping_address' => $request->shipping_address,
+                'shipping_address' => $shippingAddress,
             ];
 
+            \Log::info('Creating order', $orderData);
             $order = Order::create($orderData);
+            \Log::info('Order created: ' . $order->order_id);
 
             // สร้างรายการสินค้าในคำสั่งซื้อ
             foreach ($cartItems as $item) {
@@ -143,6 +245,7 @@ class CheckoutController extends Controller
                 OrderItem::create([
                     'order_id' => $order->order_id,
                     'product_id' => $item->product_id,
+                    'product_name' => $item->product->product_name,
                     'quantity' => $item->quantity,
                     'price_at_purchase' => $item->product->price,
                     'subtotal' => $subtotal,
@@ -244,7 +347,7 @@ class CheckoutController extends Controller
         // จำลองการเรียก API ของ payment gateway
         sleep(1); // จำลอง delay
 
-        $success = rand(1, 10) > 2; // 80% success rate สำหรับ demo
+        $success = true; // สำหรับ demo ให้สำเร็จเสมอ
 
         if ($success) {
             $payment->markAsCompleted();
@@ -318,11 +421,31 @@ class CheckoutController extends Controller
     public function success(int $orderId): View
     {
         $user = auth()->user();
-        $order = Order::with(['items.product', 'payment'])
+        $order = Order::with(['orderItems.product', 'payment'])
             ->where('user_id', $user->user_id)
             ->where('order_id', $orderId)
             ->firstOrFail();
 
         return view('checkout.success', compact('order'));
+    }
+
+    /**
+     * แปลงรหัสจังหวัดเป็นชื่อจังหวัด
+     */
+    private function getProvinceName($provinceCode)
+    {
+        $provinces = json_decode(file_get_contents(public_path('json/src/provinces.json')), true);
+        $province = collect($provinces)->firstWhere('provinceCode', $provinceCode);
+        return $province ? $province['provinceNameTh'] : $provinceCode;
+    }
+
+    /**
+     * แปลงรหัสอำเภอเป็นชื่ออำเภอ
+     */
+    private function getDistrictName($districtCode)
+    {
+        $districts = json_decode(file_get_contents(public_path('json/src/districts.json')), true);
+        $district = collect($districts)->firstWhere('districtCode', $districtCode);
+        return $district ? $district['districtNameTh'] : $districtCode;
     }
 }

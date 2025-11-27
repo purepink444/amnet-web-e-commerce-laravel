@@ -31,7 +31,7 @@
                     <!-- Order Summary -->
                     <div class="text-start mb-4">
                         <h5 class="mb-3">รายละเอียดคำสั่งซื้อ</h5>
-                        @foreach($order->items as $item)
+                        @foreach($order->orderItems as $item)
                         <div class="d-flex justify-content-between py-2 border-bottom">
                             <span>{{ $item->product->product_name }} ({{ $item->quantity }} ชิ้น)</span>
                             <span>฿{{ number_format($item->price * $item->quantity, 2) }}</span>

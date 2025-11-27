@@ -17,6 +17,7 @@ class Member extends Model
         'date_of_birth',
         'address',
         'district',
+        'subdistrict',
         'province',
         'postal_code',
         'profile_image',
@@ -67,5 +68,34 @@ class Member extends Model
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class, 'member_id', 'member_id');
+    }
+
+    /**
+     * Check if member can review a product (has purchased and order is completed).
+     */
+    public function canReviewProduct($productId)
+    {
+        return $this->orders()
+            ->where('order_status', 'completed')
+            ->whereHas('orderItems', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if member has already reviewed a product.
+     */
+    public function hasReviewedProduct($productId)
+    {
+        return $this->reviews()->where('product_id', $productId)->exists();
+    }
+
+    /**
+     * Get full name attribute.
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

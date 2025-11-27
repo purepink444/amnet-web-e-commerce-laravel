@@ -18,6 +18,7 @@ class Payment extends Model
         'amount',
         'transaction_id',
         'payment_proof_url',
+        'payment_data',
     ];
 
     protected $casts = [
@@ -31,5 +32,16 @@ class Payment extends Model
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * Mark the payment as completed.
+     */
+    public function markAsCompleted()
+    {
+        $this->update([
+            'payment_status' => 'completed',
+            'payment_date' => now(),
+        ]);
     }
 }

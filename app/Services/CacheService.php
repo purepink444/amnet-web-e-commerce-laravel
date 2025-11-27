@@ -34,7 +34,7 @@ class CacheService
             self::KEY_CATEGORIES,
             self::CACHE_TTL_MEDIUM,
             function () {
-                return \App\Models\Category::where('status', 'active')
+                return \App\Models\Category::where('is_active', true)
                                          ->orderBy('category_name')
                                          ->get();
             }
@@ -50,9 +50,9 @@ class CacheService
             self::KEY_BRANDS,
             self::CACHE_TTL_MEDIUM,
             function () {
-                return \App\Models\Brand::where('status', 'active')
-                                      ->orderBy('brand_name')
-                                      ->get();
+                return \App\Models\Brand::where('is_active', true)
+                                       ->orderBy('brand_name')
+                                       ->get();
             }
         );
     }

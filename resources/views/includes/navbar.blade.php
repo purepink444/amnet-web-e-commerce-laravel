@@ -90,7 +90,7 @@
                         <span class="visually-hidden">ตะกร้าสินค้า</span>
                         <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="cart-counter">
                             @php
-                                $cartCount = \App\Models\CartItem::where('user_id', auth()->id())->sum('quantity');
+                                $cartCount = auth()->user()->member ? \App\Models\CartItem::where('member_id', auth()->user()->member->member_id)->sum('quantity') : 0;
                                 echo $cartCount ?: 0;
                             @endphp
                         </span>
