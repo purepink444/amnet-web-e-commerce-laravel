@@ -15,19 +15,23 @@ class Product extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
+        'category_id',
+        'brand_id',
+        'sku',
         'product_name',
         'description',
         'price',
         'stock_quantity',
-        'category_id',
-        'brand_id',
+        'specifications',
         'status',
-        'image_url',
+        'views',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'stock_quantity' => 'integer',
+        'specifications' => 'json',
+        'views' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -46,6 +50,46 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class, 'brand_id', 'brand_id');
+    }
+
+    /**
+     * Get the images for the product.
+     */
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id', 'product_id');
+    }
+
+    /**
+     * Get the primary image for the product.
+     */
+    public function primaryImage()
+    {
+        return $this->hasOne(ProductImage::class, 'product_id', 'product_id')->where('is_primary', true);
+    }
+
+    /**
+     * Get the cart items for the product.
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'product_id', 'product_id');
+    }
+
+    /**
+     * Get the reviews for the product.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id', 'product_id');
+    }
+
+    /**
+     * Get the wishlists for the product.
+     */
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'product_id', 'product_id');
     }
 
     /**

@@ -15,33 +15,36 @@ class Order extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'user_id',
-        'order_number',
+        'member_id',
+        'order_date',
         'total_amount',
-        'status',
-        'notes',
+        'discount_amount',
+        'order_status',
+        'payment_status',
         'shipping_address',
-        'payment_method',
+        'shipping_method',
+        'tracking_number',
+        'notes',
     ];
 
     protected $casts = [
+        'order_date' => 'datetime',
         'total_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the user that owns the order.
-     * ระบุ foreign key และ owner key ให้ชัดเจน
+     * Get the member that owns the order.
      */
-    public function user()
+    public function member()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(Member::class, 'member_id', 'member_id');
     }
 
     /**
      * Get the order items.
-     * ระบุ foreign key ให้ตรงกับโครงสร้างของคุณ
      */
     public function items()
     {
@@ -49,15 +52,34 @@ class Order extends Model
     }
 
     /**
+     * Get the payments for the order.
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'order_id', 'order_id');
+    }
+
+    /**
+     * Get the shipping for the order.
+     */
+    public function shipping()
+    {
+        return $this->hasOne(Shipping::class, 'order_id', 'order_id');
+    }
+
+    /**
      * Get the status badge class for Bootstrap.
      */
     public function getStatusBadgeAttribute()
     {
-        return match($this->status) {
+        return match($this->order_status) {
             'pending' => 'warning',
-            'processing' => 'info',
-            'completed' => 'success',
+            'confirmed' => 'info',
+            'processing' => 'primary',
+            'shipped' => 'info',
+            'delivered' => 'success',
             'cancelled' => 'danger',
+            'refunded' => 'secondary',
             default => 'secondary',
         };
     }
@@ -67,12 +89,15 @@ class Order extends Model
      */
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match($this->order_status) {
             'pending' => 'รอดำเนินการ',
+            'confirmed' => 'ยืนยันแล้ว',
             'processing' => 'กำลังดำเนินการ',
-            'completed' => 'สำเร็จ',
+            'shipped' => 'จัดส่งแล้ว',
+            'delivered' => 'ส่งถึงแล้ว',
             'cancelled' => 'ยกเลิก',
-            default => $this->status,
+            'refunded' => 'คืนเงิน',
+            default => $this->order_status,
         };
     }
 }

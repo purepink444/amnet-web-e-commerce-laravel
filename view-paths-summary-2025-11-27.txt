@@ -1,0 +1,113 @@
+📁 โครงสร้าง Path ของหน้าเว็บในโปรเจค Amnet E-commerce Laravel
+📅 สร้างเมื่อ: 2025-11-27
+
+================================================================================
+
+🏠 หน้าแรกและทั่วไป
+================================================================================
+- หน้าแรก: resources/views/welcome.blade.php หรือ resources/views/home.blade.php
+- เกี่ยวกับเรา: resources/views/pages/about.blade.php
+- ติดต่อเรา: resources/views/pages/contact.blade.php
+- ข่าวสาร: resources/views/pages/news.blade.php
+- วิธีชำระเงิน: resources/views/pages/payment.blade.php
+- นโยบายความเป็นส่วนตัว: resources/views/pages/privacy.blade.php
+- ข้อกำหนดและเงื่อนไข: resources/views/pages/terms.blade.php
+
+================================================================================
+
+🛍️ ระบบสินค้า
+================================================================================
+- รายการสินค้าทั้งหมด: resources/views/products/index.blade.php
+- หน้าร้านค้า: resources/views/pages/shop.blade.php หรือ resources/views/pages/product.blade.php
+- รายละเอียดสินค้า: resources/views/products/show.blade.php หรือ resources/views/pages/product_detail.blade.php
+- รีวิวสินค้า (แสดง): resources/views/products/reviews/index.blade.php
+- รีวิวสินค้า (เพิ่ม): resources/views/products/reviews/create.blade.php
+
+================================================================================
+
+🛒 ตะกร้าสินค้าและชำระเงิน
+================================================================================
+- ตะกร้าสินค้า: resources/views/cart/index.blade.php
+- หน้าเช็คเอาท์: resources/views/checkout/index.blade.php
+- ชำระเงินสำเร็จ: resources/views/checkout/success.blade.php
+- ยกเลิกการชำระ: resources/views/checkout/cancel.blade.php
+
+================================================================================
+
+👤 ระบบสมาชิก
+================================================================================
+- เข้าสู่ระบบ: resources/views/auth/login.blade.php
+- สมัครสมาชิก: resources/views/auth/register.blade.php
+- โปรไฟล์ส่วนตัว: resources/views/account/profile.blade.php
+- ตั้งค่าบัญชี: resources/views/account/settings.blade.php
+- รายการโปรด (Wishlist): resources/views/account/wishlist.blade.php
+- ประวัติคำสั่งซื้อ (รายการทั้งหมด): resources/views/account/orders/index.blade.php
+- ประวัติคำสั่งซื้อ (รายละเอียด): resources/views/account/orders/show.blade.php หรือ resources/views/account/orders.blade.php
+
+================================================================================
+
+👨‍💼 Admin Panel
+================================================================================
+- Dashboard: resources/views/admin/dashboard.blade.php
+
+จัดการสินค้า:
+- รายการสินค้า: resources/views/admin/products/index.blade.php
+- เพิ่มสินค้า: resources/views/admin/products/create.blade.php
+- แก้ไขสินค้า: resources/views/admin/products/edit.blade.php
+- แสดงสินค้า: resources/views/admin/products/show.blade.php
+
+จัดการหมวดหมู่:
+- รายการหมวดหมู่: resources/views/admin/categories/index.blade.php
+- เพิ่มหมวดหมู่: resources/views/admin/categories/create.blade.php
+- แก้ไขหมวดหมู่: resources/views/admin/categories/edit.blade.php
+- แสดงหมวดหมู่: resources/views/admin/categories/show.blade.php
+
+จัดการแบรนด์:
+- รายการแบรนด์: resources/views/admin/brands/index.blade.php
+- เพิ่มแบรนด์: resources/views/admin/brands/create.blade.php
+- แก้ไขแบรนด์: resources/views/admin/brands/edit.blade.php
+- แสดงแบรนด์: resources/views/admin/brands/show.blade.php
+
+จัดการคำสั่งซื้อ:
+- รายการคำสั่งซื้อ: resources/views/admin/orders/index.blade.php
+- รายละเอียดคำสั่งซื้อ: resources/views/admin/orders/show.blade.php
+
+จัดการผู้ใช้:
+- รายการผู้ใช้: resources/views/admin/users/index.blade.php
+- เพิ่มผู้ใช้: resources/views/admin/users/create.blade.php
+- แก้ไขผู้ใช้: resources/views/admin/users/edit.blade.php
+- แสดงผู้ใช้: resources/views/admin/users/show.blade.php
+
+ระบบรายงาน:
+- เมนูรายงาน: resources/views/admin/reports/index.blade.php
+- รายงานการขาย: resources/views/admin/reports/sales.blade.php
+- รายงานสินค้า: resources/views/admin/reports/products.blade.php
+- รายงานลูกค้า: resources/views/admin/reports/customers.blade.php
+
+================================================================================
+
+🛠️ ส่วนประกอบและ Layouts
+================================================================================
+- Layout หลัก: resources/views/layouts/default.blade.php
+- Layout Admin: resources/views/layouts/admin.blade.php
+- Navbar: resources/views/includes/navbar.blade.php
+- Footer: resources/views/includes/footer.blade.php
+- Alert Component: resources/views/components/alert.blade.php
+- หน้า Error 403: resources/views/errors/403.blade.php
+- หน้า Error 404: resources/views/errors/404.blade.php
+
+================================================================================
+
+🔧 ฟีเจอร์พิเศษ
+================================================================================
+- Overclock Dashboard: resources/views/overclock/dashboard.blade.php
+- Admin Profile: resources/views/profile/adm_profile.blade.php
+
+================================================================================
+
+📝 หมายเหตุ:
+- ทุก path เป็น relative path จาก root directory ของโปรเจค
+- ไฟล์ .blade.php เป็น Blade template ของ Laravel
+- หน้าเว็บอาจมีการ redirect หรือ route ที่ชี้ไปยัง view ต่างๆ ตาม logic ของ Controller
+
+================================================================================

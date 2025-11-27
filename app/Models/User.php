@@ -18,13 +18,9 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'firstname',
-        'lastname',
-        'address',
-        'subdistrict',
-        'district',
-        'province',
-        'zipcode',
+        'phone',
+        'is_active',
+        'last_login',
         'role_id',
     ];
 
@@ -36,6 +32,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean',
+        'last_login' => 'datetime',
     ];
 
     /**
@@ -47,6 +45,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the member profile for the user.
+     */
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'user_id', 'user_id');
+    }
+
+    /**
      * Get the orders for the user.
      */
     public function orders()
@@ -55,24 +61,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the wishlist items for the user.
-     */
-    public function wishlist()
-    {
-        return $this->hasMany(Wishlist::class, 'user_id', 'user_id');
-    }
-
-    /**
      * Get the role of the user.
-     * ระบุ foreign key และ owner key ให้ชัดเจน
      */
     public function role()
     {
-        // ตรวจสอบว่าตาราง roles ใช้ primary key ชื่ออะไร
-        // ถ้าใช้ role_id ให้เปลี่ยนเป็น
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
-        
-        // ถ้าใช้ id ให้ใช้
-        // return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }
