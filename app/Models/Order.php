@@ -37,6 +37,14 @@ class Order extends Model
     ];
 
     /**
+     * Get the user that owns the order.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    /**
      * Get the member that owns the order.
      */
     public function member()

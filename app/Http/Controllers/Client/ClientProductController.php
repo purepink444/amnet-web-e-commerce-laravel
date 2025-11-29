@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\{Product, Category, Brand};
 use App\Services\{SearchService, ProductSearchService, CacheService};
-use Illuminate\Support\Facades\{Cache, Log};
+use Illuminate\Support\Facades\{Cache, Log, DB};
 
 class ClientProductController extends Controller
 {
@@ -30,6 +30,10 @@ class ClientProductController extends Controller
      */
     public function index(Request $request): View
     {
+        $startTime = microtime(true);
+        DB::enableQueryLog();
+        Log::info('ClientProductController index start', ['url' => $request->fullUrl()]);
+
         // Build filters array for ProductSearchService
         $filters = [
             'search' => $request->input('search'),
@@ -43,10 +47,19 @@ class ClientProductController extends Controller
 
         // Use optimized ProductSearchService
         $products = $this->productSearchService->search($filters, 12);
+        Log::info('Product search completed', ['count' => $products->count(), 'time' => microtime(true) - $startTime]);
 
         // Get cached filter options using CacheService
         $categories = $this->cacheService->getCategories();
         $brands = $this->cacheService->getBrands();
+        Log::info('Cache retrieval completed', ['time' => microtime(true) - $startTime]);
+
+        $queries = DB::getQueryLog();
+        $totalQueryTime = array_sum(array_column($queries, 'time'));
+        Log::info('Database queries log', ['queries' => $queries, 'total_query_time' => $totalQueryTime]);
+
+        $totalTime = microtime(true) - $startTime;
+        Log::info('ClientProductController index end', ['total_time' => $totalTime]);
 
         return view('pages.product', compact('products', 'categories', 'brands'));
     }

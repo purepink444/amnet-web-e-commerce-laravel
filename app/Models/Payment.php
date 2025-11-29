@@ -24,6 +24,7 @@ class Payment extends Model
     protected $casts = [
         'payment_date' => 'datetime',
         'amount' => 'decimal:2',
+        'payment_data' => 'array',
     ];
 
     /**

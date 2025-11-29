@@ -65,16 +65,16 @@ return new class extends Migration
         // Orders table indexes for efficient queries
         Schema::table('orders', function (Blueprint $table) {
             // Index for user orders lookup
-            $table->index('user_id', 'idx_orders_user');
+            $table->index('member_id', 'idx_orders_member');
 
             // Index for order status filtering
-            $table->index('status', 'idx_orders_status');
+            $table->index('order_status', 'idx_orders_status');
 
             // Index for date-based queries
             $table->index('created_at', 'idx_orders_created_at');
 
             // Composite index for user orders by date
-            $table->index(['user_id', 'created_at'], 'idx_orders_user_date');
+            $table->index(['member_id', 'created_at'], 'idx_orders_member_date');
         });
 
         // Payments table indexes
@@ -83,7 +83,7 @@ return new class extends Migration
             $table->index('order_id', 'idx_payments_order');
 
             // Index for payment status queries
-            $table->index('status', 'idx_payments_status');
+            $table->index('payment_status', 'idx_payments_status');
 
             // Index for payment method analytics
             $table->index('payment_method', 'idx_payments_method');
@@ -126,10 +126,10 @@ return new class extends Migration
 
         // Remove orders table indexes
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropIndex('idx_orders_user');
+            $table->dropIndex('idx_orders_member');
             $table->dropIndex('idx_orders_status');
             $table->dropIndex('idx_orders_created_at');
-            $table->dropIndex('idx_orders_user_date');
+            $table->dropIndex('idx_orders_member_date');
         });
 
         // Remove payments table indexes

@@ -39,8 +39,8 @@ class DashboardController extends Controller
 
         // Get recent orders with eager loading
         $recentOrders = Order::with([
-            'user' => function($query) {
-                $query->select('user_id', 'firstname', 'lastname');
+            'member' => function($query) {
+                $query->select('member_id', 'first_name', 'last_name');
             },
             'orderItems' => function($query) {
                 $query->with(['product' => function($productQuery) {

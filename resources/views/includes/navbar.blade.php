@@ -147,8 +147,8 @@
 .navbar-brand:hover { transform: scale(1.05); }
 .nav-link { transition: all 0.3s ease; border-radius: 8px; margin: 0 2px; }
 .nav-link:hover { background-color: rgba(26,26,26,0.3); transform: translateY(-2px); }
-.btn-register { background-color: rgba(26,26,26,0.4); border-radius: 8px; }
-.btn-register:hover { background-color: #1a1a1a; }
+.btn-register { background-color: transparent; border-radius: 8px; }
+.btn-register:hover { background-color: rgba(26,26,26,0.4); }
 .dropdown-menu {
     z-index: 1050;
 }

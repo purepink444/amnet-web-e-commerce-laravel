@@ -46,8 +46,29 @@
                     <!-- Payment Info -->
                     <div class="alert alert-info text-start">
                         <h6><i class="bi bi-info-circle me-2"></i>ข้อมูลการชำระเงิน</h6>
-                        <p class="mb-1">วิธีการชำระเงิน: <strong>{{ $order->payment_method === 'credit' ? 'บัตรเครดิต/เดบิต' : ($order->payment_method === 'qr' ? 'QR พร้อมเพย์' : 'ชำระปลายทาง') }}</strong></p>
+                        <p class="mb-1">วิธีการชำระเงิน: <strong>{{ $order->shipping_method === 'credit' ? 'บัตรเครดิต/เดบิต' : ($order->shipping_method === 'qr' ? 'QR พร้อมเพย์' : 'ชำระปลายทาง') }}</strong></p>
+                        <p class="mb-1">บริษัทขนส่ง: <strong>{{ $order->shipping->shipping_company ?? 'รอดำหนด' }}</strong></p>
                         <p class="mb-0">สถานะ: <span class="badge bg-{{ $order->payment->status === 'completed' ? 'success' : 'warning' }}">{{ $order->payment->status === 'completed' ? 'ชำระแล้ว' : 'รอการชำระ' }}</span></p>
+
+                        @if($order->shipping_method === 'qr')
+                        <div class="mt-3 text-center">
+                            @php
+                                $paymentData = $order->payment->payment_data;
+                                if (is_string($paymentData)) {
+                                    $paymentData = json_decode($paymentData, true);
+                                }
+                            @endphp
+                            @if($paymentData && isset($paymentData['qr_code']))
+                            <p class="mb-2">QR Code สำหรับชำระเงิน:</p>
+                            <img src="{{ $paymentData['qr_code'] }}" alt="QR Payment" class="border p-2 rounded shadow-sm" style="max-width: 200px;">
+                            <p class="mt-2 mb-1">ยอดชำระ: <strong>฿{{ number_format($order->total_amount, 2) }}</strong></p>
+                            <small class="text-muted">สแกน QR Code นี้เพื่อชำระเงิน</small>
+                            @else
+                            <p class="mb-2 text-warning">QR Code ไม่สามารถสร้างได้ กรุณาติดต่อผู้ดูแลระบบ</p>
+                            <small class="text-muted">Payment Data: {{ json_encode($paymentData) }}</small>
+                            @endif
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Action Buttons -->

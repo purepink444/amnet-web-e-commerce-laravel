@@ -3,95 +3,273 @@
 @section('title', 'ชำระเงิน')
 
 @section('content')
-<div class="container my-5">
-    <div class="row">
-        <!-- ข้อมูลคำสั่งซื้อ -->
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0 rounded-4 mb-4">
-                <div class="card-header bg-gradient-orange text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-receipt me-2"></i>รายการสินค้า
-                    </h4>
-                </div>
-                <div class="card-body">
-                    @foreach($cart->items as $item)
-                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                        <img src="{{ $item->product->image_url ?: 'https://via.placeholder.com/60x60' }}"
-                             alt="{{ $item->product->product_name }}"
-                             class="rounded me-3"
-                             style="width: 60px; height: 60px; object-fit: cover;">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">{{ $item->product->product_name }}</h6>
-                            <small class="text-muted">จำนวน: {{ $item->quantity }}</small>
+<style>
+.checkout-progress .step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border: 2px solid #e9ecef;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.checkout-progress .step.completed .step-circle {
+    border-color: #198754;
+}
+
+.checkout-progress .step.active .step-circle {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.address-option-card, .payment-option-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #e9ecef !important;
+}
+
+.address-option-card:hover, .payment-option-card:hover {
+    border-color: #0d6efd !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-check-input:checked ~ .form-check-label .bg-primary {
+    background-color: #0d6efd !important;
+}
+
+@media (max-width: 768px) {
+    .checkout-progress .d-flex {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .checkout-progress .step {
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .step-circle {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 12px !important;
+    }
+}
+</style>
+
+<div class="container-fluid py-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
+    <!-- Progress Indicator -->
+    <div class="container mb-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="checkout-progress">
+                    <div class="progress mb-4" style="height: 4px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="step completed">
+                            <div class="step-circle bg-success text-white">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <small class="text-success fw-semibold">ตะกร้าสินค้า</small>
                         </div>
-                        <div class="text-end">
-                            <div class="fw-bold">฿{{ number_format($item->subtotal, 2) }}</div>
+                        <div class="step completed">
+                            <div class="step-circle bg-success text-white">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <small class="text-success fw-semibold">ข้อมูลจัดส่ง</small>
+                        </div>
+                        <div class="step active">
+                            <div class="step-circle bg-primary text-white">
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+                            <small class="text-primary fw-semibold">ชำระเงิน</small>
+                        </div>
+                        <div class="step">
+                            <div class="step-circle bg-light text-muted">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <small class="text-muted">เสร็จสิ้น</small>
                         </div>
                     </div>
-                    @endforeach
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- ฟอร์มชำระเงิน -->
-        <div class="col-lg-4">
-            <div class="card shadow-lg border-0 rounded-4 mb-4">
-                <div class="card-header bg-gradient-orange text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-credit-card me-2"></i>ข้อมูลการชำระเงิน
-                    </h5>
+    <div class="container">
+        <div class="row justify-content-center">
+            <!-- ข้อมูลคำสั่งซื้อ -->
+            <div class="col-12 col-lg-7 mb-4">
+                <div class="card shadow-sm border-0 rounded-3 mb-4" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                    <div class="card-header bg-white border-0 py-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                <i class="bi bi-receipt text-primary fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 text-dark">รายการสินค้า</h5>
+                                <small class="text-muted">{{ $cart->total_items }} รายการ</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @foreach($cart->items as $item)
+                        @php
+                            $subtotal = $item->quantity * $item->product->price;
+                        @endphp
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-light">
+                            <img src="{{ $item->product->image_url ?: 'https://via.placeholder.com/80x80' }}"
+                                 alt="{{ $item->product->product_name }}"
+                                 class="rounded-3 me-3 shadow-sm"
+                                 style="width: 70px; height: 70px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 text-dark fw-semibold">{{ $item->product->product_name }}</h6>
+                                <small class="text-muted">จำนวน: <span class="fw-semibold">{{ $item->quantity }}</span></small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-primary fs-5">฿{{ number_format($subtotal, 2) }}</div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
-                <div class="card-body">
-                    <!-- แสดง error messages -->
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <h6 class="alert-heading">
-                                <i class="bi bi-exclamation-triangle me-2"></i>พบข้อผิดพลาด
-                            </h6>
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+            </div>
 
-                    <!-- แสดง success message -->
-                    @if(session('success'))
-                        <div class="alert alert-success">
-                            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+            <!-- ฟอร์มชำระเงิน -->
+            <div class="col-12 col-lg-5">
+                <div class="sticky-top" style="top: 20px;">
+                    <!-- Order Summary Card -->
+                    <div class="card shadow-sm border-0 rounded-3 mb-4" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                        <div class="card-header bg-white border-0 py-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+                                        <i class="bi bi-calculator text-success fs-5"></i>
+                                    </div>
+                                    <h6 class="mb-0 text-dark fw-semibold">สรุปคำสั่งซื้อ</h6>
+                                </div>
+                                <span class="badge bg-primary">{{ $cart->total_items }} รายการ</span>
+                            </div>
                         </div>
-                    @endif
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">จำนวนสินค้า:</span>
+                                <span class="fw-semibold">{{ $cart->total_items }} ชิ้น</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">ราคารวม:</span>
+                                <span class="fw-bold text-primary fs-4">฿{{ number_format($cart->total_price, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- แสดง error message -->
-                    @if(session('error'))
-                        <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <!-- Payment Form Card -->
+                    <div class="card shadow-sm border-0 rounded-3" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+                        <div class="card-header bg-white border-0 py-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+                                    <i class="bi bi-credit-card text-warning fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 text-dark">ข้อมูลการชำระเงิน</h5>
+                                    <small class="text-muted">กรุณากรอกข้อมูลให้ครบถ้วน</small>
+                                </div>
+                            </div>
                         </div>
-                    @endif
+                        <div class="card-body p-4">
+                            <!-- แสดง error messages -->
+                            @if($errors->any())
+                                <div class="alert alert-danger border-0 rounded-3 mb-4" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger bg-opacity-20 p-2 rounded-circle me-3">
+                                            <i class="bi bi-exclamation-triangle text-danger fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="alert-heading mb-1 text-danger">พบข้อผิดพลาด</h6>
+                                            <ul class="mb-0 small">
+                                                @foreach($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- แสดง success message -->
+                            @if(session('success'))
+                                <div class="alert alert-success border-0 rounded-3 mb-4" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle text-success fs-5 me-3"></i>
+                                        <span class="fw-semibold">{{ session('success') }}</span>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- แสดง error message -->
+                            @if(session('error'))
+                                <div class="alert alert-danger border-0 rounded-3 mb-4" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-exclamation-triangle text-danger fs-5 me-3"></i>
+                                        <span class="fw-semibold">{{ session('error') }}</span>
+                                    </div>
+                                </div>
+                            @endif
 
                     <form action="{{ route('account.checkout.process') }}" method="POST">
                         @csrf
 
-                        <!-- เลือกที่อยู่จัดส่ง -->
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">ที่อยู่จัดส่ง <span class="text-danger">*</span></label>
+                            <!-- เลือกที่อยู่จัดส่ง -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold d-flex align-items-center mb-3">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                                    ที่อยู่จัดส่ง <span class="text-danger">*</span>
+                                </label>
 
-                            <!-- ตัวเลือกที่อยู่ -->
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input address-option" type="radio" name="address_type" value="registered" id="registered_address" checked>
-                                    <label class="form-check-label fw-semibold" for="registered_address">
-                                        <i class="bi bi-house-door me-2"></i>ใช้ที่อยู่ที่ลงทะเบียนไว้
-                                    </label>
+                                <!-- ตัวเลือกที่อยู่ -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-12">
+                                        <div class="address-option-card p-3 border rounded-3" data-type="registered">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input address-option" type="radio" name="address_type" value="registered" id="registered_address" checked>
+                                                <label class="form-check-label fw-semibold w-100" for="registered_address">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                                            <i class="bi bi-house-door text-primary"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-semibold text-dark">ใช้ที่อยู่ที่ลงทะเบียนไว้</div>
+                                                            <small class="text-muted">ที่อยู่หลักของคุณ</small>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="address-option-card p-3 border rounded-3" data-type="new">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input address-option" type="radio" name="address_type" value="new" id="new_address">
+                                                <label class="form-check-label fw-semibold w-100" for="new_address">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+                                                            <i class="bi bi-plus-circle text-success"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-semibold text-dark">เพิ่มที่อยู่ใหม่</div>
+                                                            <small class="text-muted">สำหรับการจัดส่งครั้งนี้</small>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input address-option" type="radio" name="address_type" value="new" id="new_address">
-                                    <label class="form-check-label fw-semibold" for="new_address">
-                                        <i class="bi bi-plus-circle me-2"></i>เพิ่มที่อยู่ใหม่
-                                    </label>
-                                </div>
-                            </div>
 
                             <!-- แสดงที่อยู่ที่ลงทะเบียนไว้ -->
                             <div id="registered-address-display" class="border rounded p-3 mb-3 bg-light">
@@ -120,15 +298,15 @@
                                 <div class="row g-4">
                                     <div class="col-md-6">
                                         <label class="form-label">ชื่อ <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="new_first_name" placeholder="ชื่อ" style="height: 50px; font-size: 16px;">
+                                        <input type="text" class="form-control" name="new_first_name" placeholder="ชื่อ" data-required style="height: 50px; font-size: 16px;">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">นามสกุล <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="new_last_name" placeholder="นามสกุล" style="height: 50px; font-size: 16px;">
+                                        <input type="text" class="form-control" name="new_last_name" placeholder="นามสกุล" data-required style="height: 50px; font-size: 16px;">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">ที่อยู่ <span class="text-danger">*</span></label>
-                                        <textarea class="form-control" name="new_address" rows="3" placeholder="บ้านเลขที่ ถนน ตำบล/แขวง" style="font-size: 16px;"></textarea>
+                                        <textarea class="form-control" name="new_address" rows="3" placeholder="บ้านเลขที่ ถนน ตำบล/แขวง" data-required style="font-size: 16px;"></textarea>
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <label class="form-label">ตำบล/แขวง</label>
@@ -144,41 +322,113 @@
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <label class="form-label">จังหวัด <span class="text-danger">*</span></label>
-                                        <select name="new_province" id="new_province" class="form-control form-select-lg" style="height: 50px; font-size: 16px; width: 100%;">
+                                        <select name="new_province" id="new_province" class="form-control form-select-lg" data-required style="height: 50px; font-size: 16px; width: 100%;">
                                             <option value="">-- เลือกจังหวัด --</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <label class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="new_postal_code" id="new_postal_code" placeholder="รหัสไปรษณีย์ 5 หลัก" maxlength="5" readonly required style="height: 50px; font-size: 16px; width: 100%;">
+                                        <input type="text" class="form-control" name="new_postal_code" id="new_postal_code" placeholder="รหัสไปรษณีย์ 5 หลัก" maxlength="5" readonly data-required style="height: 50px; font-size: 16px; width: 100%;">
                                     </div>
                                 </div>
                                 <input type="hidden" name="shipping_address" id="new-address-hidden" value="">
                             </div>
                         </div>
 
-                        <!-- วิธีการชำระเงิน -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">วิธีการชำระเงิน</label>
-                            <div class="form-check">
-                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="credit" id="credit" checked>
-                                <label class="form-check-label" for="credit">
-                                    <i class="bi bi-credit-card me-2"></i>บัตรเครดิต/เดบิต
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="qr" id="qr">
-                                <label class="form-check-label" for="qr">
-                                    <i class="bi bi-qr-code me-2"></i>QR พร้อมเพย์
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="cod" id="cod">
-                                <label class="form-check-label" for="cod">
-                                    <i class="bi bi-cash me-2"></i>ชำระปลายทาง
-                                </label>
+                    <!-- เลือกบริษัทขนส่ง -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold d-flex align-items-center mb-3">
+                            <i class="bi bi-truck text-primary me-2"></i>
+                            บริษัทขนส่ง
+                        </label>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <select name="shipping_company" class="form-select form-select-lg" style="height: 50px; font-size: 16px;" required>
+                                    <option value="">-- เลือกบริษัทขนส่ง --</option>
+                                    <option value="ไปรษณีย์ไทย">ไปรษณีย์ไทย</option>
+                                    <option value="Kerry Express">Kerry Express</option>
+                                    <option value="Flash Express">Flash Express</option>
+                                    <option value="J&T Express">J&T Express</option>
+                                    <option value="DHL">DHL</option>
+                                    <option value="FedEx">FedEx</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- วิธีการชำระเงิน -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold d-flex align-items-center mb-3">
+                                    <i class="bi bi-wallet text-primary me-2"></i>
+                                    วิธีการชำระเงิน
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="payment-option-card p-3 border rounded-3" data-method="credit">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="credit" id="credit" checked>
+                                                <label class="form-check-label fw-semibold w-100" for="credit">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                                            <i class="bi bi-credit-card text-primary fs-5"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold text-dark">บัตรเครดิต/เดบิต</div>
+                                                            <small class="text-muted">Visa, MasterCard, JCB</small>
+                                                        </div>
+                                                        <div class="text-success">
+                                                            <i class="bi bi-shield-check fs-4"></i>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="payment-option-card p-3 border rounded-3" data-method="qr">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="qr" id="qr">
+                                                <label class="form-check-label fw-semibold w-100" for="qr">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+                                                            <i class="bi bi-qr-code text-success fs-5"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold text-dark">QR พร้อมเพย์</div>
+                                                            <small class="text-muted">สแกน QR Code เพื่อชำระเงิน</small>
+                                                        </div>
+                                                        <div class="text-success">
+                                                            <i class="bi bi-lightning-charge fs-4"></i>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="payment-option-card p-3 border rounded-3" data-method="cod">
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input payment-method" type="radio" name="payment_method" value="cod" id="cod">
+                                                <label class="form-check-label fw-semibold w-100" for="cod">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-3">
+                                                            <i class="bi bi-cash text-warning fs-5"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold text-dark">ชำระปลายทาง</div>
+                                                            <small class="text-muted">ชำระเงินเมื่อได้รับสินค้า</small>
+                                                        </div>
+                                                        <div class="text-warning">
+                                                            <i class="bi bi-truck fs-4"></i>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         <!-- ฟอร์มบัตรเครดิต -->
                         <div id="credit-form" class="payment-form">
@@ -189,20 +439,20 @@
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="form-label">ชื่อบนบัตร</label>
-                                        <input type="text" class="form-control" name="card_name" placeholder="เช่น JOHN DOE" required>
+                                        <input type="text" class="form-control" name="card_name" placeholder="เช่น JOHN DOE" data-required>
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">หมายเลขบัตร</label>
-                                        <input type="text" class="form-control" name="card_number_display" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                        <input type="text" class="form-control" name="card_number_display" placeholder="0000 0000 0000 0000" maxlength="19" data-required>
                                         <input type="hidden" name="card_number" id="card_number_hidden">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">วันหมดอายุ</label>
-                                        <input type="text" class="form-control" name="card_exp" placeholder="MM/YY" maxlength="5" required>
+                                        <input type="text" class="form-control" name="card_exp" placeholder="MM/YY" maxlength="5" data-required>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">รหัส CVV</label>
-                                        <input type="password" class="form-control" name="card_cvv" placeholder="***" maxlength="4" required>
+                                        <input type="password" class="form-control" name="card_cvv" placeholder="***" maxlength="4" data-required>
                                     </div>
                                 </div>
                             </div>
@@ -214,23 +464,11 @@
                                 <h6 class="fw-semibold mb-3">
                                     <i class="bi bi-qr-code text-success me-2"></i>QR พร้อมเพย์
                                 </h6>
-                                <div id="qr-loading" class="d-none">
-                                    <div class="spinner-border text-success" role="status">
-                                        <span class="visually-hidden">กำลังสร้าง QR Code...</span>
-                                    </div>
-                                    <p class="mt-2 text-muted">กำลังสร้าง QR Code...</p>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    QR Code จะถูกสร้างขึ้นเมื่อคุณยืนยันการสั่งซื้อ
                                 </div>
-                                <div id="qr-container" style="display: none;">
-                                    <img id="qrImage" src="" width="180" alt="QR Payment" class="border p-2 rounded shadow-sm mb-2">
-                                    <p class="mb-1">ยอดชำระ: <strong>฿{{ number_format($cart->total_price, 2) }}</strong></p>
-                                    <small class="text-muted">บัญชี: 1234567890 (ธนาคารตัวอย่าง)</small>
-                                </div>
-                                <div class="mt-3">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-check-circle me-2"></i>ดำเนินการชำระเงิน
-                                    </button>
-                                    <small class="d-block mt-2 text-muted">* สแกน QR Code แล้วระบบจะดำเนินการชำระเงินอัตโนมัติ</small>
-                                </div>
+                                <p class="mb-0 text-muted">วิธีนี้รวดเร็วและปลอดภัย สแกน QR แล้วชำระเงินได้ทันที</p>
                             </div>
                         </div>
 
@@ -248,24 +486,19 @@
                             </div>
                         </div>
 
-                        <!-- สรุปราคา -->
-                        <hr>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>จำนวนสินค้า:</span>
-                            <span class="fw-bold">{{ $cart->total_items }} ชิ้น</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>ราคารวม:</span>
-                            <span class="fw-bold text-orange">฿{{ number_format($cart->total_price, 2) }}</span>
-                        </div>
+                            <!-- Submit Buttons -->
+                            <div class="d-grid gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center" id="submit-btn">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <span id="submit-text">ยืนยันการสั่งซื้อ</span>
+                                </button>
 
-                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
-                            <i class="bi bi-check-circle me-2"></i>ยืนยันการสั่งซื้อ
-                        </button>
-
-                        <a href="{{ route('account.cart.index') }}" class="btn btn-outline-secondary w-100">
-                            <i class="bi bi-arrow-left me-2"></i>กลับไปแก้ไขตะกร้า
-                        </a>
+                                <a href="{{ route('account.cart.index') }}" class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    กลับไปแก้ไขตะกร้า
+                                </a>
+                            </div>
                     </form>
                 </div>
             </div>
@@ -281,17 +514,22 @@ function showPaymentForm(method) {
     // ซ่อนทุกฟอร์ม
     document.querySelectorAll('.payment-form').forEach(form => {
         form.style.display = 'none';
+        // Remove required from hidden fields
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+            field.removeAttribute('required');
+        });
     });
 
     // แสดงฟอร์มที่เลือก
     const selectedForm = document.getElementById(method + '-form');
     if (selectedForm) {
         selectedForm.style.display = 'block';
-
-        // ถ้าเลือก QR ให้สร้าง QR code
-        if (method === 'qr') {
-            generateQRCode();
-        }
+        // Add required to visible fields
+        selectedForm.querySelectorAll('input, select, textarea').forEach(field => {
+            if (field.hasAttribute('data-required')) {
+                field.setAttribute('required', '');
+            }
+        });
     }
 }
 
@@ -303,10 +541,46 @@ function showAddressForm(type) {
     if (type === 'registered') {
         registeredDisplay.style.display = 'block';
         newAddressForm.style.display = 'none';
+        // Remove required from hidden new address fields
+        newAddressForm.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+            field.removeAttribute('required');
+        });
     } else if (type === 'new') {
         registeredDisplay.style.display = 'none';
         newAddressForm.style.display = 'block';
+        // Add required to visible new address fields
+        newAddressForm.querySelectorAll('input[data-required], select[data-required], textarea[data-required]').forEach(field => {
+            field.setAttribute('required', '');
+        });
     }
+}
+
+// จัดการ visual feedback สำหรับ address options
+function updateAddressOptionStyles() {
+    document.querySelectorAll('.address-option-card').forEach(card => {
+        const radio = card.querySelector('.address-option');
+        if (radio.checked) {
+            card.classList.add('border-primary', 'bg-primary', 'bg-opacity-5');
+            card.classList.remove('border-light');
+        } else {
+            card.classList.remove('border-primary', 'bg-primary', 'bg-opacity-5');
+            card.classList.add('border-light');
+        }
+    });
+}
+
+// จัดการ visual feedback สำหรับ payment options
+function updatePaymentOptionStyles() {
+    document.querySelectorAll('.payment-option-card').forEach(card => {
+        const radio = card.querySelector('.payment-method');
+        if (radio.checked) {
+            card.classList.add('border-primary', 'bg-primary', 'bg-opacity-5', 'shadow-sm');
+            card.classList.remove('border-light');
+        } else {
+            card.classList.remove('border-primary', 'bg-primary', 'bg-opacity-5', 'shadow-sm');
+            card.classList.add('border-light');
+        }
+    });
 }
 
 // อัปเดตที่อยู่ที่ซ่อนไว้สำหรับฟอร์มใหม่
@@ -327,12 +601,14 @@ function updateNewAddress() {
 document.querySelectorAll('.payment-method').forEach(radio => {
     radio.addEventListener('change', function() {
         showPaymentForm(this.value);
+        updatePaymentOptionStyles();
     });
 });
 
 document.querySelectorAll('.address-option').forEach(radio => {
     radio.addEventListener('change', function() {
         showAddressForm(this.value);
+        updateAddressOptionStyles();
         // Update shipping address when address type changes
         if (this.value === 'registered') {
             const registeredAddress = document.querySelector('#registered-address-display input[name="shipping_address"]');
@@ -436,6 +712,15 @@ document.addEventListener('DOMContentLoaded', function() {
 document.querySelector('form').addEventListener('submit', function(e) {
     console.log('Form submission started - processing...');
 
+    // Show loading state
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const spinner = submitBtn.querySelector('.spinner-border');
+
+    submitBtn.disabled = true;
+    submitText.textContent = 'กำลังดำเนินการ...';
+    spinner.classList.remove('d-none');
+
     // Card number is already cleaned in the hidden input during input
 
     // ตั้งค่าที่อยู่ก่อน submit
@@ -468,6 +753,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
             if (!isValid) {
                 e.preventDefault();
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitText.textContent = 'ยืนยันการสั่งซื้อ';
+                spinner.classList.add('d-none');
+
                 alert('กรุณากรอกข้อมูลที่อยู่ให้ครบถ้วน');
                 if (firstInvalidField) {
                     firstInvalidField.focus();
@@ -512,28 +802,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkedAddressRadio) {
         showAddressForm(checkedAddressRadio.value);
     }
+
+    // Initialize visual styles
+    updateAddressOptionStyles();
+    updatePaymentOptionStyles();
 });
 
-// ฟังก์ชันสร้าง QR Code
-function generateQRCode() {
-    const qrLoading = document.getElementById('qr-loading');
-    const qrContainer = document.getElementById('qr-container');
-
-    // แสดง loading
-    qrLoading.classList.remove('d-none');
-    qrContainer.style.display = 'none';
-
-    // จำลองการสร้าง QR code (ในระบบจริงควรเรียก API)
-    setTimeout(() => {
-        // ซ่อน loading
-        qrLoading.classList.add('d-none');
-
-        // แสดง QR code (ใช้ placeholder หรือเรียก API จริง)
-        const qrImage = document.getElementById('qrImage');
-        qrImage.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFSIENPREU8L3RleHQ+Cjwvc3ZnPg==';
-        qrContainer.style.display = 'block';
-    }, 1000);
-}
 
 
 // จัดรูปแบบหมายเลขบัตรเครดิต และเก็บค่า original

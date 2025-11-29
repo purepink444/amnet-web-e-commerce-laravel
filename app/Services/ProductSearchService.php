@@ -19,6 +19,9 @@ class ProductSearchService
      */
     public function search(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
+        $startTime = microtime(true);
+        \Log::info('ProductSearchService search start', ['filters' => $filters]);
+
         $query = Product::query()->with(['category', 'brand']);
 
         // Apply filters using efficient algorithms
@@ -27,7 +30,12 @@ class ProductSearchService
         // Apply sorting with optimized algorithms
         $query = $this->applySorting($query, $filters['sort'] ?? 'relevance');
 
-        return $query->paginate($perPage);
+        $result = $query->paginate($perPage);
+
+        $searchTime = microtime(true) - $startTime;
+        \Log::info('ProductSearchService search end', ['time' => $searchTime, 'count' => $result->count()]);
+
+        return $result;
     }
 
     /**
