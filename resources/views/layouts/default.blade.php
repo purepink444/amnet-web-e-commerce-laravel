@@ -156,29 +156,9 @@
     @yield('scripts')
 
     <script>
-        // Ensure dropdowns work
-        document.addEventListener('DOMContentLoaded', function() {
-            var dropdowns = document.querySelectorAll('.dropdown-toggle');
-            dropdowns.forEach(function(dropdown) {
-                dropdown.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var menu = this.nextElementSibling;
-                    if (menu && menu.classList.contains('dropdown-menu')) {
-                        menu.classList.toggle('show');
-                    }
-                });
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.dropdown')) {
-                    var openMenus = document.querySelectorAll('.dropdown-menu.show');
-                    openMenus.forEach(function(menu) {
-                        menu.classList.remove('show');
-                    });
-                }
-            });
-        });
+        // Bootstrap dropdowns should work automatically
+        // If issues persist, check console for errors
+        console.log('Bootstrap loaded, dropdowns should work');
     </script>
         
 </body>

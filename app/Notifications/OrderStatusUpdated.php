@@ -3,14 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\Order;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderStatusUpdated extends Notification implements ShouldQueue
+class OrderStatusUpdated extends Notification
 {
-    use Queueable;
 
     public Order $order;
     public string $oldStatus;
@@ -43,9 +40,13 @@ class OrderStatusUpdated extends Notification implements ShouldQueue
     {
         $statusLabel = $this->getStatusLabel($this->newStatus);
 
+        $member = $notifiable->member;
+        $firstName = $member ? $member->first_name : 'ลูกค้า';
+        $lastName = $member ? $member->last_name : '';
+
         return (new MailMessage)
             ->subject("อัปเดตสถานะคำสั่งซื้อ #{$this->order->order_id}")
-            ->greeting("สวัสดี {$notifiable->firstname} {$notifiable->lastname}")
+            ->greeting("สวัสดี {$firstName} {$lastName}")
             ->line("สถานะคำสั่งซื้อของคุณได้เปลี่ยนจาก '{$this->getStatusLabel($this->oldStatus)}' เป็น '{$statusLabel}'")
             ->line("รายละเอียดคำสั่งซื้อ:")
             ->line("หมายเลขคำสั่งซื้อ: #{$this->order->order_id}")

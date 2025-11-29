@@ -25,7 +25,7 @@
                     @forelse($orders as $order)
                         <tr>
                             <td>{{ $order->order_id }}</td>
-                            <td>{{ $order->user ? $order->user->firstname . ' ' . $order->user->lastname : 'N/A' }}</td>
+                            <td>{{ $order->member ? $order->member->first_name . ' ' . $order->member->last_name : 'N/A' }}</td>
                             <td>{{ $order->user ? $order->user->email : 'N/A' }}</td>
                             <td>฿{{ number_format($order->total_amount, 2) }}</td>
                             <td>

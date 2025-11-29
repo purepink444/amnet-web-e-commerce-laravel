@@ -1,4 +1,4 @@
-า<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
     <title>@yield('title', 'Admin Panel')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- AdminLTE CSS removed - using custom styling -->
 
     <!-- Google Fonts - Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,29 +91,29 @@
             font-size: 1.1rem;
         }
 
-        /* Sidebar */
+        /* Sidebar - Custom overlay behavior */
         .main-sidebar {
-            background: linear-gradient(180deg, var(--admin-orange-dark) 0%, var(--admin-orange) 100%);
-            box-shadow: 2px 0 10px rgba(255, 107, 53, 0.2);
+            background: linear-gradient(180deg, var(--admin-orange-dark) 0%, var(--admin-orange) 100%) !important;
+            box-shadow: 2px 0 10px rgba(255, 107, 53, 0.2) !important;
             position: fixed !important;
             top: 57px !important;
             left: 0 !important;
             height: calc(100vh - 57px) !important;
             width: 250px !important;
-            z-index: 1000 !important;
+            z-index: 1031 !important;
             transition: transform 0.3s ease !important;
-            /* Default hidden state for hover-to-show */
+            /* Hidden by default */
             transform: translateX(-250px) !important;
         }
 
-        /* Expanded state on hover */
-        .main-sidebar.sidebar-expanded {
+        /* Show sidebar when body has sidebar-open class */
+        .sidebar-open .main-sidebar {
             transform: translateX(0) !important;
         }
 
-        /* Ensure sidebar stays below navbar */
+        /* Ensure sidebar stays below navbar but above content */
         .main-sidebar {
-            z-index: 1000 !important;
+            z-index: 1031 !important;
         }
 
         .brand-link {
@@ -149,18 +149,38 @@
             overflow-x: hidden;
         }
 
-        /* Content */
+        /* Content - Consistent full-height layout */
         .content-wrapper {
-            background-color: #f4f6f9;
-            margin-top: 57px !important;
-            min-height: calc(100vh - 57px);
+            background-color: #f4f6f9 !important;
             margin-left: 0 !important;
-            transition: margin-left 0.3s ease !important;
-            position: relative !important;
-            z-index: 800 !important;
+            transition: none !important;
+            min-height: calc(100vh - 57px) !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
 
-        /* Content stays in place for hover-to-show (no shifting) */
+        .content {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .content > .container-fluid {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 1.5rem !important;
+            min-height: calc(100vh - 57px - 2rem) !important;
+        }
+
+        /* Ensure sidebar overlays content - no margin adjustments needed */
+        .main-sidebar {
+            z-index: 1031 !important;
+        }
+
+        /* Remove any margin-left from content wrapper in all cases */
         .content-wrapper {
             margin-left: 0 !important;
         }
@@ -260,16 +280,9 @@
             box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
         }
 
-        /* Hover Sidebar Functionality */
-        .sidebar-hover-zone {
-            position: fixed;
-            top: 57px;
-            left: 0;
-            width: 15px;
-            height: calc(100vh - 57px);
-            z-index: 999;
-            background: transparent;
-            cursor: pointer;
+        /* Click-to-toggle Sidebar Functionality */
+        .sidebar-toggle-zone {
+            display: none; /* Hidden since we use the hamburger button */
         }
 
         /* Mobile sidebar backdrop */
@@ -367,20 +380,7 @@
             text-align: center;
         }
 
-        /* Mobile override */
-        @media (max-width: 768px) {
-            .sidebar-mini.sidebar-collapse .main-sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-open {
-                transform: translateX(0);
-            }
-
-            /* Hide sidebar hover zone on mobile */
-            .sidebar-hover-zone {
-                display: none !important;
-            }
+        /* Mobile override - Let AdminLTE handle sidebar behavior */
 
             /* Adjust navbar for mobile */
             .main-header.navbar {
@@ -422,10 +422,6 @@
                 height: calc(100vh - 50px) !important;
                 width: 250px;
             }
-
-            .sidebar-hover-zone {
-                height: calc(100vh - 50px) !important;
-            }
         }
 
         /* AdminLTE overrides */
@@ -465,31 +461,16 @@
             padding: 1rem !important;
         }
 
-        /* Responsive */
+        /* Responsive - Let AdminLTE handle mobile sidebar behavior */
         @media (max-width: 768px) {
-            .sidebar-hover-zone {
-                display: none;
-            }
-
-            /* Mobile sidebar behavior - let AdminLTE handle it */
-            .sidebar-open .main-sidebar {
-                transform: translateX(0) !important;
-            }
-
             /* Ensure proper overlay on mobile */
             .main-sidebar {
                 box-shadow: 2px 0 20px rgba(0,0,0,0.3) !important;
-                z-index: 1050 !important;
-            }
-
-            .content-wrapper {
-                z-index: 800 !important;
             }
         }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="sidebar-hover-zone"></div>
     <!-- Mobile sidebar backdrop -->
     <div class="sidebar-backdrop"></div>
 
@@ -527,7 +508,7 @@
             <a href="{{ route('home') }}" class="quick-link">
                 <i class="fas fa-home"></i>กลับหน้าหลัก
             </a>
-            <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">
+            <form action="{{ route('account.logout') }}" method="POST" class="d-inline w-100">
                 @csrf
                 <button type="submit" class="quick-link w-100 text-start border-0 bg-transparent">
                     <i class="fas fa-sign-out-alt"></i>ออกจากระบบ
@@ -577,7 +558,7 @@
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            <form action="{{ route('account.logout') }}" method="POST" class="d-inline">
                                 @csrf
                                 <button class="dropdown-item" type="submit">
                                     <i class="fas fa-sign-out-alt me-2"></i>ออกจากระบบ
@@ -683,8 +664,9 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE JS removed - using custom sidebar functionality -->
 
     {{-- SweetAlert2 Integration --}}
     <script>
@@ -740,83 +722,68 @@
             }
         });
 
-        // Sidebar functionality
-        const sidebar = document.querySelector('.main-sidebar');
-        const hoverZone = document.querySelector('.sidebar-hover-zone');
-        const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
-        const body = document.body;
-        let hoverTimeout;
+        // Custom Sidebar Toggle Functionality
+        function toggleSidebar() {
+            const body = document.body;
+            const backdrop = document.querySelector('.sidebar-backdrop');
 
-        // Hover-to-show functionality (desktop only)
-        if (window.innerWidth > 768) {
-            function expandSidebar() {
-                clearTimeout(hoverTimeout);
-                sidebar.classList.add('sidebar-expanded');
-                body.classList.add('sidebar-expanded');
-            }
-
-            function collapseSidebar() {
-                hoverTimeout = setTimeout(() => {
-                    if (!sidebar.matches(':hover') && !hoverZone.matches(':hover')) {
-                        sidebar.classList.remove('sidebar-expanded');
-                        body.classList.remove('sidebar-expanded');
-                    }
-                }, 300);
-            }
-
-            // Hover zone events
-            if (hoverZone) {
-                hoverZone.addEventListener('mouseenter', expandSidebar);
-                hoverZone.addEventListener('mouseleave', collapseSidebar);
-            }
-
-            // Sidebar events
-            if (sidebar) {
-                sidebar.addEventListener('mouseenter', expandSidebar);
-                sidebar.addEventListener('mouseleave', collapseSidebar);
-            }
-        }
-
-        // Handle mobile backdrop clicks
-        if (sidebarBackdrop) {
-            sidebarBackdrop.addEventListener('click', function() {
-                // Close sidebar by triggering AdminLTE's close mechanism
-                const pushMenuBtn = document.querySelector('[data-widget="pushmenu"]');
-                if (pushMenuBtn && window.innerWidth <= 768) {
-                    // Simulate click to close
-                    document.body.classList.remove('sidebar-open');
-                    sidebarBackdrop.classList.remove('show');
+            if (body.classList.contains('sidebar-open')) {
+                // Close sidebar
+                body.classList.remove('sidebar-open');
+                if (backdrop) backdrop.classList.remove('show');
+                console.log('Sidebar closed');
+            } else {
+                // Open sidebar
+                body.classList.add('sidebar-open');
+                if ($(window).width() <= 768 && backdrop) {
+                    backdrop.classList.add('show');
                 }
-            });
+                console.log('Sidebar opened');
+            }
         }
 
-        // Listen for AdminLTE sidebar events and manage expanded state
-        $(document).on('collapsed.lte.pushmenu', function() {
-            body.classList.remove('sidebar-expanded');
-            sidebarBackdrop.classList.remove('show');
+        // Handle hamburger menu click - multiple binding methods for reliability
+        $('[data-widget="pushmenu"]').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hamburger clicked (jQuery)!');
+            toggleSidebar();
+            return false;
         });
 
-        $(document).on('shown.lte.pushmenu', function() {
-            body.classList.add('sidebar-expanded');
-            if (window.innerWidth <= 768) {
-                sidebarBackdrop.classList.add('show');
+        // Direct binding as backup
+        document.querySelector('[data-widget="pushmenu"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hamburger clicked (direct)!');
+            toggleSidebar();
+        });
+
+        // Global click handler as final backup
+        document.addEventListener('click', function(e) {
+            const hamburgerBtn = e.target.closest('[data-widget="pushmenu"]');
+            if (hamburgerBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Hamburger clicked (global)!');
+                toggleSidebar();
+            }
+        });
+
+        // Handle mobile backdrop clicks
+        $('.sidebar-backdrop').on('click', function() {
+            if ($(window).width() <= 768) {
+                toggleSidebar();
             }
         });
 
         // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
+        $(window).on('resize', function() {
+            if ($(window).width() > 768) {
                 // Reset mobile state on desktop
-                document.body.classList.remove('sidebar-open');
-                sidebarBackdrop.classList.remove('show');
-                // Close mobile menu if open
+                $('body').removeClass('sidebar-open');
+                $('.sidebar-backdrop').removeClass('show');
                 closeMobileMenu();
-                // Re-enable hover functionality
-                location.reload(); // Simple way to re-initialize hover listeners
-            } else {
-                // Disable hover on mobile
-                sidebar.classList.remove('sidebar-expanded');
-                body.classList.remove('sidebar-expanded');
             }
         });
 

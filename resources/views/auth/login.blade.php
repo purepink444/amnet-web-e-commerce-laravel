@@ -8,7 +8,7 @@
         <img src="/mnt/data/2d1956aa-d7e5-4cdb-93ab-df858379fc06.png" style="width:100%; border-radius: 12px; margin-bottom:16px;" />
         <form action="{{ route('login') }}" method="POST">
             @csrf
-            <input type="text" name="username" style="width: 100%; background: #d9d9d9; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 18px; text-align: left; border: none;" placeholder="ชื่อผู้ใช้" required autofocus>
+            <input type="text" name="username" value="{{ old('username') }}" style="width: 100%; background: #d9d9d9; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 18px; text-align: left; border: none;" placeholder="ชื่อผู้ใช้" required autofocus>
             <input type="password" name="password" style="width: 100%; background: #d9d9d9; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 18px; text-align: left; border: none;" placeholder="รหัสผ่าน" required>
             <button type="submit" style="width: 100%; padding: 16px; font-size: 20px; border-radius: 16px; background: #ff8c39; border: none; cursor: pointer; color: white; font-weight: bold;">เข้าสู่ระบบ</button>
         </form>

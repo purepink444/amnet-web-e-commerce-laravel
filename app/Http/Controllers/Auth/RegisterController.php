@@ -32,8 +32,8 @@ class RegisterController extends Controller
                 'confirmed'
             ],
             'prefix' => 'required|string',
-            'firstname' => 'required|string',
-            'lastname' => 'required|string',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
             'phone' => 'required|digits:10',
             'address' => 'required|string',
             'province' => 'required|string',
@@ -69,8 +69,8 @@ class RegisterController extends Controller
             // สร้าง Member profile
             $member = Member::create([
                 'user_id' => $user->user_id,
-                'first_name' => $request->firstname,
-                'last_name' => $request->lastname,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
                 'address' => $request->address,
                 'district' => $districtName,
                 'subdistrict' => $request->subdistrict,

@@ -35,7 +35,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">ลูกค้า:</label>
                             <p class="form-control-plaintext">
-                                {{ $order->user ? $order->user->firstname . ' ' . $order->user->lastname : 'N/A' }}
+                                {{ $order->member ? $order->member->first_name . ' ' . $order->member->last_name : 'N/A' }}
                             </p>
                         </div>
                     </div>

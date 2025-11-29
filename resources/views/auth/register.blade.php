@@ -88,11 +88,11 @@ select.form-input {
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label mb-1">ชื่อ</label>
-                                <input type="text" name="firstname" class="form-input">
+                                <input type="text" name="first_name" class="form-input">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label mb-1">นามสกุล</label>
-                                <input type="text" name="lastname" class="form-input">
+                                <input type="text" name="last_name" class="form-input">
                             </div>
                         </div>
 

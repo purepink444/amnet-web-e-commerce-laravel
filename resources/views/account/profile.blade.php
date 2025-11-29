@@ -149,6 +149,18 @@
                                        value="{{ old('phone', $user->phone) }}">
                             </div>
 
+                            <div class="form-group mb-3">
+                                <label>รหัสผ่านใหม่ (เว้นว่างถ้าไม่ต้องการเปลี่ยน)</label>
+                                <input type="password" name="password" class="form-control"
+                                       placeholder="ใส่รหัสผ่านใหม่">
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label>ยืนยันรหัสผ่านใหม่</label>
+                                <input type="password" name="password_confirmation" class="form-control"
+                                       placeholder="ใส่รหัสผ่านใหม่อีกครั้ง">
+                            </div>
+
                             <div class="form-group mb-4">
                                 <label>ที่อยู่</label>
                                 <textarea name="address" class="form-control" rows="3">{{ old('address', $user->address) }}</textarea>

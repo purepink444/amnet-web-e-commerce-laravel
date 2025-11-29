@@ -12,7 +12,7 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':membe
 
         // Profile
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
         // Logout
         Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

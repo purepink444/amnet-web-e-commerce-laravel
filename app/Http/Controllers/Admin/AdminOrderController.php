@@ -13,8 +13,8 @@ class AdminOrderController extends Controller
     public function index()
     {
         $orders = Order::with([
-            'user' => function($query) {
-                $query->select('user_id', 'firstname', 'lastname');
+            'member' => function($query) {
+                $query->select('member_id', 'first_name', 'last_name');
             },
             'orderItems' => function($query) {
                 $query->with(['product' => function($productQuery) {
@@ -29,8 +29,11 @@ class AdminOrderController extends Controller
     public function show($id)
     {
         $order = Order::with([
+            'member' => function($query) {
+                $query->select('member_id', 'first_name', 'last_name');
+            },
             'user' => function($query) {
-                $query->select('user_id', 'firstname', 'lastname', 'email', 'phone');
+                $query->select('user_id', 'email', 'phone');
             },
             'orderItems' => function($query) {
                 $query->with(['product' => function($productQuery) {
@@ -45,12 +48,15 @@ class AdminOrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,paid,shipped,delivered,cancelled'
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,refunded'
         ]);
 
         $order = Order::with([
+            'member' => function($query) {
+                $query->select('member_id', 'first_name', 'last_name');
+            },
             'user' => function($query) {
-                $query->select('user_id', 'firstname', 'lastname', 'email');
+                $query->select('user_id', 'email');
             }
         ])->findOrFail($id);
         $oldStatus = $order->order_status;
@@ -64,6 +70,8 @@ class AdminOrderController extends Controller
 
         // Send notification to user
         if ($order->user) {
+            // Load member relationship for notification
+            $order->user->load('member');
             $order->user->notify(new OrderStatusUpdated($order, $oldStatus, $request->status));
         }
 

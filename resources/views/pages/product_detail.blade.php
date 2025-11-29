@@ -171,7 +171,7 @@
                                 <div class="flex-shrink-0 me-3">
                                     <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
                                          style="width: 40px; height: 40px; font-weight: bold;">
-                                        {{ substr($review->member->user->firstname, 0, 1) . substr($review->member->user->lastname, 0, 1) }}
+                                        {{ substr($review->member->first_name, 0, 1) . substr($review->member->last_name, 0, 1) }}
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">

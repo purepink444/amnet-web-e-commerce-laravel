@@ -80,8 +80,8 @@
                 <div class="col-md-5">
                     <div class="mb-3">
                         <label for="firstname" class="form-label">ชื่อ <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('firstname') is-invalid @enderror"
-                               id="firstname" name="firstname" value="{{ old('firstname') }}" required>
+                        <input type="text" class="form-control @error('first_name') is-invalid @enderror"
+                               id="first_name" name="first_name" value="{{ old('first_name') }}" required>
                         @error('firstname')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -91,8 +91,8 @@
                 <div class="col-md-5">
                     <div class="mb-3">
                         <label for="lastname" class="form-label">นามสกุล <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('lastname') is-invalid @enderror"
-                               id="lastname" name="lastname" value="{{ old('lastname') }}" required>
+                        <input type="text" class="form-control @error('last_name') is-invalid @enderror"
+                               id="last_name" name="last_name" value="{{ old('last_name') }}" required>
                         @error('lastname')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

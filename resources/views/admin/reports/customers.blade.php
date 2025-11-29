@@ -55,7 +55,7 @@
                     @forelse($customers as $customer)
                         <tr>
                             <td>{{ $customer->user_id }}</td>
-                            <td>{{ $customer->firstname }} {{ $customer->lastname }}</td>
+                            <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
                             <td>{{ $customer->email }}</td>
                             <td>{{ $customer->phone ?? '-' }}</td>
                             <td>{{ $customer->total_orders ?? 0 }}</td>

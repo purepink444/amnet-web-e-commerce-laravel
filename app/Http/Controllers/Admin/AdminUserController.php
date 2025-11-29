@@ -18,9 +18,35 @@ class AdminUserController extends Controller
         $this->sweetAlert = $sweetAlert;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('role')->latest()->paginate(15);
+        $query = User::with('role');
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('member', function($memberQuery) use ($search) {
+                    $memberQuery->where('first_name', 'LIKE', "%{$search}%")
+                               ->orWhere('last_name', 'LIKE', "%{$search}%");
+                })
+                ->orWhere('username', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Role filter
+        if ($request->filled('role')) {
+            $query->where('role_id', $request->role);
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status);
+        }
+
+        $users = $query->latest()->paginate(15)->appends($request->query());
 
         return view('admin.users.index', compact('users'));
     }
@@ -40,8 +66,8 @@ class AdminUserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'role_id' => 'required|exists:roles,role_id',
             'prefix' => 'nullable|string|max:10',
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'province' => 'nullable|string|max:255',
@@ -85,8 +111,8 @@ class AdminUserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'required|exists:roles,role_id',
             'prefix' => 'nullable|string|max:10',
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'province' => 'nullable|string|max:255',

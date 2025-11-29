@@ -62,13 +62,13 @@
                     <div class="col-md-5">
                         <div class="mb-3">
                             <label class="form-label fw-bold">ชื่อ:</label>
-                            <p class="form-control-plaintext">{{ $user->firstname }}</p>
+                            <p class="form-control-plaintext">{{ $user->first_name }}</p>
                         </div>
                     </div>
                     <div class="col-md-5">
                         <div class="mb-3">
                             <label class="form-label fw-bold">นามสกุล:</label>
-                            <p class="form-control-plaintext">{{ $user->lastname }}</p>
+                            <p class="form-control-plaintext">{{ $user->last_name }}</p>
                         </div>
                     </div>
                 </div>

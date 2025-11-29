@@ -106,8 +106,9 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white fw-semibold px-3" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle me-1"></i>{{ $user->username }}
+                        <span class="badge bg-light text-dark ms-1">{{ $user->role_id == 1 ? 'Admin' : 'Member' }}</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown" style="z-index: 1050;">
                         @if($user->role_id == 1)
                             <!-- Admin Options -->
                             <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
@@ -123,9 +124,11 @@
                         @endif
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <form action="{{ route('account.logout') }}" method="POST" class="d-inline">
+                            <form action="{{ route('account.logout') }}" method="POST" class="d-inline" id="logout-form">
                                 @csrf
-                                <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ</button>
+                                <button class="dropdown-item text-danger" type="submit" onclick="return confirm('คุณต้องการออกจากระบบหรือไม่?')">
+                                    <i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ
+                                </button>
                             </form>
                         </li>
                     </ul>
