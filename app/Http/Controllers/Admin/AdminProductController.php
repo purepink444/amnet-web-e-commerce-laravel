@@ -11,15 +11,28 @@ use Illuminate\Support\Facades\{DB, Log};
 class AdminProductController extends Controller
 {
     /**
-     * Display paginated products list
+     * Display paginated products list with proper ordering
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand'])
-            ->latest()
-            ->get();
+        $sortBy = $request->get('sort', 'product_id'); // Default sort by ID
+        $sortDirection = $request->get('direction', 'asc'); // Default ascending for ID
 
-        return view('admin.products.index', compact('products'));
+        // Validate sort parameters
+        $allowedSorts = ['product_id', 'product_name', 'price', 'stock_quantity', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'product_id';
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        $products = Product::with(['category', 'brand'])
+            ->orderBy($sortBy, $sortDirection)
+            ->paginate(15); // Add pagination for better performance
+
+        return view('admin.products.index', compact('products', 'sortBy', 'sortDirection'));
     }
 
     /**

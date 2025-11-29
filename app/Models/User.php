@@ -19,6 +19,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'address',
+        'display_id',
         'is_active',
         'last_login',
         'role_id',
@@ -66,5 +68,22 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
+    }
+
+    /**
+     * Generate the next sequential display ID
+     */
+    public static function generateDisplayId()
+    {
+        $maxDisplayId = self::max('display_id') ?? 0;
+        return $maxDisplayId + 1;
+    }
+
+    /**
+     * Get the display ID for the user (for showing in UI)
+     */
+    public function getDisplayId()
+    {
+        return $this->display_id ?? $this->user_id;
     }
 }

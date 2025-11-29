@@ -45,6 +45,14 @@
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
 
+                    <!-- USER ID (Read-only) -->
+                    <div>
+                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
+                            <i class="fas fa-hashtag" style="margin-right: 8px; color: #ff8b26;"></i>ID ผู้ใช้
+                        </label>
+                        <input type="text" value="{{ $user->getDisplayId() }}" readonly style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #e5e7eb; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif; background: #f9f9f9; color: #6b7280;">
+                    </div>
+
                     <!-- PREFIX -->
                     <div>
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
@@ -52,10 +60,10 @@
                         </label>
                         <select name="prefix" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; background: white; font-family: 'Prompt', sans-serif;">
                             <option value="">เลือกคำนำหน้า</option>
-                            <option value="นาย" {{ old('prefix', $user->prefix) == 'นาย' ? 'selected' : '' }}>นาย</option>
-                            <option value="นาง" {{ old('prefix', $user->prefix) == 'นาง' ? 'selected' : '' }}>นาง</option>
-                            <option value="นางสาว" {{ old('prefix', $user->prefix) == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
-                            <option value="ดร." {{ old('prefix', $user->prefix) == 'ดร.' ? 'selected' : '' }}>ดร.</option>
+                            <option value="นาย" {{ old('prefix', $user->member->prefix ?? '') == 'นาย' ? 'selected' : '' }}>นาย</option>
+                            <option value="นาง" {{ old('prefix', $user->member->prefix ?? '') == 'นาง' ? 'selected' : '' }}>นาง</option>
+                            <option value="นางสาว" {{ old('prefix', $user->member->prefix ?? '') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
+                            <option value="ดร." {{ old('prefix', $user->member->prefix ?? '') == 'ดร.' ? 'selected' : '' }}>ดร.</option>
                         </select>
                         @error('prefix')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
@@ -67,7 +75,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-user" style="margin-right: 8px; color: #ff8b26;"></i>ชื่อ
                         </label>
-                        <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}" placeholder="กรอกชื่อ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="first_name" value="{{ old('first_name', $user->member->first_name ?? '') }}" placeholder="กรอกชื่อ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('first_name')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -78,7 +86,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-user" style="margin-right: 8px; color: #ff8b26;"></i>นามสกุล
                         </label>
-                        <input type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}" placeholder="กรอกนามสกุล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="last_name" value="{{ old('last_name', $user->member->last_name ?? '') }}" placeholder="กรอกนามสกุล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('last_name')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -172,7 +180,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-home" style="margin-right: 8px; color: #ff8b26;"></i>ที่อยู่
                         </label>
-                        <textarea name="address" rows="3" placeholder="กรอกที่อยู่" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif; resize: vertical;">{{ old('address', $user->address) }}</textarea>
+                        <textarea name="address" rows="3" placeholder="กรอกที่อยู่" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif; resize: vertical;">{{ old('address', $user->address ?? $user->member->address ?? '') }}</textarea>
                         @error('address')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -183,7 +191,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-city" style="margin-right: 8px; color: #ff8b26;"></i>จังหวัด
                         </label>
-                        <input type="text" name="province" value="{{ old('province', $user->province) }}" placeholder="กรอกจังหวัด" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="province" value="{{ old('province', $user->member->province ?? '') }}" placeholder="กรอกจังหวัด" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('province')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -194,7 +202,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-building" style="margin-right: 8px; color: #ff8b26;"></i>อำเภอ
                         </label>
-                        <input type="text" name="district" value="{{ old('district', $user->district) }}" placeholder="กรอกอำเภอ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="district" value="{{ old('district', $user->member->district ?? '') }}" placeholder="กรอกอำเภอ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('district')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -205,7 +213,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-map" style="margin-right: 8px; color: #ff8b26;"></i>ตำบล
                         </label>
-                        <input type="text" name="subdistrict" value="{{ old('subdistrict', $user->subdistrict) }}" placeholder="กรอกตำบล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="subdistrict" value="{{ old('subdistrict', $user->member->subdistrict ?? '') }}" placeholder="กรอกตำบล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('subdistrict')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror
@@ -216,7 +224,7 @@
                         <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
                             <i class="fas fa-mailbox" style="margin-right: 8px; color: #ff8b26;"></i>รหัสไปรษณีย์
                         </label>
-                        <input type="text" name="zipcode" value="{{ old('zipcode', $user->zipcode) }}" placeholder="กรอกรหัสไปรษณีย์" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
+                        <input type="text" name="zipcode" value="{{ old('zipcode', $user->member->postal_code ?? '') }}" placeholder="กรอกรหัสไปรษณีย์" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
                         @error('zipcode')
                             <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
                         @enderror

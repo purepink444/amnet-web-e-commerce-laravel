@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{User, Role};
+use App\Models\{User, Role, Member};
 use App\Services\SweetAlertService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\{Hash, DB, Log};
 use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
@@ -20,7 +20,7 @@ class AdminUserController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with('role');
+        $query = User::with(['role', 'member']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -46,7 +46,7 @@ class AdminUserController extends Controller
             $query->where('is_active', $request->status);
         }
 
-        $users = $query->latest()->paginate(15)->appends($request->query());
+        $users = $query->orderBy('user_id', 'asc')->paginate(15)->appends($request->query());
 
         return view('admin.users.index', compact('users'));
     }
@@ -76,17 +76,57 @@ class AdminUserController extends Controller
             'zipcode' => 'nullable|string|max:10',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        try {
+            DB::beginTransaction();
 
-        User::create($validated);
+            // Separate User and Member data
+            $userData = [
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $validated['role_id'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+            ];
 
-        $this->sweetAlert->created('ผู้ใช้');
-        return redirect()->route('admin.users.index');
+            $memberData = [
+                'prefix' => $validated['prefix'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'province' => $validated['province'],
+                'district' => $validated['district'],
+                'subdistrict' => $validated['subdistrict'],
+                'postal_code' => $validated['zipcode'],
+            ];
+
+            // Generate display_id for the new user
+            $userData['display_id'] = User::generateDisplayId();
+
+            // Create User
+            $user = User::create($userData);
+
+            // Create Member with user_id
+            $memberData['user_id'] = $user->user_id;
+            Member::create($memberData);
+
+            DB::commit();
+
+            $this->sweetAlert->created('ผู้ใช้');
+            return redirect()->route('admin.users.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('User creation failed: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        }
     }
 
     public function show($id)
     {
-        $user = User::with(['role', 'orders' => function($query) {
+        $user = User::with(['role', 'member', 'orders' => function($query) {
             $query->latest()->take(5);
         }])->findOrFail($id);
 
@@ -95,7 +135,7 @@ class AdminUserController extends Controller
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('member')->findOrFail($id);
         $roles = Role::all();
 
         return view('admin.users.edit', compact('user', 'roles'));
@@ -121,16 +161,57 @@ class AdminUserController extends Controller
             'zipcode' => 'nullable|string|max:10',
         ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+        try {
+            DB::beginTransaction();
+
+            // Separate User and Member data
+            $userData = [
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'role_id' => $validated['role_id'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+            ];
+
+            $memberData = [
+                'prefix' => $validated['prefix'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'province' => $validated['province'],
+                'district' => $validated['district'],
+                'subdistrict' => $validated['subdistrict'],
+                'postal_code' => $validated['zipcode'],
+            ];
+
+            // Handle password update
+            if (!empty($validated['password'])) {
+                $userData['password'] = Hash::make($validated['password']);
+            }
+
+            // Update User model
+            $user->update($userData);
+
+            // Update or create Member model
+            if ($user->member) {
+                $user->member->update($memberData);
+            } else {
+                $memberData['user_id'] = $user->user_id;
+                Member::create($memberData);
+            }
+
+            DB::commit();
+
+            $this->sweetAlert->updated('ผู้ใช้');
+            return redirect()->route('admin.users.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('User update failed: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
         }
-
-        $user->update($validated);
-
-        $this->sweetAlert->updated('ผู้ใช้');
-        return redirect()->route('admin.users.index');
     }
 
     public function destroy($id)
@@ -149,9 +230,32 @@ class AdminUserController extends Controller
             return redirect()->route('admin.users.index');
         }
 
-        $user->delete();
+        try {
+            DB::beginTransaction();
 
-        $this->sweetAlert->deleted('ผู้ใช้');
-        return redirect()->route('admin.users.index');
+            $deletedDisplayId = $user->display_id;
+
+            // Delete the user
+            $user->delete();
+
+            // Recalculate display_ids to fill the gap
+            $users = User::orderBy('user_id')->get();
+            $displayId = 1;
+            foreach ($users as $remainingUser) {
+                $remainingUser->update(['display_id' => $displayId]);
+                $displayId++;
+            }
+
+            DB::commit();
+
+            $this->sweetAlert->deleted('ผู้ใช้');
+            return redirect()->route('admin.users.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('User deletion failed: ' . $e->getMessage());
+
+            return back()->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        }
     }
 }

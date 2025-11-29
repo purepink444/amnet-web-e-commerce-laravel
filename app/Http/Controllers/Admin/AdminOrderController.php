@@ -10,8 +10,21 @@ use Illuminate\Support\Facades\Notification;
 
 class AdminOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $sortBy = $request->get('sort', 'order_id'); // Default sort by order ID
+        $sortDirection = $request->get('direction', 'asc'); // Default ascending for ID
+
+        // Validate sort parameters
+        $allowedSorts = ['order_id', 'order_date', 'total_amount', 'order_status', 'created_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'order_id';
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
         $orders = Order::with([
             'member' => function($query) {
                 $query->select('member_id', 'first_name', 'last_name');
@@ -21,9 +34,11 @@ class AdminOrderController extends Controller
                     $productQuery->select('product_id', 'product_name');
                 }]);
             }
-        ])->latest()->get();
+        ])
+        ->orderBy($sortBy, $sortDirection)
+        ->paginate(15); // Add pagination for better performance
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders', 'sortBy', 'sortDirection'));
     }
 
     public function show($id)

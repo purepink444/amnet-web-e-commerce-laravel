@@ -103,7 +103,7 @@
             <tbody>
                 @forelse($users as $user)
                     <tr>
-                        <td style="padding: 22px; text-align: center; border-top: 3px solid #ff8b26; font-weight: 500;">{{ $user->user_id }}</td>
+                        <td style="padding: 22px; text-align: center; border-top: 3px solid #ff8b26; font-weight: 500;">{{ $user->getDisplayId() }}</td>
                         <td style="padding: 22px; text-align: center; border-top: 3px solid #ff8b26; font-weight: 500;">
                             {{ $user->prefix }} {{ $user->first_name }} {{ $user->last_name }}<br>
                             <small style="color: #666; font-size: 18px;">{{ $user->username }}</small>

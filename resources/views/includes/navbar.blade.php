@@ -34,7 +34,7 @@
                 </li>
 
                 <!-- Guest Links -->
-                @guest
+                @guestห
                     <li class="nav-item">
                         <a class="nav-link text-white fw-semibold px-3 btn-register" href="{{ route('register') }}">
                             <i class="bi bi-person-plus me-1"></i>Register
@@ -145,18 +145,85 @@
 </nav>
 
 <style>
-.navbar { padding: 0.8rem 0; margin: 0 !important; width: 100%; }
-.navbar-brand { color: #fff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); transition: all 0.3s ease; }
-.navbar-brand:hover { transform: scale(1.05); }
-.nav-link { transition: all 0.3s ease; border-radius: 8px; margin: 0 2px; }
-.nav-link:hover { background-color: rgba(26,26,26,0.3); transform: translateY(-2px); }
-.btn-register { background-color: transparent; border-radius: 8px; }
-.btn-register:hover { background-color: rgba(26,26,26,0.4); }
+/* ===== STANDARDIZED FONTS FOR NAVBAR ===== */
+.navbar {
+    padding: 0.8rem 0;
+    margin: 0 !important;
+    width: 100%;
+    font-family: 'Kanit', sans-serif !important;
+}
+
+.navbar * {
+    font-family: 'Kanit', sans-serif !important;
+}
+
+.navbar-brand {
+    color: #fff !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 0 2px;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.3px;
+}
+
+.nav-link:hover {
+    background-color: rgba(26,26,26,0.3);
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    background-color: transparent;
+    border-radius: 8px;
+    font-weight: 600 !important;
+}
+
+.btn-register:hover {
+    background-color: rgba(26,26,26,0.4);
+}
+
 .dropdown-menu {
     z-index: 1050;
+    font-family: 'Kanit', sans-serif !important;
 }
+
+.dropdown-menu * {
+    font-family: 'Kanit', sans-serif !important;
+}
+
+.dropdown-item {
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+}
+
+.badge {
+    font-family: 'Kanit', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+}
+
 @media (max-width: 991px) {
-    .navbar-nav { padding: 1rem 0; }
-    .nav-link { padding: 0.5rem 1rem !important; margin: 0.2rem 0; }
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+    .nav-link {
+        padding: 0.5rem 1rem !important;
+        margin: 0.2rem 0;
+        font-size: 0.9rem !important;
+    }
+    .navbar-brand {
+        font-size: 1.3rem !important;
+    }
 }
 </style>

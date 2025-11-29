@@ -22,7 +22,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label fw-bold">ID ผู้ใช้:</label>
-                            <p class="form-control-plaintext">{{ $user->user_id }}</p>
+                            <p class="form-control-plaintext">{{ $user->getDisplayId() }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
