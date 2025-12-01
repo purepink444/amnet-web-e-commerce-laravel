@@ -127,20 +127,46 @@
 
                         <!-- รูปภาพ -->
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-dark">URL รูปภาพ</label>
-                            <input type="url"
-                                   name="image_url"
-                                   class="form-control"
-                                   value="{{ old('image_url', $product->image_url) }}"
-                                   placeholder="https://example.com/image.jpg">
-                            @if($product->image_url)
-                                <div class="mt-3 text-center">
-                                    <img src="{{ $product->image_url }}"
-                                         alt="{{ $product->product_name }}"
-                                         class="img-fluid rounded shadow-sm"
-                                         style="max-width: 100%; height: auto; max-height: 300px;">
+                            <label class="form-label fw-semibold text-dark">รูปภาพสินค้า</label>
+
+                            <!-- Existing Images -->
+                            @if($product->images && $product->images->count() > 0)
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">รูปภาพที่มีอยู่</label>
+                                    <div class="row g-2">
+                                        @foreach($product->images->sortBy('display_order') as $image)
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="position-relative">
+                                                    <img src="{{ Storage::url($image->image_path) }}"
+                                                         alt="{{ $image->alt_text ?? $product->product_name }}"
+                                                         class="img-fluid rounded shadow-sm">
+                                                    @if($image->is_primary)
+                                                        <span class="badge bg-primary position-absolute top-0 start-0">หลัก</span>
+                                                    @endif
+                                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0"
+                                                            onclick="deleteImage({{ $image->image_id }})">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             @endif
+
+                            <!-- Upload New Images -->
+                            <input type="file"
+                                   name="photos[]"
+                                   class="form-control"
+                                   accept="image/*"
+                                   multiple>
+                            <div class="form-text">เลือกรูปภาพใหม่เพื่อเพิ่ม รองรับไฟล์ jpeg, png, jpg, gif ขนาดไม่เกิน 2MB ต่อไฟล์ สามารถอัพโหลดได้หลายไฟล์</div>
+                            @error('photos')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            @error('photos.*')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <!-- สถานะ -->
@@ -195,6 +221,36 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function deleteImage(imageId) {
+    if (confirm('คุณต้องการลบรูปภาพนี้หรือไม่?')) {
+        fetch(`{{ url('admin/products/images') }}/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to show updated images
+                location.reload();
+            } else {
+                alert(data.message || 'เกิดข้อผิดพลาดในการลบรูปภาพ');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาดในการลบรูปภาพ');
+        });
+    }
+}
+</script>
 @endsection
 
 @section('styles')

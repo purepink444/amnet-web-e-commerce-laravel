@@ -69,7 +69,41 @@ body {
 
 .hero-container {
     max-width: 750px;
-    margin-left: 80px;
+    margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .hero-container {
+        margin-left: 80px;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .hero-container {
+        margin: 0 auto;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .hero .btn-group {
+        justify-content: center;
+    }
+
+    .hero .btn-group button {
+        margin: 5px;
+    }
 }
 
 .hero .badge {

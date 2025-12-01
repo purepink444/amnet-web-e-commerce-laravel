@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'จัดการผู้ใช้')
+@section('title', '')
 
 @section('content')
 <div style="margin: 0; padding: 40px 60px; font-family: 'Prompt', sans-serif; background: #ffffff; min-height: 100vh;">
@@ -159,4 +159,162 @@
         </div>
     @endif
 </div>
+
+<style>
+/* ===== RESPONSIVE DESIGN FOR ADMIN USERS PAGE ===== */
+
+/* Tablet and smaller screens */
+@media (max-width: 991px) {
+    div[style*="margin: 0; padding: 40px 60px"] {
+        padding: 20px 30px !important;
+    }
+
+    h1[style*="font-size: 60px"] {
+        font-size: 48px !important;
+    }
+
+    p[style*="font-size: 24px"] {
+        font-size: 18px !important;
+    }
+
+    a[style*="font-size: 24px"] {
+        font-size: 18px !important;
+        padding: 15px 40px !important;
+    }
+
+    div[style*="padding: 25px"] {
+        padding: 20px !important;
+    }
+
+    input[style*="font-size: 18px"],
+    select[style*="font-size: 18px"],
+    button[style*="font-size: 18px"] {
+        font-size: 16px !important;
+        padding: 10px 12px !important;
+    }
+
+    label[style*="font-size: 18px"] {
+        font-size: 16px !important;
+    }
+
+    table[style*="font-size: 24px"] {
+        font-size: 18px !important;
+    }
+
+    th[style*="font-size: 26px"] {
+        font-size: 20px !important;
+        padding: 15px !important;
+    }
+
+    td[style*="font-size: 20px"] {
+        font-size: 16px !important;
+        padding: 15px !important;
+    }
+
+    span[style*="font-size: 20px"] {
+        font-size: 16px !important;
+        padding: 6px 15px !important;
+    }
+
+    a[style*="font-size: 20px"],
+    button[style*="font-size: 20px"] {
+        font-size: 16px !important;
+        padding: 10px 20px !important;
+    }
+}
+
+/* Mobile screens */
+@media (max-width: 576px) {
+    div[style*="margin: 0; padding: 40px 60px"] {
+        padding: 15px 15px !important;
+    }
+
+    h1[style*="font-size: 60px"] {
+        font-size: 32px !important;
+    }
+
+    p[style*="font-size: 24px"] {
+        font-size: 16px !important;
+    }
+
+    a[style*="font-size: 24px"] {
+        font-size: 16px !important;
+        padding: 12px 30px !important;
+        width: 100% !important;
+        display: block !important;
+        text-align: center !important;
+        margin-top: 15px !important;
+    }
+
+    div[style*="padding: 25px"] {
+        padding: 15px !important;
+    }
+
+    input[style*="font-size: 18px"],
+    select[style*="font-size: 18px"],
+    button[style*="font-size: 18px"] {
+        font-size: 14px !important;
+        padding: 8px 10px !important;
+    }
+
+    label[style*="font-size: 18px"] {
+        font-size: 14px !important;
+    }
+
+    table[style*="font-size: 24px"] {
+        font-size: 14px !important;
+    }
+
+    th[style*="font-size: 26px"] {
+        font-size: 16px !important;
+        padding: 10px 5px !important;
+    }
+
+    td[style*="font-size: 20px"] {
+        font-size: 14px !important;
+        padding: 10px 5px !important;
+    }
+
+    span[style*="font-size: 20px"] {
+        font-size: 14px !important;
+        padding: 4px 10px !important;
+    }
+
+    a[style*="font-size: 20px"],
+    button[style*="font-size: 20px"] {
+        font-size: 14px !important;
+        padding: 8px 15px !important;
+        margin: 2px !important;
+    }
+
+    /* Stack buttons vertically on mobile */
+    td:last-child {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px !important;
+    }
+
+    a[style*="margin-right: 12px"] {
+        margin-right: 0 !important;
+        margin-bottom: 5px !important;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    h1[style*="font-size: 60px"] {
+        font-size: 28px !important;
+    }
+
+    table[style*="font-size: 24px"] {
+        font-size: 12px !important;
+    }
+
+    th[style*="font-size: 26px"],
+    td[style*="font-size: 20px"] {
+        font-size: 12px !important;
+        padding: 8px 3px !important;
+    }
+}
+</style>
 @endsection

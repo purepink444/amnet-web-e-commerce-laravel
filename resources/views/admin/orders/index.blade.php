@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'จัดการคำสั่งซื้อ')
+@section('title', '')
 
 @section('content')
 <div class="card">

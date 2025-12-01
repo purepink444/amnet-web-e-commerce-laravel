@@ -14,4 +14,51 @@
         </form>
     </div>
 </div>
+</div>
+
+<style>
+/* Responsive styles for login page */
+@media (max-width: 576px) {
+    div[style*="padding: 20px"] {
+        padding: 10px !important;
+    }
+
+    div[style*="padding: 24px"] {
+        padding: 20px !important;
+        max-width: 100% !important;
+        margin: 10px !important;
+    }
+
+    input[style*="padding: 16px"] {
+        padding: 12px !important;
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+
+    button[style*="padding: 16px"] {
+        padding: 14px !important;
+        font-size: 18px !important;
+    }
+
+    img[style*="margin-bottom:16px"] {
+        margin-bottom: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    div[style*="padding: 24px"] {
+        padding: 16px !important;
+    }
+
+    input[style*="padding: 16px"] {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+
+    button[style*="padding: 16px"] {
+        padding: 12px !important;
+        font-size: 16px !important;
+    }
+}
+</style>
 @endsection

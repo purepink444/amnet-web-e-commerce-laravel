@@ -32,8 +32,8 @@
                             @endif
 
                             <!-- Main Image -->
-                            <img src="{{ $product->image_url ?: 'https://via.placeholder.com/600x500' }}" 
-                                 alt="{{ $product->product_name }}" 
+                            <img src="{{ $product->photo_path ? Storage::url($product->photo_path) : 'https://via.placeholder.com/600x500' }}"
+                                 alt="{{ $product->product_name }}"
                                  class="img-fluid w-100 product-main-image"
                                  onerror="this.src='https://via.placeholder.com/600x500'">
                             
@@ -47,19 +47,31 @@
 
                     <!-- Thumbnail Gallery -->
                     <div class="row g-2 mt-3">
-                        <div class="col-3">
-                            <div class="card border-2 border-primary rounded-3 overflow-hidden">
-                                <img src="{{ $product->image_url ?: 'https://via.placeholder.com/150' }}" 
-                                     class="img-fluid" alt="Thumbnail 1">
+                        @if($product->images && $product->images->count() > 0)
+                            @foreach($product->images->take(4) as $index => $image)
+                            <div class="col-3">
+                                <div class="card {{ $index === 0 ? 'border-2 border-primary' : 'border' }} rounded-3 overflow-hidden {{ $index > 0 ? 'opacity-50' : '' }}">
+                                    <img src="{{ Storage::url($image->image_path) }}"
+                                         class="img-fluid" alt="Thumbnail {{ $index + 1 }}"
+                                         onclick="changeMainImage('{{ Storage::url($image->image_path) }}')">
+                                </div>
                             </div>
-                        </div>
-                        @for($i = 0; $i < 3; $i++)
-                        <div class="col-3">
-                            <div class="card border rounded-3 overflow-hidden opacity-50">
-                                <img src="https://via.placeholder.com/150" class="img-fluid" alt="Thumbnail {{ $i+2 }}">
+                            @endforeach
+                        @else
+                            <div class="col-3">
+                                <div class="card border-2 border-primary rounded-3 overflow-hidden">
+                                    <img src="{{ $product->photo_path ? Storage::url($product->photo_path) : 'https://via.placeholder.com/150' }}"
+                                         class="img-fluid" alt="Thumbnail 1">
+                                </div>
                             </div>
-                        </div>
-                        @endfor
+                            @for($i = 0; $i < 3; $i++)
+                            <div class="col-3">
+                                <div class="card border rounded-3 overflow-hidden opacity-50">
+                                    <img src="https://via.placeholder.com/150" class="img-fluid" alt="Thumbnail {{ $i+2 }}">
+                                </div>
+                            </div>
+                            @endfor
+                        @endif
                     </div>
                 </div>
             </div>
@@ -347,6 +359,22 @@ function decreaseQty() {
 
 function zoomImage() {
     alert('Zoom feature coming soon!');
+}
+
+function changeMainImage(imageSrc) {
+    const mainImage = document.querySelector('.product-main-image');
+    if (mainImage) {
+        mainImage.src = imageSrc;
+    }
+
+    // Update active thumbnail
+    document.querySelectorAll('.card.border-2').forEach(card => {
+        card.classList.remove('border-primary');
+        card.classList.add('border');
+    });
+
+    event.target.closest('.card').classList.remove('border');
+    event.target.closest('.card').classList.add('border-2', 'border-primary');
 }
 
 function addToCart(productId) {

@@ -57,6 +57,53 @@ select.form-input {
 .register-btn:hover {
     background: #ff7a2c;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .register-card {
+        padding: 2rem 1.5rem !important;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+    .form-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .register-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .register-layout {
+        padding: 1rem 0;
+    }
+
+    .register-card {
+        padding: 1.5rem 1rem !important;
+        margin: 0 0.5rem;
+    }
+
+    .row > div {
+        margin-bottom: 1rem;
+    }
+
+    .form-input {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .register-btn {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
 </style>
 @endsection
 

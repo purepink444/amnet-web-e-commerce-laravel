@@ -94,10 +94,7 @@
     <div class="row">
         @foreach($products as $product)
             @php
-                $imageUrl = $product->image_url;
-                if (!preg_match('/^https?:\/\//', $imageUrl)) {
-                    $imageUrl = asset('storage/' . $imageUrl);
-                }
+                $imageUrl = $product->photo_path ? \Storage::url($product->photo_path) : 'https://via.placeholder.com/300x300?text=No+Image';
             @endphp
 
             <div class="col-lg-4 col-md-4 col-sm-6 mb-4">

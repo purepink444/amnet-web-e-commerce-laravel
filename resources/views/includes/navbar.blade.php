@@ -34,7 +34,7 @@
                 </li>
 
                 <!-- Guest Links -->
-                @guestห
+                @guest
                     <li class="nav-item">
                         <a class="nav-link text-white fw-semibold px-3 btn-register" href="{{ route('register') }}">
                             <i class="bi bi-person-plus me-1"></i>Register

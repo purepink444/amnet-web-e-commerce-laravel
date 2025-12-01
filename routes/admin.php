@@ -20,6 +20,7 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin
         Route::post('/dashboard/refresh-cache', [DashboardController::class, 'refreshCache'])->name('dashboard.refresh-cache');
 
         Route::resource('products', AdminProductController::class);
+        Route::delete('products/images/{imageId}', [AdminProductController::class, 'deleteImage'])->name('products.delete-image');
         Route::resource('categories', AdminCategoryController::class);
         Route::post('categories/bulk-delete', [AdminCategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
         Route::patch('categories/bulk-update-status', [AdminCategoryController::class, 'bulkUpdateStatus'])->name('categories.bulk-update-status');

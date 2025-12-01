@@ -170,14 +170,14 @@ class ClientProductController extends Controller
             // Get full product data for the suggestion
             $product = Product::where('product_name', $productName)
                              ->where('status', 'active')
-                             ->select('product_id', 'product_name', 'price', 'image_url')
+                             ->select('product_id', 'product_name', 'price', 'photo_path')
                              ->first();
 
             return $product ? [
                 'product_id' => $product->product_id,
                 'product_name' => $product->product_name,
                 'price' => $product->price,
-                'image_url' => $product->image_url,
+                'image_url' => $product->photo_path ? \Storage::url($product->photo_path) : null,
             ] : null;
         })->filter()->values());
     }

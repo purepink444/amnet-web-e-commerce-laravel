@@ -124,12 +124,19 @@
 
                         <!-- รูปภาพ -->
                         <div class="mb-3">
-                            <label class="form-label fw-semibold text-dark">URL รูปภาพ</label>
-                            <input type="url"
+                            <label class="form-label fw-semibold text-dark">รูปภาพสินค้า</label>
+                            <input type="file"
                                    class="form-control"
-                                   name="image_url"
-                                   value="{{ old('image_url') }}"
-                                   placeholder="https://example.com/image.jpg">
+                                   name="photos[]"
+                                   accept="image/*"
+                                   multiple>
+                            <div class="form-text">รองรับไฟล์รูปภาพ jpeg, png, jpg, gif ขนาดไม่เกิน 2MB ต่อไฟล์ สามารถอัพโหลดได้หลายไฟล์</div>
+                            @error('photos')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            @error('photos.*')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <!-- สถานะ -->
