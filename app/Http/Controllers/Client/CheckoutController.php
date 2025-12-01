@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\{CartItem, Order, OrderItem, Payment};
 use App\Services\QRCodeService;
+use App\Mail\OrderConfirmation;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -280,6 +282,19 @@ class CheckoutController extends Controller
             CartItem::where('member_id', $member->member_id)->delete();
 
             DB::commit();
+
+            // ส่งอีเมลยืนยันคำสั่งซื้อ
+            try {
+                Mail::to($user->email)->send(new OrderConfirmation($order));
+                Log::info('Order confirmation email sent successfully', ['order_id' => $order->order_id, 'email' => $user->email]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send order confirmation email', [
+                    'order_id' => $order->order_id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage()
+                ]);
+                // ไม่ต้อง rollback เพราะคำสั่งซื้อสำเร็จแล้ว แค่ส่งเมลไม่สำเร็จ
+            }
 
             // สำเร็จ - redirect ไป success page
             return redirect()->route('account.checkout.success', $order->order_id)
