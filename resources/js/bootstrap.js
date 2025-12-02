@@ -160,7 +160,15 @@ class ThemeManager {
      }
 }
 
+// Import additional modules
+import './components/cart.js';
+import './components/product.js';
+import './utils/address-selector.js';
+import './pages/payment.js';
+import './pages/checkout.js';
+import './pages/admin-dashboard.js';
+
 // Initialize theme manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-     window.themeManager = new ThemeManager();
+      window.themeManager = new ThemeManager();
 });
