@@ -220,53 +220,6 @@
     </div>
 </div>
 
-<style>
-.product-card {
-    transition: all 0.3s ease;
-    border: none;
-    overflow: hidden;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
-}
-
-.product-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.product-wishlist {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-.rating i {
-    font-size: 0.8rem;
-}
-
-@media (max-width: 576px) {
-    .product-card .card-body {
-        padding: 1rem 0.75rem;
-    }
-
-    .product-card .card-title {
-        font-size: 0.9rem;
-    }
-
-    .rating small {
-        font-size: 0.7rem;
-    }
-}
-</style>
 
 @section('scripts')
 <script>

@@ -4,62 +4,6 @@
 
 @section('content')
 
-<style>
-    /* ===== Wireframe-like Style ===== */
-    .wf-sidebar-card {
-        background: #e6e6e6;
-        border: none;
-        border-radius: 10px;
-        padding: 14px;
-    }
-
-    .wf-sidebar-item {
-        background: #f7f7f7;
-        border-radius: 6px;
-        padding: 10px 12px;
-        margin-bottom: 10px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        color: #333;
-        text-decoration: none;
-    }
-    .wf-sidebar-item.active {
-        background: #ffffff;
-        border: 2px solid #cfcfcf;
-    }
-
-    .wf-main-header {
-        background: #f7f7f7;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
-        font-size: 14px;
-    }
-
-    .wf-main-panel {
-        background: #dcdcdc;
-        border-radius: 10px;
-        padding: 20px;
-        min-height: 450px;
-    }
-
-    .wf-separator {
-        height: 40px;
-        background: #0b0b0b;
-        border-radius: 4px;
-        margin: 40px 0;
-    }
-
-    .table {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-</style>
 
 
 <div class="container-fluid mt-4">
