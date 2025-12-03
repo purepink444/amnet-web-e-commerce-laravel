@@ -96,6 +96,15 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            'read' => [
+                'host' => [
+                    env('DB_READ_HOST1', '127.0.0.1'),
+                    env('DB_READ_HOST2', '127.0.0.2'),
+                ],
+            ],
+            'write' => [
+                'host' => env('DB_WRITE_HOST', '127.0.0.1'),
+            ],
         ],
 
         'sqlsrv' => [
