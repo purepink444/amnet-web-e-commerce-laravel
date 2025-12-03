@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('restrict');
+        Schema::table('products', function (Blueprint $table) {
+            $table->index('status', 'idx_products_status');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            //
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropIndex('idx_products_status');
         });
     }
 };

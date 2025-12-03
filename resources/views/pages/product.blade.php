@@ -17,7 +17,7 @@
             </div>
             <div class="col-lg-4 text-lg-end">
                 <div class="search-box">
-                    <input type="text" class="form-control form-control-lg" placeholder="🔍 ค้นหาสินค้า...">
+                    <input type="text" class="form-control form-control-lg" placeholder="🔍 ค้นหาสินค้า..." value="{{ request('search') }}">
                 </div>
             </div>
         </div>
@@ -73,11 +73,15 @@
                     <span class="ms-2 text-muted">รายการสินค้า</span>
                 </div>
                 <div class="d-flex gap-2">
-                    <select class="form-select form-select-sm" style="width: auto;">
-                        <option>เรียงตาม: แนะนำ</option>
-                        <option>ราคา: ต่ำ-สูง</option>
-                        <option>ราคา: สูง-ต่ำ</option>
-                        <option>ชื่อ: A-Z</option>
+                    <select class="form-select form-select-sm" style="width: auto;" name="sort">
+                        <option value="relevance" {{ request('sort') == 'relevance' ? 'selected' : '' }}>เรียงตาม: แนะนำ</option>
+                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>ราคา: ต่ำ-สูง</option>
+                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>ราคา: สูง-ต่ำ</option>
+                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>ชื่อ: A-Z</option>
+                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>ชื่อ: Z-A</option>
+                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>ใหม่ล่าสุด</option>
+                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>เก่าที่สุด</option>
+                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>ยอดนิยม</option>
                     </select>
                     <button class="btn btn-outline-secondary btn-sm">
                         <i class="bi bi-grid-3x3"></i>
@@ -91,7 +95,7 @@
     </div>
 
     <!-- Products Grid -->
-    <div class="row">
+    <div class="products-grid grid-view">
         @foreach($products as $product)
             @php
                 $imageUrl = $product->photo_path ? \Storage::url($product->photo_path) : 'https://via.placeholder.com/300x300?text=No+Image';
@@ -166,6 +170,65 @@
 
 @section('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.querySelector('.search-box input');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            updateProducts({ search: this.value });
+        }, 500);
+    });
+
+    // Sort functionality
+    const sortSelect = document.querySelector('.filter-bar select');
+    sortSelect.addEventListener('change', function() {
+        updateProducts({ sort: this.value });
+    });
+
+    // View toggle functionality
+    const gridBtn = document.querySelector('.btn-outline-secondary:nth-child(1)');
+    const listBtn = document.querySelector('.btn-outline-secondary:nth-child(2)');
+
+    gridBtn.addEventListener('click', function() {
+        document.querySelector('.products-grid').classList.remove('list-view');
+        document.querySelector('.products-grid').classList.add('grid-view');
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+    });
+
+    listBtn.addEventListener('click', function() {
+        document.querySelector('.products-grid').classList.remove('grid-view');
+        document.querySelector('.products-grid').classList.add('list-view');
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    });
+
+    // Category filter
+    const categoryLinks = document.querySelectorAll('.dropdown-item[href*="/category/"]');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.href.split('/category/')[1];
+            updateProducts({ category: category });
+        });
+    });
+});
+
+function updateProducts(params) {
+    const url = new URL(window.location);
+    Object.keys(params).forEach(key => {
+        if (params[key]) {
+            url.searchParams.set(key, params[key]);
+        } else {
+            url.searchParams.delete(key);
+        }
+    });
+    window.location.href = url.toString();
+}
+
 function addToCart(productId) {
     // Basic add to cart functionality - you can enhance this
     fetch('/account/cart/add/' + productId, {
@@ -187,15 +250,39 @@ function addToCart(productId) {
                 counter.textContent = data.cart_count || '0';
             }
             // Show success message
-            alert('เพิ่มสินค้าในตะกร้าแล้ว!');
+            showToast('เพิ่มสินค้าในตะกร้าแล้ว!', 'success');
         } else {
-            alert('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มสินค้าได้'));
+            showToast('เกิดข้อผิดพลาด: ' + (data.message || 'ไม่สามารถเพิ่มสินค้าได้'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+        showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
     });
+}
+
+function showToast(message, type = 'info') {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 9999;
+        font-weight: 500;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }
 </script>
 @endsection
@@ -476,19 +563,79 @@ function addToCart(productId) {
     padding: 5rem 2rem;
 }
 
+/* Grid/List View */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.products-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.products-grid.list-view .product-card {
+    display: flex;
+    flex-direction: row;
+}
+
+.products-grid.list-view .product-image {
+    width: 200px;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+.products-grid.list-view .product-body {
+    flex: 1;
+    padding-left: 1.5rem;
+}
+
+/* Toast Styles */
+.toast {
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast-success { background: #28a745; }
+.toast-error { background: #dc3545; }
+.toast-info { background: #007bff; }
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .product-hero h1 {
         font-size: 2rem;
     }
-    
-    .filter-bar {ฤ
+
+    .filter-bar {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .product-image {
         height: 200px;
+    }
+
+    .products-grid.list-view .product-card {
+        flex-direction: column;
+    }
+
+    .products-grid.list-view .product-image {
+        width: 100%;
+        height: 200px;
+    }
+
+    .products-grid.list-view .product-body {
+        padding-left: 0;
     }
 }
 </style>
