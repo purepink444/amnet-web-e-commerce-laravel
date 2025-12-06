@@ -1,248 +1,255 @@
 @extends('layouts.admin')
 
-@section('title', 'แก้ไขผู้ใช้')
+@section('title', 'แก้ไขผู้ใช้ - ' . ($user->member ? $user->member->first_name . ' ' . $user->member->last_name : $user->username))
 
 @section('content')
-<div style="margin: 0; padding: 40px 60px; font-family: 'Prompt', sans-serif; background: #ffffff; min-height: 100vh;">
-
-    <!-- HEADER SECTION -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
-
-        <!-- TITLE -->
-        <div>
-            <h1 style="font-size: 60px; font-weight: 700; margin-bottom: 5px; color: #1f2937;">แก้ไขผู้ใช้</h1>
-            <p style="font-size: 24px; color: #6b7280; margin: 0; font-weight: 500;">แก้ไขข้อมูลผู้ใช้ในระบบ</p>
+<div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+            <div class="flex-grow-1">
+                <h1 class="title mb-1">แก้ไขผู้ใช้</h1>
+                <p class="subtitle mb-0">
+                    แก้ไขข้อมูลของ <strong>{{ $user->member ? $user->member->first_name . ' ' . $user->member->last_name : $user->username }}</strong>
+                    <span class="badge bg-secondary ms-2">{{ $user->getDisplayId() }}</span>
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.users.show', $user->user_id) }}" class="btn btn-outline-info">
+                    <i class="bi bi-eye me-1"></i>ดูข้อมูล
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>กลับไปหน้าหลัก
+                </a>
+            </div>
         </div>
-
-        <!-- BACK BUTTON -->
-        <a href="{{ route('admin.users.index') }}" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: #fff; padding: 18px 40px; font-size: 20px; font-weight: 600; border: 0; border-radius: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3); transition: all 0.3s ease;">
-            <i class="fas fa-arrow-left" style="margin-right: 10px;"></i>กลับไปหน้าหลัก
-        </a>
-
     </div>
 
-    <!-- EDIT FORM -->
-    <div style="background: white; border-radius: 20px; box-shadow: 0 8px 25px rgba(255, 139, 38, 0.15); border: 3px solid #ff8b26; overflow: hidden;">
+    <!-- Progress Indicator -->
+    <div class="progress-section">
+        <div class="progress-header">
+            <h6 class="mb-2">ความคืบหน้าการกรอกข้อมูล</h6>
+            <div class="progress">
+                <div class="progress-bar" id="formProgress" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
 
-        <!-- FORM HEADER -->
-        <div style="background: linear-gradient(135deg, #ff8b26 0%, #e67e22 100%); padding: 25px 40px; color: white;">
-            <h2 style="font-size: 28px; font-weight: 700; margin: 0;">
-                <i class="fas fa-user-edit" style="margin-right: 15px;"></i>ข้อมูลผู้ใช้
-            </h2>
-            <p style="font-size: 18px; margin: 5px 0 0 0; opacity: 0.9;">แก้ไขข้อมูลส่วนตัวของผู้ใช้</p>
+    <!-- Edit Form -->
+    <div class="content-card">
+        <!-- Form Header with Avatar -->
+        <div class="form-header">
+            <div class="d-flex align-items-center gap-3">
+                <div class="user-avatar-large">
+                    @if($user->member && $user->member->photo_path)
+                        <img src="{{ asset('storage/' . $user->member->photo_path) }}" alt="{{ $user->username }}" class="avatar-img">
+                    @else
+                        <div class="avatar-placeholder-large">
+                            {{ strtoupper(substr($user->username, 0, 1)) }}
+                        </div>
+                    @endif
+                </div>
+                <div>
+                    <h3 class="mb-1">{{ $user->member ? $user->member->first_name . ' ' . $user->member->last_name : $user->username }}</h3>
+                    <p class="text-muted mb-0">{{ $user->email }}</p>
+                    <div class="d-flex gap-2 mt-2">
+                        <span class="badge {{ $user->role_id == 1 ? 'bg-primary' : 'bg-success' }}">{{ $user->role?->role_name ?? 'ปกติ' }}</span>
+                        <span class="badge {{ $user->is_active ? 'bg-success' : 'bg-danger' }}">
+                            {{ $user->is_active ? 'ใช้งาน' : 'ปิดใช้งาน' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- FORM CONTENT -->
-        <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST" style="padding: 40px;">
+        <!-- Tabbed Form -->
+        <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST" id="userForm">
             @csrf
             @method('PUT')
 
-            <!-- BASIC INFO SECTION -->
-            <div style="margin-bottom: 40px;">
-                <h3 style="font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 25px; border-bottom: 2px solid #ff8b26; padding-bottom: 10px;">
-                    <i class="fas fa-id-card" style="margin-right: 10px;"></i>ข้อมูลพื้นฐาน
-                </h3>
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs" id="editTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
+                        <i class="bi bi-person me-2"></i>ข้อมูลพื้นฐาน
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab">
+                        <i class="bi bi-shield me-2"></i>ข้อมูลบัญชี
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">
+                        <i class="bi bi-geo-alt me-2"></i>ที่อยู่
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                        <i class="bi bi-lock me-2"></i>ความปลอดภัย
+                    </button>
+                </li>
+            </ul>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-
-                    <!-- USER ID (Read-only) -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-hashtag" style="margin-right: 8px; color: #ff8b26;"></i>ID ผู้ใช้
-                        </label>
-                        <input type="text" value="{{ $user->getDisplayId() }}" readonly style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #e5e7eb; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif; background: #f9f9f9; color: #6b7280;">
+            <!-- Tab Content -->
+            <div class="tab-content p-4" id="editTabsContent">
+                <!-- Basic Information Tab -->
+                <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">ID ผู้ใช้</label>
+                            <input type="text" class="form-control" value="{{ $user->getDisplayId() }}" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">คำนำหน้า</label>
+                            <select name="prefix" class="form-select">
+                                <option value="">เลือก</option>
+                                <option value="นาย" {{ old('prefix', $user->member->prefix ?? '') == 'นาย' ? 'selected' : '' }}>นาย</option>
+                                <option value="นาง" {{ old('prefix', $user->member->prefix ?? '') == 'นาง' ? 'selected' : '' }}>นาง</option>
+                                <option value="นางสาว" {{ old('prefix', $user->member->prefix ?? '') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
+                                <option value="ดร." {{ old('prefix', $user->member->prefix ?? '') == 'ดร.' ? 'selected' : '' }}>ดร.</option>
+                            </select>
+                            @error('prefix')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ชื่อ</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $user->member->first_name ?? '') }}" required>
+                            @error('first_name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">นามสกุล</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $user->member->last_name ?? '') }}" required>
+                            @error('last_name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อผู้ใช้</label>
+                            <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}" required>
+                            @error('username')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">อีเมล</label>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                            @error('email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
                     </div>
+                </div>
 
-                    <!-- PREFIX -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-user-tag" style="margin-right: 8px; color: #ff8b26;"></i>คำนำหน้า
-                        </label>
-                        <select name="prefix" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; background: white; font-family: 'Prompt', sans-serif;">
-                            <option value="">เลือกคำนำหน้า</option>
-                            <option value="นาย" {{ old('prefix', $user->member->prefix ?? '') == 'นาย' ? 'selected' : '' }}>นาย</option>
-                            <option value="นาง" {{ old('prefix', $user->member->prefix ?? '') == 'นาง' ? 'selected' : '' }}>นาง</option>
-                            <option value="นางสาว" {{ old('prefix', $user->member->prefix ?? '') == 'นางสาว' ? 'selected' : '' }}>นางสาว</option>
-                            <option value="ดร." {{ old('prefix', $user->member->prefix ?? '') == 'ดร.' ? 'selected' : '' }}>ดร.</option>
-                        </select>
-                        @error('prefix')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
+                <!-- Account Information Tab -->
+                <div class="tab-pane fade" id="account" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">เบอร์โทรศัพท์</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}">
+                            @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">บทบาท</label>
+                            <select name="role_id" class="form-select" required>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->role_id }}" {{ old('role_id', $user->role_id) == $role->role_id ? 'selected' : '' }}>
+                                        {{ $role->role_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('role_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>ข้อมูลสำคัญ:</strong> การเปลี่ยนบทบาทจะส่งผลต่อสิทธิ์การเข้าถึงของผู้ใช้
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- FIRST NAME -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-user" style="margin-right: 8px; color: #ff8b26;"></i>ชื่อ
-                        </label>
-                        <input type="text" name="first_name" value="{{ old('first_name', $user->member->first_name ?? '') }}" placeholder="กรอกชื่อ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('first_name')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
+                <!-- Address Information Tab -->
+                <div class="tab-pane fade" id="address" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">ที่อยู่</label>
+                            <textarea name="address" class="form-control" rows="3">{{ old('address', $user->address ?? $user->member->address ?? '') }}</textarea>
+                            @error('address')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">จังหวัด</label>
+                            <input type="text" name="province" class="form-control" value="{{ old('province', $user->member->province ?? '') }}">
+                            @error('province')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">อำเภอ</label>
+                            <input type="text" name="district" class="form-control" value="{{ old('district', $user->member->district ?? '') }}">
+                            @error('district')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">รหัสไปรษณีย์</label>
+                            <input type="text" name="zipcode" class="form-control" value="{{ old('zipcode', $user->member->postal_code ?? '') }}">
+                            @error('zipcode')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
                     </div>
+                </div>
 
-                    <!-- LAST NAME -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-user" style="margin-right: 8px; color: #ff8b26;"></i>นามสกุล
-                        </label>
-                        <input type="text" name="last_name" value="{{ old('last_name', $user->member->last_name ?? '') }}" placeholder="กรอกนามสกุล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('last_name')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">รหัสผ่านใหม่</label>
+                            <input type="password" name="password" class="form-control" placeholder="เว้นว่างหากไม่ต้องการเปลี่ยน">
+                            <div class="form-text">รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร</div>
+                            @error('password')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ยืนยันรหัสผ่าน</label>
+                            <input type="password" name="password_confirmation" class="form-control" placeholder="ยืนยันรหัสผ่านใหม่">
+                            @error('password_confirmation')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>คำเตือน:</strong> การเปลี่ยนรหัสผ่านจะทำให้ผู้ใช้ต้องเข้าสู่ระบบใหม่
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="security-info">
+                                <h6>ข้อมูลความปลอดภัย</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="security-item">
+                                            <i class="bi bi-calendar-event me-2"></i>
+                                            <span>วันที่สร้าง: {{ $user->created_at->format('d/m/Y H:i') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="security-item">
+                                            <i class="bi bi-clock me-2"></i>
+                                            <span>แก้ไขล่าสุด: {{ $user->updated_at->format('d/m/Y H:i') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- USERNAME -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-at" style="margin-right: 8px; color: #ff8b26;"></i>ชื่อผู้ใช้
-                        </label>
-                        <input type="text" name="username" value="{{ old('username', $user->username) }}" placeholder="กรอกชื่อผู้ใช้" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('username')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                 </div>
             </div>
 
-            <!-- ACCOUNT INFO SECTION -->
-            <div style="margin-bottom: 40px;">
-                <h3 style="font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 25px; border-bottom: 2px solid #ff8b26; padding-bottom: 10px;">
-                    <i class="fas fa-shield-alt" style="margin-right: 10px;"></i>ข้อมูลบัญชี
-                </h3>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-
-                    <!-- EMAIL -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-envelope" style="margin-right: 8px; color: #ff8b26;"></i>อีเมล
-                        </label>
-                        <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="กรอกอีเมล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('email')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="auto-save-status">
+                        <small id="saveStatus" class="text-muted">
+                            <i class="bi bi-cloud-check me-1"></i>บันทึกอัตโนมัติ
+                        </small>
                     </div>
-
-                    <!-- PHONE -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-phone" style="margin-right: 8px; color: #ff8b26;"></i>เบอร์โทรศัพท์
-                        </label>
-                        <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="กรอกเบอร์โทรศัพท์" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('phone')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
+                    <div class="action-buttons">
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>ยกเลิก
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="bi bi-check-circle me-1"></i>บันทึกการเปลี่ยนแปลง
+                        </button>
                     </div>
-
-                    <!-- ROLE -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-user-cog" style="margin-right: 8px; color: #ff8b26;"></i>บทบาท
-                        </label>
-                        <select name="role_id" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; background: white; font-family: 'Prompt', sans-serif;">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->role_id }}" {{ old('role_id', $user->role_id) == $role->role_id ? 'selected' : '' }}>
-                                    {{ $role->role_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('role_id')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- PASSWORD -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-lock" style="margin-right: 8px; color: #ff8b26;"></i>รหัสผ่านใหม่ (เว้นว่างหากไม่ต้องการเปลี่ยน)
-                        </label>
-                        <input type="password" name="password" placeholder="กรอกรหัสผ่านใหม่" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('password')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                 </div>
             </div>
-
-            <!-- ADDRESS SECTION -->
-            <div style="margin-bottom: 40px;">
-                <h3 style="font-size: 24px; font-weight: 600; color: #1f2937; margin-bottom: 25px; border-bottom: 2px solid #ff8b26; padding-bottom: 10px;">
-                    <i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i>ข้อมูลที่อยู่
-                </h3>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-
-                    <!-- ADDRESS -->
-                    <div style="grid-column: 1 / -1;">
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-home" style="margin-right: 8px; color: #ff8b26;"></i>ที่อยู่
-                        </label>
-                        <textarea name="address" rows="3" placeholder="กรอกที่อยู่" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif; resize: vertical;">{{ old('address', $user->address ?? $user->member->address ?? '') }}</textarea>
-                        @error('address')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- PROVINCE -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-city" style="margin-right: 8px; color: #ff8b26;"></i>จังหวัด
-                        </label>
-                        <input type="text" name="province" value="{{ old('province', $user->member->province ?? '') }}" placeholder="กรอกจังหวัด" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('province')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- DISTRICT -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-building" style="margin-right: 8px; color: #ff8b26;"></i>อำเภอ
-                        </label>
-                        <input type="text" name="district" value="{{ old('district', $user->member->district ?? '') }}" placeholder="กรอกอำเภอ" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('district')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- SUBDISTRICT -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-map" style="margin-right: 8px; color: #ff8b26;"></i>ตำบล
-                        </label>
-                        <input type="text" name="subdistrict" value="{{ old('subdistrict', $user->member->subdistrict ?? '') }}" placeholder="กรอกตำบล" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('subdistrict')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- ZIPCODE -->
-                    <div>
-                        <label style="display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #374151;">
-                            <i class="fas fa-mailbox" style="margin-right: 8px; color: #ff8b26;"></i>รหัสไปรษณีย์
-                        </label>
-                        <input type="text" name="zipcode" value="{{ old('zipcode', $user->member->postal_code ?? '') }}" placeholder="กรอกรหัสไปรษณีย์" style="width: 100%; padding: 15px 18px; font-size: 18px; border: 2px solid #ff8b26; border-radius: 12px; outline: none; font-family: 'Prompt', sans-serif;">
-                        @error('zipcode')
-                            <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- FORM ACTIONS -->
-            <div style="border-top: 2px solid #e5e7eb; padding-top: 30px; display: flex; justify-content: flex-end; gap: 20px;">
-                <a href="{{ route('admin.users.index') }}" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; padding: 15px 30px; font-size: 18px; font-weight: 600; border: none; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3); transition: all 0.3s ease;">
-                    <i class="fas fa-times" style="margin-right: 8px;"></i>ยกเลิก
-                </a>
-                <button type="submit" style="background: linear-gradient(135deg, #00d621 0%, #00b81f 100%); color: white; padding: 15px 40px; font-size: 18px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 214, 33, 0.3); transition: all 0.3s ease;">
-                    <i class="fas fa-save" style="margin-right: 8px;"></i>บันทึกการเปลี่ยนแปลง
-                </button>
-            </div>
-
         </form>
     </div>
 </div>

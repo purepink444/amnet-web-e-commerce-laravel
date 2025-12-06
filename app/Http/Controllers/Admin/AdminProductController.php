@@ -28,9 +28,36 @@ class AdminProductController extends Controller
             $sortDirection = 'desc';
         }
 
-        $products = Product::with(['category', 'brand'])
-            ->orderBy($sortBy, $sortDirection)
-            ->paginate(15); // Add pagination for better performance
+        $query = Product::with(['category', 'brand', 'images']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('product_name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhere('product_id', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by brand
+        if ($request->filled('brand')) {
+            $query->where('brand_id', $request->brand);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $products = $query->orderBy($sortBy, $sortDirection)
+            ->paginate(15)
+            ->appends($request->query()); // Preserve query parameters in pagination
 
         return view('admin.products.index', compact('products', 'sortBy', 'sortDirection'));
     }
@@ -310,6 +337,72 @@ class AdminProductController extends Controller
         $validated['status'] ??= 'active';
 
         return $validated;
+    }
+
+    /**
+     * Handle bulk actions
+     */
+    public function bulk(Request $request)
+    {
+        $request->validate([
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'integer|exists:products,product_id',
+            'action' => 'required|in:activate,deactivate,delete'
+        ]);
+
+        $productIds = $request->product_ids;
+        $action = $request->action;
+
+        try {
+            DB::beginTransaction();
+
+            switch ($action) {
+                case 'activate':
+                    Product::whereIn('product_id', $productIds)->update(['status' => 'active']);
+                    $message = 'เปิดใช้งานสินค้าเรียบร้อยแล้ว';
+                    break;
+
+                case 'deactivate':
+                    Product::whereIn('product_id', $productIds)->update(['status' => 'inactive']);
+                    $message = 'ปิดใช้งานสินค้าเรียบร้อยแล้ว';
+                    break;
+
+                case 'delete':
+                    // Check if any products have been ordered
+                    $orderedProducts = Product::whereIn('product_id', $productIds)
+                        ->whereHas('orderItems')
+                        ->pluck('product_name')
+                        ->toArray();
+
+                    if (!empty($orderedProducts)) {
+                        return back()->with('error', 'ไม่สามารถลบสินค้าที่มีประวัติการสั่งซื้อได้: ' . implode(', ', $orderedProducts));
+                    }
+
+                    // Delete related data and products
+                    foreach ($productIds as $productId) {
+                        $product = Product::find($productId);
+                        if ($product) {
+                            $product->images()->delete();
+                            $product->cartItems()->delete();
+                            $product->reviews()->delete();
+                            $product->wishlists()->delete();
+                            $product->delete();
+                        }
+                    }
+                    $message = 'ลบสินค้าเรียบร้อยแล้ว';
+                    break;
+            }
+
+            DB::commit();
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk action failed: ' . $e->getMessage());
+
+            return back()->with('error', 'เกิดข้อผิดพลาดในการดำเนินการ');
+        }
     }
 
     /**

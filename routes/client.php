@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\{ClientProductController, CheckoutController, ReviewController, DiagnosticController};
+use App\Http\Controllers\Client\{CartController, ClientProductController, CheckoutController, ReviewController, DiagnosticController};
 
 Route::get('/', fn() => view('home'))->name('home');
 

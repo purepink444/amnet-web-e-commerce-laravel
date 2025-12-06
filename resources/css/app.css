@@ -1919,6 +1919,42 @@ body {
     color: var(--orange-dark);
 }
 
+/* Dark theme support for login/register forms */
+[data-theme="dark"] .login-container {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .login-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+}
+
+[data-theme="dark"] .login-input {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .login-input:focus {
+    outline: none;
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 2px var(--orange-primary);
+    border-color: var(--orange-primary);
+}
+
+[data-theme="dark"] .login-input::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .login-btn {
+    background: var(--orange-light);
+    color: white;
+}
+
+[data-theme="dark"] .login-btn:hover {
+    background: var(--orange-primary);
+}
+
 /* Responsive styles for register page */
 @media (max-width: 768px) {
     .register-card {
@@ -1963,6 +1999,55 @@ body {
     .register-btn {
         padding: 12px;
         font-size: 15px;
+    }
+}
+
+/* Responsive name and location rows for login-style register form */
+.name-row, .location-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.name-row .login-input, .location-row .login-input {
+    flex: 1;
+}
+
+.name-row select {
+    flex: 0 0 80px;
+}
+
+/* Mobile responsive for name and location rows */
+@media (max-width: 768px) {
+    .name-row, .location-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .name-row select {
+        flex: 0 0 70px;
+        font-size: 14px;
+    }
+
+    .name-row .login-input, .location-row .login-input {
+        flex: 1;
+        min-width: 120px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .name-row, .location-row {
+        gap: 5px;
+    }
+
+    .name-row select {
+        flex: 0 0 60px;
+    }
+
+    .name-row .login-input, .location-row .login-input {
+        min-width: 100px;
+        font-size: 13px;
     }
 }
 

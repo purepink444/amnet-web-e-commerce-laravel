@@ -20,6 +20,7 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin
         Route::post('/dashboard/refresh-cache', [DashboardController::class, 'refreshCache'])->name('dashboard.refresh-cache');
 
         Route::resource('products', AdminProductController::class);
+        Route::post('products/bulk', [AdminProductController::class, 'bulk'])->name('products.bulk');
         Route::delete('products/images/{imageId}', [AdminProductController::class, 'deleteImage'])->name('products.delete-image');
         Route::resource('categories', AdminCategoryController::class);
         Route::post('categories/bulk-delete', [AdminCategoryController::class, 'bulkDelete'])->name('categories.bulk-delete');
@@ -28,6 +29,8 @@ Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin
         Route::post('brands/bulk-delete', [AdminBrandController::class, 'bulkDelete'])->name('brands.bulk-delete');
         Route::patch('brands/bulk-update-status', [AdminBrandController::class, 'bulkUpdateStatus'])->name('brands.bulk-update-status');
         Route::resource('users', AdminUserController::class);
+        Route::post('users/bulk', [AdminUserController::class, 'bulk'])->name('users.bulk');
+        Route::get('users/export', [AdminUserController::class, 'export'])->name('users.export');
 
         // Orders
         Route::prefix('orders')->name('orders.')->group(function () {

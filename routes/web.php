@@ -35,5 +35,34 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register', [RegisterController::class, 'register'])->name('register.store');
 
 
+// Health Check Route (for load balancer)
+Route::get('/health', function () {
+    try {
+        // Check database connection
+        \DB::connection()->getPdo();
+
+        // Check Redis connection if configured
+        if (config('cache.default') === 'redis') {
+            \Redis::ping();
+        }
+
+        return response()->json([
+            'status' => 'healthy',
+            'timestamp' => now()->toISOString(),
+            'services' => [
+                'database' => 'ok',
+                'cache' => config('cache.default') === 'redis' ? 'ok' : 'file',
+                'storage' => is_writable(storage_path()) ? 'ok' : 'error'
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'unhealthy',
+            'error' => $e->getMessage(),
+            'timestamp' => now()->toISOString()
+        ], 500);
+    }
+});
+
 // Fallback
 Route::fallback(fn() => response()->view('errors.404', [], 404));

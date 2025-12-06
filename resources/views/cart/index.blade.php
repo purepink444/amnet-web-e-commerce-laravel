@@ -4,9 +4,11 @@
 
 @section('content')
 <div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0 rounded-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-11 col-md-12">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0 rounded-4">
                 <div class="card-header bg-gradient-orange text-white">
                     <h4 class="mb-0">
                         <i class="bi bi-cart3 me-2"></i>ตะกร้าสินค้า
@@ -84,42 +86,42 @@
             </div>
         </div>
 
-        @if(!$cart->items->isEmpty())
-        <div class="col-lg-4">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-gradient-orange text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-receipt me-2"></i>สรุปคำสั่งซื้อ
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>จำนวนสินค้า:</span>
-                        <span class="fw-bold">{{ $cart->total_items }} ชิ้น</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>ราคารวม:</span>
-                        <span class="fw-bold text-orange">฿{{ number_format($cart->total_price, 2) }}</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 mb-0">รวมทั้งสิ้น:</span>
-                        <span class="h5 mb-0 text-orange fw-bold">฿{{ number_format($cart->total_price, 2) }}</span>
-                    </div>
+                @if(!$cart->items->isEmpty())
+                <div class="col-lg-4">
+                    <div class="card shadow-lg border-0 rounded-4 sticky-top" style="top: 2rem;">
+                        <div class="card-header bg-gradient-orange text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-receipt me-2"></i>สรุปคำสั่งซื้อ
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>จำนวนสินค้า:</span>
+                                <span class="fw-bold">{{ $cart->total_items }} ชิ้น</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>ราคารวม:</span>
+                                <span class="fw-bold text-orange">฿{{ number_format($cart->total_price, 2) }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="h5 mb-0">รวมทั้งสิ้น:</span>
+                                <span class="h5 mb-0 text-orange fw-bold">฿{{ number_format($cart->total_price, 2) }}</span>
+                            </div>
 
-                    <a href="{{ route('account.checkout.index') }}" class="btn btn-success btn-lg w-100 mb-3">
-                        <i class="bi bi-credit-card me-2"></i>ดำเนินการชำระเงิน
-                    </a>
+                            <a href="{{ route('account.checkout.index') }}" class="btn btn-success btn-lg w-100 mb-3">
+                                <i class="bi bi-credit-card me-2"></i>ดำเนินการชำระเงิน
+                            </a>
 
-                    <a href="{{ route('client.products.index') }}" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าเพิ่ม
-                    </a>
+                            <a href="{{ route('client.products.index') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-left me-2"></i>เลือกซื้อสินค้าเพิ่ม
+                            </a>
+                        </div>
+                    </div>
                 </div>
+                @endif
             </div>
         </div>
-        @endif
     </div>
 </div>
-@endsection
-
 @endsection
