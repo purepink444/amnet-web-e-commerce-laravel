@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\{ClientProductController, CheckoutController, ReviewController};
+use App\Http\Controllers\Client\{ClientProductController, CheckoutController, ReviewController, DiagnosticController};
 
 Route::get('/', fn() => view('home'))->name('home');
 
@@ -30,6 +30,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
     });
+});
+
+// Diagnostic
+Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
+    Route::get('/', [DiagnosticController::class, 'index'])->name('index');
+    Route::get('/system', [DiagnosticController::class, 'systemCheck'])->name('system');
+    Route::get('/network', [DiagnosticController::class, 'networkCheck'])->name('network');
+    Route::get('/product', [DiagnosticController::class, 'productCheck'])->name('product');
 });
 
 
