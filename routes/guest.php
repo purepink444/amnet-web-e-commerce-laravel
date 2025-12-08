@@ -9,8 +9,6 @@ Route::middleware(['guest'])->group(function () {
 
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
-    Route::get('/register/pending', [RegisterController::class, 'showPendingVerification'])->name('register.pending');
-    Route::get('/email/verify', [RegisterController::class, 'verifyEmail'])->name('email.verify');
     Route::post('/check-username', [RegisterController::class, 'checkUsername'])->name('check.username');
     Route::post('/check-email', [RegisterController::class, 'checkEmail'])->name('check.email');
 });

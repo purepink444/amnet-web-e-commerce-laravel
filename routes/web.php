@@ -34,8 +34,6 @@ Route::middleware(['throttle:10,1'])->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
-    Route::get('/register/pending', [RegisterController::class, 'showPendingVerification'])->name('register.pending');
-    Route::get('/email/verify', [RegisterController::class, 'verifyEmail'])->name('email.verify');
     Route::post('/check-username', [RegisterController::class, 'checkUsername'])->name('check.username');
     Route::post('/check-email', [RegisterController::class, 'checkEmail'])->name('check.email');
 });

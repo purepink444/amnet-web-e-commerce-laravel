@@ -86,25 +86,47 @@ class AdminProductController extends Controller
             $files = $request->file('photos');
             $isFirst = true;
 
+            // Allowed image extensions
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
             foreach ($files as $file) {
-                $path = $file->store('products', 'public');
+                // Manual file type check
+                $extension = strtolower($file->getClientOriginalExtension());
+                if (!in_array($extension, $allowedExtensions)) {
+                    return back()->withInput()->with('error', 'ไฟล์ต้องเป็นรูปภาพเท่านั้น (jpg, jpeg, png, gif)');
+                }
+
+                // Get file info before moving
+                $fileSize = $file->getSize();
+                $originalName = $file->getClientOriginalName();
+
+                // Store file using native PHP functions to avoid MIME type detection
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $fullPath = public_path('storage/products/' . $filename);
+
+                // Ensure directory exists
+                $directory = dirname($fullPath);
+                if (!is_dir($directory)) {
+                    mkdir($directory, 0755, true);
+                }
+
+                // Move uploaded file
+                $file->move($directory, $filename);
+                $path = 'products/' . $filename;
+
                 $imageData = [
                     'image_path' => $path,
-                    'image_filename' => $file->getClientOriginalName(),
-                    'original_filename' => $file->getClientOriginalName(),
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
+                    'image_filename' => $filename,
+                    'original_filename' => $originalName,
+                    'file_size' => $fileSize,
+                    'mime_type' => 'image/' . $extension,
                     'is_primary' => $isFirst, // First image is primary
                     'display_order' => count($uploadedImages),
                     'uploaded_by' => auth()->id(),
                 ];
 
-                // Get image dimensions
-                $imageInfo = getimagesize($file->getRealPath());
-                if ($imageInfo) {
-                    $imageData['width'] = $imageInfo[0];
-                    $imageData['height'] = $imageInfo[1];
-                }
+                // Skip image dimensions for now - can be added later if needed
+                // Image dimensions require fileinfo extension which may not be available
 
                 $uploadedImages[] = $imageData;
                 $isFirst = false;
@@ -115,11 +137,15 @@ class AdminProductController extends Controller
             DB::beginTransaction();
 
             $product = Product::create($validated);
+            Log::info('Product created', ['product_id' => $product->product_id]);
 
             // Create product images
             if (!empty($uploadedImages)) {
+                Log::info('Creating product images', ['count' => count($uploadedImages)]);
                 foreach ($uploadedImages as $imageData) {
-                    $product->images()->create($imageData);
+                    Log::info('Creating image', $imageData);
+                    $image = $product->images()->create($imageData);
+                    Log::info('Image created', ['image_id' => $image->image_id]);
                 }
             }
 
@@ -132,10 +158,11 @@ class AdminProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Product creation failed: ' . $e->getMessage());
+            Log::error('Product creation stack trace: ' . $e->getTraceAsString());
 
             return back()
                 ->withInput()
-                ->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+                ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
         }
     }
 
@@ -193,25 +220,47 @@ class AdminProductController extends Controller
                 $files = $request->file('photos');
                 $currentOrder = $product->images()->max('display_order') ?? 0;
 
+                // Allowed image extensions
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
                 foreach ($files as $file) {
-                    $path = $file->store('products', 'public');
+                    // Manual file type check
+                    $extension = strtolower($file->getClientOriginalExtension());
+                    if (!in_array($extension, $allowedExtensions)) {
+                        return back()->withInput()->with('error', 'ไฟล์ต้องเป็นรูปภาพเท่านั้น (jpg, jpeg, png, gif)');
+                    }
+
+                    // Get file info before moving
+                    $fileSize = $file->getSize();
+                    $originalName = $file->getClientOriginalName();
+
+                    // Store file using native PHP functions to avoid MIME type detection
+                    $filename = time() . '_' . uniqid() . '.' . $extension;
+                    $fullPath = public_path('storage/products/' . $filename);
+
+                    // Ensure directory exists
+                    $directory = dirname($fullPath);
+                    if (!is_dir($directory)) {
+                        mkdir($directory, 0755, true);
+                    }
+
+                    // Move uploaded file
+                    $file->move($directory, $filename);
+                    $path = 'products/' . $filename;
+
                     $imageData = [
                         'image_path' => $path,
-                        'image_filename' => $file->getClientOriginalName(),
-                        'original_filename' => $file->getClientOriginalName(),
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
+                        'image_filename' => $filename,
+                        'original_filename' => $originalName,
+                        'file_size' => $fileSize,
+                        'mime_type' => 'image/' . $extension,
                         'is_primary' => false, // New images are not primary by default
                         'display_order' => ++$currentOrder,
                         'uploaded_by' => auth()->id(),
                     ];
 
-                    // Get image dimensions
-                    $imageInfo = getimagesize($file->getRealPath());
-                    if ($imageInfo) {
-                        $imageData['width'] = $imageInfo[0];
-                        $imageData['height'] = $imageInfo[1];
-                    }
+                    // Skip image dimensions for now - can be added later if needed
+                    // Image dimensions require fileinfo extension which may not be available
 
                     $uploadedImages[] = $imageData;
                 }
@@ -312,6 +361,7 @@ class AdminProductController extends Controller
     private function validateProduct(Request $request): array
     {
         $validated = $request->validate([
+            'sku' => ['required', 'string', 'max:100', 'unique:products,sku', 'regex:/^[A-Za-z0-9\-_]+$/'],
             'product_name' => ['required', 'string', 'max:200'],
             'description' => ['nullable', 'string', 'max:5000'],
             'price' => ['required', 'numeric', 'min:0', 'max:999999999.99'],
@@ -319,9 +369,12 @@ class AdminProductController extends Controller
             'category_id' => ['required', 'exists:categories,category_id'],
             'brand_id' => ['nullable', 'exists:brands,brand_id'],
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'photos.*' => ['max:2048'],
             'status' => ['nullable', 'in:active,inactive'],
         ], [
+            'sku.required' => 'กรุณาระบุรหัสสินค้า (SKU)',
+            'sku.unique' => 'รหัสสินค้านี้ถูกใช้งานแล้ว',
+            'sku.regex' => 'รหัสสินค้าต้องประกอบด้วยตัวอักษร ตัวเลข ขีดกลาง และขีดล่างเท่านั้น',
             'product_name.required' => 'กรุณาระบุชื่อสินค้า',
             'price.required' => 'กรุณาระบุราคา',
             'price.min' => 'ราคาต้องมากกว่าหรือเท่ากับ 0',
@@ -329,9 +382,8 @@ class AdminProductController extends Controller
             'category_id.required' => 'กรุณาเลือกหมวดหมู่',
             'category_id.exists' => 'หมวดหมู่ไม่ถูกต้อง',
             'brand_id.exists' => 'แบรนด์ไม่ถูกต้อง',
-            'photo.image' => 'ไฟล์ต้องเป็นรูปภาพ',
-            'photo.mimes' => 'รูปภาพต้องเป็นไฟล์ jpeg, png, jpg หรือ gif',
-            'photo.max' => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
+            'photo.mimes' => 'ไฟล์ต้องเป็น jpeg, png, jpg หรือ gif',
+            'photo.max' => 'ขนาดไฟล์ต้องไม่เกิน 2MB',
         ]);
 
         $validated['status'] ??= 'active';

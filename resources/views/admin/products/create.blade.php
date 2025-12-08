@@ -7,306 +7,173 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">
             <!-- Header -->
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
-                <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
                     <h2 class="mb-1">
                         <i class="bi bi-plus-circle text-success me-2"></i>
                         เพิ่มสินค้าใหม่
                     </h2>
-                    <p class="text-muted mb-0 small">กรุณากรอกข้อมูลสินค้าให้ครบถ้วน</p>
-                    <!-- Progress Indicator -->
-                    <div class="progress mt-2" style="height: 4px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%" id="formProgress"></div>
-                    </div>
+                    <p class="text-muted mb-0">กรุณากรอกข้อมูลสินค้าให้ครบถ้วน</p>
                 </div>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-primary btn-sm" id="autoSaveBtn" disabled>
-                        <i class="bi bi-cloud-upload me-1"></i>
-                        <span class="d-none d-sm-inline">บันทึกอัตโนมัติ</span>
-                        <span class="d-inline d-sm-none">💾</span>
-                    </button>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="bi bi-arrow-left me-1"></i>
-                        <span class="d-none d-sm-inline">กลับ</span>
-                        <span class="d-inline d-sm-none">←</span>
-                    </a>
-                </div>
+                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>กลับ
+                </a>
             </div>
 
             <!-- Form Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <ul class="nav nav-tabs card-header-tabs" id="formTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
-                                <i class="bi bi-info-circle me-1"></i>ข้อมูลพื้นฐาน
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media" type="button" role="tab">
-                                <i class="bi bi-images me-1"></i>รูปภาพ
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
-                                <i class="bi bi-gear me-1"></i>ตั้งค่า
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body p-3 p-md-4">
-                    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" novalidate id="productForm">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        <!-- Basic Information Tab -->
-                        <div class="tab-content" id="formTabsContent">
-                            <div class="tab-pane fade show active" id="basic" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="mb-3 text-primary">
-                                            <i class="bi bi-tag me-2"></i>ข้อมูลสินค้า
-                                        </h5>
-                                    </div>
-                                </div>
-
-                                <!-- ชื่อสินค้า -->
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="ชื่อสินค้าที่จะแสดงให้ลูกค้าเห็น">
-                                        ชื่อสินค้า <span class="text-danger">*</span>
-                                        <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="ชื่อควรสื่อความหมายและน่าสนใจ"></i>
-                                    </label>
-                                    <input type="text"
-                                           class="form-control form-control-lg @error('product_name') is-invalid @enderror"
-                                           name="product_name"
-                                           value="{{ old('product_name') }}"
-                                           required
-                                           placeholder="กรุณาป้อนชื่อสินค้า"
-                                           maxlength="200">
-                                    <div class="form-text">
-                                        <small class="text-muted">ความยาวสูงสุด 200 ตัวอักษร</small>
-                                        <span class="float-end">
-                                            <small class="text-muted" id="nameCounter">0/200</small>
-                                        </span>
-                                    </div>
-                                    @error('product_name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <!-- หมวดหมู่และแบรนด์ -->
-                                <div class="row g-3 mb-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="จัดหมวดหมู่สินค้าเพื่อความสะดวกในการค้นหา">
-                                            หมวดหมู่ <span class="text-danger">*</span>
-                                        </label>
-                                        <select class="form-select @error('category_id') is-invalid @enderror" name="category_id" required>
-                                            <option value="">-- เลือกหมวดหมู่ --</option>
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->category_id }}" {{ old('category_id') == $category->category_id ? 'selected' : '' }}>
-                                                    {{ $category->category_name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('category_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="แบรนด์สินค้า (ไม่บังคับ)">
-                                            แบรนด์
-                                            <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="เว้นว่างได้หากไม่มีแบรนด์เฉพาะ"></i>
-                                        </label>
-                                        <select class="form-select" name="brand_id">
-                                            <option value="">-- ไม่ระบุแบรนด์ --</option>
-                                            @foreach($brands as $brand)
-                                                <option value="{{ $brand->brand_id }}" {{ old('brand_id') == $brand->brand_id ? 'selected' : '' }}>
-                                                    {{ $brand->brand_name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- คำอธิบาย -->
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="รายละเอียดเพิ่มเติมของสินค้า">
-                                        คำอธิบาย
-                                        <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="อธิบายคุณสมบัติ ประโยชน์ และรายละเอียดสำคัญ"></i>
-                                    </label>
-                                    <textarea class="form-control"
-                                              name="description"
-                                              rows="4"
-                                              placeholder="รายละเอียดสินค้า..."
-                                              maxlength="5000">{{ old('description') }}</textarea>
-                                    <div class="form-text">
-                                        <small class="text-muted">ความยาวสูงสุด 5,000 ตัวอักษร</small>
-                                        <span class="float-end">
-                                            <small class="text-muted" id="descriptionCounter">0/5000</small>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- ราคาและจำนวน -->
-                                <div class="row g-3 mb-3">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="ราคาขายต่อหน่วย">
-                                            ราคา (บาท) <span class="text-danger">*</span>
-                                            <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="ราคาที่ลูกค้าจะเห็นและชำระ"></i>
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">฿</span>
-                                            <input type="number"
-                                                   step="0.01"
-                                                   min="0"
-                                                   max="999999999.99"
-                                                   class="form-control @error('price') is-invalid @enderror"
-                                                   name="price"
-                                                   value="{{ old('price') }}"
-                                                   required
-                                                   placeholder="0.00">
-                                            @error('price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="จำนวนสินค้าคงเหลือในสต็อก">
-                                            จำนวนคงเหลือ <span class="text-danger">*</span>
-                                            <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="จำนวนที่พร้อมจำหน่าย"></i>
-                                        </label>
-                                        <input type="number"
-                                               min="0"
-                                               max="999999"
-                                               class="form-control @error('stock_quantity') is-invalid @enderror"
-                                               name="stock_quantity"
-                                               value="{{ old('stock_quantity') }}"
-                                               required
-                                               placeholder="0">
-                                        @error('stock_quantity')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Media Tab -->
-                            <div class="tab-pane fade" id="media" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="mb-3 text-primary">
-                                            <i class="bi bi-images me-2"></i>รูปภาพสินค้า
-                                        </h5>
-                                    </div>
-                                </div>
-
-                                <!-- Drag & Drop Upload Area -->
-                                <div class="mb-3">
-                                    <div class="upload-area" id="uploadArea">
-                                        <div class="upload-content">
-                                            <i class="bi bi-cloud-upload display-4 text-muted mb-3"></i>
-                                            <h5 class="text-muted">ลากและวางรูปภาพที่นี่</h5>
-                                            <p class="text-muted mb-3">หรือคลิกเพื่อเลือกไฟล์</p>
-                                            <button type="button" class="btn btn-outline-primary" id="selectFilesBtn">
-                                                <i class="bi bi-folder2-open me-2"></i>เลือกไฟล์
-                                            </button>
-                                        </div>
-                                        <input type="file"
-                                               class="d-none"
-                                               id="photosInput"
-                                               name="photos[]"
-                                               accept="image/*"
-                                               multiple>
-                                    </div>
-                                    <div class="form-text text-center mt-2">
-                                        <small class="text-muted">
-                                            รองรับไฟล์ jpeg, png, jpg, gif ขนาดไม่เกิน 2MB ต่อไฟล์
-                                            <br>แนะนำ: อัพโหลดรูปภาพที่มีคุณภาพสูง ขนาดอย่างน้อย 800x800 พิกเซล
-                                        </small>
-                                    </div>
-                                    @error('photos')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    @error('photos.*')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <!-- Image Preview Grid -->
-                                <div id="imagePreview" class="image-preview-grid">
-                                    <!-- Images will be added here dynamically -->
-                                </div>
-                            </div>
-
-                            <!-- Settings Tab -->
-                            <div class="tab-pane fade" id="settings" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="mb-3 text-primary">
-                                            <i class="bi bi-gear me-2"></i>ตั้งค่าขั้นสูง
-                                        </h5>
-                                    </div>
-                                </div>
-
-                                <!-- สถานะ -->
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-dark" data-bs-toggle="tooltip" title="ควบคุมการแสดงสินค้าในร้าน">
-                                        สถานะการขาย
-                                        <i class="bi bi-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="สินค้าที่ปิดใช้งานจะไม่แสดงให้ลูกค้าเห็น"></i>
-                                    </label>
-                                    <select class="form-select" name="status">
-                                        <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>
-                                            ✅ เปิดใช้งาน (แสดงในร้านค้า)
-                                        </option>
-                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
-                                            ❌ ปิดใช้งาน (ไม่แสดงในร้านค้า)
-                                        </option>
-                                    </select>
-                                    <div class="form-text">
-                                        <small class="text-muted">สินค้าที่ปิดใช้งานจะไม่ปรากฏในหน้าร้านค้า แต่ยังคงอยู่ในระบบ</small>
-                                    </div>
-                                </div>
-
-                                <!-- Additional Settings -->
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    <strong>เคล็ดลับ:</strong> ตรวจสอบข้อมูลให้ครบถ้วนก่อนบันทึก
-                                    <ul class="mb-0 mt-2">
-                                        <li>ชื่อสินค้าควรสื่อความหมายและน่าสนใจ</li>
-                                        <li>อัพโหลดรูปภาพที่มีคุณภาพสูงอย่างน้อย 1 รูป</li>
-                                        <li>กำหนดราคาและจำนวนสินค้าให้ถูกต้อง</li>
-                                    </ul>
-                                </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="mb-3">ข้อมูลสินค้า</h5>
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
-                        <div class="form-actions mt-4 pt-3 border-top">
-                            <div class="row g-2">
-                                <div class="col-12 col-md-4">
-                                    <button type="submit" class="btn btn-success w-100 btn-lg" id="submitBtn">
-                                        <i class="bi bi-check-circle me-2"></i>
-                                        <span id="submitText">บันทึกสินค้า</span>
-                                    </button>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <button type="button" class="btn btn-outline-primary w-100" id="previewBtn" disabled>
-                                        <i class="bi bi-eye me-2"></i>ดูตัวอย่าง
-                                    </button>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary w-100">
-                                        <i class="bi bi-x-circle me-2"></i>ยกเลิก
-                                    </a>
-                                </div>
+                        <!-- SKU -->
+                        <div class="mb-3">
+                            <label class="form-label">รหัสสินค้า (SKU) <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control @error('sku') is-invalid @enderror"
+                                   name="sku"
+                                   value="{{ old('sku') }}"
+                                   required
+                                   placeholder="กรุณาป้อนรหัสสินค้า เช่น PROD-001"
+                                   pattern="[A-Za-z0-9\-_]+"
+                                   title="รหัสสินค้าต้องประกอบด้วยตัวอักษร ตัวเลข ขีดกลาง และขีดล่างเท่านั้น">
+                            @error('sku')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">
+                                <small class="text-muted">รหัสสินค้าต้องไม่ซ้ำกันและประกอบด้วยตัวอักษร ตัวเลข ขีดกลาง และขีดล่างเท่านั้น</small>
                             </div>
+                        </div>
 
-                            <!-- Save Status -->
-                            <div id="saveStatus" class="mt-3 text-center d-none">
-                                <small class="text-muted">
-                                    <i class="bi bi-cloud-check me-1"></i>
-                                    <span id="saveMessage">บันทึกข้อมูลเรียบร้อยแล้ว</span>
-                                </small>
+                        <!-- ชื่อสินค้า -->
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อสินค้า <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control @error('product_name') is-invalid @enderror"
+                                   name="product_name"
+                                   value="{{ old('product_name') }}"
+                                   required
+                                   placeholder="กรุณาป้อนชื่อสินค้า">
+                            @error('product_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- หมวดหมู่และแบรนด์ -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">หมวดหมู่ <span class="text-danger">*</span></label>
+                                <select class="form-select @error('category_id') is-invalid @enderror" name="category_id" required>
+                                    <option value="">-- เลือกหมวดหมู่ --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->category_id }}" {{ old('category_id') == $category->category_id ? 'selected' : '' }}>
+                                            {{ $category->category_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">แบรนด์</label>
+                                <select class="form-select" name="brand_id">
+                                    <option value="">-- ไม่ระบุแบรนด์ --</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->brand_id }}" {{ old('brand_id') == $brand->brand_id ? 'selected' : '' }}>
+                                            {{ $brand->brand_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- คำอธิบาย -->
+                        <div class="mb-3">
+                            <label class="form-label">คำอธิบาย</label>
+                            <textarea class="form-control"
+                                      name="description"
+                                      rows="3"
+                                      placeholder="รายละเอียดสินค้า...">{{ old('description') }}</textarea>
+                        </div>
+
+                        <!-- ราคาและจำนวน -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">ราคา (บาท) <span class="text-danger">*</span></label>
+                                <input type="number"
+                                       step="0.01"
+                                       min="0"
+                                       class="form-control @error('price') is-invalid @enderror"
+                                       name="price"
+                                       value="{{ old('price') }}"
+                                       required
+                                       placeholder="0.00">
+                                @error('price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">จำนวนคงเหลือ <span class="text-danger">*</span></label>
+                                <input type="number"
+                                       min="0"
+                                       class="form-control @error('stock_quantity') is-invalid @enderror"
+                                       name="stock_quantity"
+                                       value="{{ old('stock_quantity') }}"
+                                       required
+                                       placeholder="0">
+                                @error('stock_quantity')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- รูปภาพ -->
+                        <div class="mb-3">
+                            <label class="form-label">รูปภาพสินค้า</label>
+                            <input type="file"
+                                   class="form-control"
+                                   name="photos[]"
+                                   accept="image/*"
+                                   multiple>
+                            <div class="form-text">
+                                <small class="text-muted">รองรับไฟล์ jpeg, png, jpg, gif ขนาดไม่เกิน 2MB ต่อไฟล์</small>
+                            </div>
+                            @error('photos')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            @error('photos.*')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- สถานะ -->
+                        <div class="mb-3">
+                            <label class="form-label">สถานะการขาย</label>
+                            <select class="form-select" name="status">
+                                <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>
+                                    เปิดใช้งาน
+                                </option>
+                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                                    ปิดใช้งาน
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i>บันทึกสินค้า
+                            </button>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-1"></i>ยกเลิก
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -742,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== FORM PROGRESS TRACKING =====
     function updateProgress() {
-        const requiredFields = ['product_name', 'category_id', 'price', 'stock_quantity'];
+        const requiredFields = ['sku', 'product_name', 'category_id', 'price', 'stock_quantity'];
         let completed = 0;
         let total = requiredFields.length;
 
@@ -1017,6 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         let preview = '=== ตัวอย่างสินค้า ===\n\n';
 
+        preview += `รหัสสินค้า: ${formData.get('sku') || 'ไม่ได้ระบุ'}\n`;
         preview += `ชื่อสินค้า: ${formData.get('product_name') || 'ไม่ได้ระบุ'}\n`;
         preview += `ราคา: ${formData.get('price') || '0'} บาท\n`;
         preview += `จำนวนคงเหลือ: ${formData.get('stock_quantity') || '0'} ชิ้น\n`;

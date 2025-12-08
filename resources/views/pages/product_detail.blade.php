@@ -99,7 +99,7 @@
                         <span class="text-muted">
                             ({{ number_format($product->average_rating, 1) }}/5 จาก {{ $product->total_reviews }} รีวิว)
                         </span>
-                        @if($product->hasReviews())
+                        @if($product->total_reviews > 0)
                             <a href="{{ route('products.reviews.index', $product->product_id) }}" class="btn btn-sm btn-outline-primary ms-2">
                                 <i class="bi bi-chat-dots me-1"></i>ดูรีวิวทั้งหมด
                             </a>
@@ -107,7 +107,7 @@
                     </div>
 
                     <!-- Rating Distribution -->
-                    @if($product->hasReviews())
+                    @if($product->total_reviews > 0)
                     <div class="mb-4">
                         <h6 class="fw-semibold mb-3">การให้คะแนน</h6>
                         <div class="row g-2">
@@ -117,7 +117,7 @@
                                     <span class="text-muted me-2" style="min-width: 30px;">{{ $stars }}★</span>
                                     <div class="progress flex-grow-1" style="height: 8px;">
                                         <div class="progress-bar bg-warning"
-                                             style="width: {{ $product->total_reviews > 0 ? ($count / $product->total_reviews) * 100 : 0 }}%">
+                                              style="width: {{ $product->total_reviews > 0 ? ($count / $product->total_reviews) * 100 : 0 }}%">
                                         </div>
                                     </div>
                                     <span class="text-muted ms-2" style="min-width: 30px;">{{ $count }}</span>
@@ -172,23 +172,23 @@
                     @endif
 
                     <!-- Reviews Section -->
-                    @if($product->hasReviews())
+                    @if($product->total_reviews > 0)
                     <div class="mb-4">
                         <h5 class="fw-semibold mb-3">
                             <i class="bi bi-chat-dots text-primary me-2"></i>รีวิวล่าสุด
                         </h5>
                         <div class="card bg-light border-0 p-3">
-                            @foreach($product->getLatestReviews(3) as $review)
+                            @foreach($product->reviews as $review)
                             <div class="d-flex mb-3 pb-3 border-bottom">
                                 <div class="flex-shrink-0 me-3">
                                     <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                         style="width: 40px; height: 40px; font-weight: bold;">
+                                          style="width: 40px; height: 40px; font-weight: bold;">
                                         {{ substr($review->member->first_name, 0, 1) . substr($review->member->last_name, 0, 1) }}
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-2">
-                                        <strong class="me-2">{{ $review->member->full_name }}</strong>
+                                        <strong class="me-2">{{ $review->member->first_name }} {{ $review->member->last_name }}</strong>
                                         <div class="text-warning">
                                             {!! $review->rating_stars !!}
                                         </div>

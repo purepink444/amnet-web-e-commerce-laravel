@@ -71,16 +71,30 @@ class ClientProductController extends Controller
     public function show(int $id): View
     {
         try {
-            // Get product with optimized eager loading
+            // Get product with optimized eager loading - include reviews and images
             $product = Product::with([
                 'category:category_id,category_name',
-                'brand:brand_id,brand_name'
+                'brand:brand_id,brand_name',
+                'images:product_id,image_path,is_primary',
+                'reviews' => function($query) {
+                    $query->with('member:user_id,first_name,last_name')
+                          ->latest()
+                          ->limit(3);
+                }
             ])
             ->where('status', 'active')
             ->findOrFail($id);
 
             // Increment view count using optimized caching
             $this->cacheService->incrementProductView($id);
+
+            // Pre-compute expensive attributes to avoid N+1 queries
+            $product->average_rating = $product->reviews->avg('rating') ?? 0;
+            $product->total_reviews = $product->reviews->count();
+            $product->rating_stars = $this->generateRatingStars($product->average_rating);
+
+            // Calculate rating distribution efficiently
+            $product->rating_distribution = $this->calculateRatingDistribution($product->reviews);
 
             // Get related products using collaborative filtering algorithm
             $relatedProducts = $this->productSearchService->getRelatedProducts($id, 4);
@@ -149,6 +163,38 @@ class ClientProductController extends Controller
             ->sortBy(function ($product) use ($viewedIds) {
                 return array_search($product->product_id, $viewedIds);
             });
+    }
+
+    /**
+     * Generate rating stars HTML to avoid repeated calculations
+     */
+    private function generateRatingStars(float $rating): string
+    {
+        $stars = '';
+
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $rating) {
+                $stars .= '<i class="bi bi-star-fill text-warning"></i>';
+            } elseif ($i - 0.5 <= $rating) {
+                $stars .= '<i class="bi bi-star-half text-warning"></i>';
+            } else {
+                $stars .= '<i class="bi bi-star text-warning"></i>';
+            }
+        }
+
+        return $stars;
+    }
+
+    /**
+     * Calculate rating distribution efficiently
+     */
+    private function calculateRatingDistribution(\Illuminate\Database\Eloquent\Collection $reviews): array
+    {
+        $distribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $distribution[$i] = $reviews->where('rating', $i)->count();
+        }
+        return $distribution;
     }
 
     /**

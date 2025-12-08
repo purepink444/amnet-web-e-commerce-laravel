@@ -42,4 +42,18 @@ class Review extends Model
     {
         return $this->belongsTo(Product::class, 'product_id', 'product_id');
     }
+
+    /**
+     * Get rating stars HTML.
+     */
+    public function getRatingStarsAttribute()
+    {
+        $stars = '';
+        for ($i = 1; $i <= 5; $i++) {
+            $stars .= $i <= $this->rating
+                ? '<i class="bi bi-star-fill text-warning"></i>'
+                : '<i class="bi bi-star text-warning"></i>';
+        }
+        return $stars;
+    }
 }
