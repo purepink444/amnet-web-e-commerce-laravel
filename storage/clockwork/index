@@ -122,3 +122,10 @@
 1765167619-9672-1500549831,1765167619.9281,POST,/account/logout,App\Http\Controllers\Auth\LoginController@logout,302,316.83492660522,request
 1765167620-2781-157648419,1765167620.2542,GET,/login,App\Http\Controllers\Auth\LoginController@showLoginForm,200,777.89688110352,request
 1765167621-3498-292097377,1765167621.1762,GET,/mnt/data/2d1956aa-d7e5-4cdb-93ab-df858379fc06.png,Closure,404,709.60688591003,request
+1765169322-9657-896570206,1765169322.8937,GET,/login,App\Http\Controllers\Auth\LoginController@showLoginForm,200,795.17006874084,request
+1765169323-8553-1866043420,1765169323.7976,GET,/mnt/data/2d1956aa-d7e5-4cdb-93ab-df858379fc06.png,Closure,404,538.31505775452,request
+1765169343-4240-1143371310,1765169343.3832,POST,/login,App\Http\Controllers\Auth\LoginController@login,302,769.71292495728,request
+1765169344-1952-1366218885,1765169344.1653,GET,/admin/dashboard,App\Http\Controllers\Admin\DashboardController@index,200,1741.7478561401,request
+1765169346-0571-1441605099,1765169346.0051,GET,/css/dashboard.css,Closure,404,317.24905967712,request
+1765169346-3971-1407201109,1765169346.3411,GET,/js/pages/admin-dashboard.js,Closure,404,481.44507408142,request
+1765169591-5188-2137670547,1765169591.3786,GET,/admin/dashboard,App\Http\Controllers\Admin\DashboardController@index,200,534.67798233032,request
