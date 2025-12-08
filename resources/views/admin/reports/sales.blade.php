@@ -121,11 +121,11 @@
                             <td>{{ $order->user ? $order->user->email : 'N/A' }}</td>
                             <td>฿{{ number_format($order->total_amount, 2) }}</td>
                             <td>
-                                <span class="badge bg-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'cancelled' ? 'danger' : 'warning') }}">
-                                    {{ $order->status == 'pending' ? 'รอดำเนินการ' :
-                                       ($order->status == 'processing' ? 'กำลังดำเนินการ' :
-                                       ($order->status == 'shipped' ? 'จัดส่งแล้ว' :
-                                       ($order->status == 'delivered' ? 'ส่งถึงแล้ว' : 'ยกเลิก'))) }}
+                                <span class="badge bg-{{ $order->order_status == 'delivered' ? 'success' : ($order->order_status == 'cancelled' ? 'danger' : 'warning') }}">
+                                    {{ $order->order_status == 'pending' ? 'รอดำเนินการ' :
+                                       ($order->order_status == 'processing' ? 'กำลังดำเนินการ' :
+                                       ($order->order_status == 'shipped' ? 'จัดส่งแล้ว' :
+                                       ($order->order_status == 'delivered' ? 'ส่งถึงแล้ว' : 'ยกเลิก'))) }}
                                 </span>
                             </td>
                             <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>

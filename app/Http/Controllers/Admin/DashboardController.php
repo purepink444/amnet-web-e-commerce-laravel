@@ -65,7 +65,7 @@ class DashboardController extends Controller
             ->get();
 
         // Get pending orders
-        $pendingOrders = Order::where('status', 'pending')
+        $pendingOrders = Order::where('order_status', 'pending')
             ->with(['member' => function($query) {
                 $query->select('member_id', 'first_name', 'last_name');
             }])
@@ -223,11 +223,11 @@ class DashboardController extends Controller
             SELECT
                 p.product_name,
                 SUM(oi.quantity) as total_sold,
-                SUM(oi.total_price) as total_revenue
+                SUM(oi.subtotal) as total_revenue
             FROM products p
             JOIN order_items oi ON p.product_id = oi.product_id
             JOIN orders o ON oi.order_id = o.order_id
-            WHERE o.status != 'cancelled'
+            WHERE o.order_status != 'cancelled'
             GROUP BY p.product_id, p.product_name
             ORDER BY total_sold DESC
             LIMIT 5

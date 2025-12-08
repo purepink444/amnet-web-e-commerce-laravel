@@ -11,7 +11,7 @@
                 <i class="fas fa-box"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $stats['total_products'] }}</h3>
+                <h3 class="stat-value">{{ number_format($stats['total_products']) }}</h3>
                 <p class="stat-label">สินค้าทั้งหมด</p>
             </div>
             <a href="{{ route('admin.products.index') }}" class="stat-link">
@@ -24,7 +24,7 @@
                 <i class="fas fa-shopping-cart"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $stats['total_orders'] }}</h3>
+                <h3 class="stat-value">{{ number_format($stats['total_orders']) }}</h3>
                 <p class="stat-label">คำสั่งซื้อ</p>
             </div>
             <a href="{{ route('admin.orders.index') }}" class="stat-link">
@@ -37,7 +37,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">{{ $stats['total_users'] }}</h3>
+                <h3 class="stat-value">{{ number_format($stats['total_users']) }}</h3>
                 <p class="stat-label">จำนวนผู้ใช้</p>
             </div>
             <a href="{{ route('admin.users.index') }}" class="stat-link">
@@ -68,7 +68,7 @@
                 <p class="welcome-subtitle">สวัสดี {{ auth()->user()->username }}</p>
                 <div class="welcome-stats">
                     <div class="stat-mini">
-                        <span class="stat-number">{{ $todayStats['orders_today'] }}</span>
+                        <span class="stat-number">{{ number_format($todayStats['orders_today']) }}</span>
                         <span class="stat-label">คำสั่งซื้อวันนี้</span>
                     </div>
                     <div class="stat-mini">
@@ -76,7 +76,7 @@
                         <span class="stat-label">ยอดขายวันนี้</span>
                     </div>
                     <div class="stat-mini">
-                        <span class="stat-number">{{ $todayStats['users_today'] }}</span>
+                        <span class="stat-number">{{ number_format($todayStats['users_today']) }}</span>
                         <span class="stat-label">ผู้ใช้ใหม่วันนี้</span>
                     </div>
                 </div>
@@ -107,30 +107,30 @@
         @if($lowStockProducts->count() > 0 || $pendingOrders->count() > 0)
         <div class="alerts-section">
             @if($lowStockProducts->count() > 0)
-                <div class="alert-card alert-warning">
-                    <div class="alert-icon">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <div class="alert-content">
-                        <h6>สินค้าคงเหลือน้อย</h6>
-                        <p>มี {{ $lowStockProducts->count() }} สินค้าที่มีจำนวนคงเหลือน้อยกว่า 10 ชิ้น</p>
-                        <a href="{{ route('admin.products.index', ['stock_filter' => 'low']) }}" class="alert-link">จัดการสินค้า</a>
-                    </div>
-                </div>
-            @endif
-
-            @if($pendingOrders->count() > 0)
-                <div class="alert-card alert-info">
-                    <div class="alert-icon">
-                        <i class="bi bi-clock"></i>
-                    </div>
-                    <div class="alert-content">
-                        <h6>คำสั่งซื้อรอดำเนินการ</h6>
-                        <p>มี {{ $pendingOrders->count() }} คำสั่งซื้อที่รอดำเนินการ</p>
-                        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="alert-link">จัดการคำสั่งซื้อ</a>
-                    </div>
-                </div>
-            @endif
+                            <div class="alert-card alert-warning">
+                                <div class="alert-icon">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h6>สินค้าคงเหลือน้อย</h6>
+                                    <p>มี {{ number_format($lowStockProducts->count()) }} สินค้าที่มีจำนวนคงเหลือน้อยกว่า 10 ชิ้น</p>
+                                    <a href="{{ route('admin.products.index', ['stock_filter' => 'low']) }}" class="alert-link">จัดการสินค้า</a>
+                                </div>
+                            </div>
+                        @endif
+            
+                        @if($pendingOrders->count() > 0)
+                            <div class="alert-card alert-info">
+                                <div class="alert-icon">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h6>คำสั่งซื้อรอดำเนินการ</h6>
+                                    <p>มี {{ number_format($pendingOrders->count()) }} คำสั่งซื้อที่รอดำเนินการ</p>
+                                    <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="alert-link">จัดการคำสั่งซื้อ</a>
+                                </div>
+                            </div>
+                        @endif
         </div>
         @endif
 
@@ -303,8 +303,8 @@
                         </div>
                         <div class="order-time">{{ $order->created_at->diffForHumans() }}</div>
                         <div class="order-status">
-                            <span class="status-badge {{ $order->status }}">
-                                {{ $order->status === 'pending' ? 'รอดำเนินการ' : ($order->status === 'completed' ? 'เสร็จสิ้น' : $order->status) }}
+                            <span class="status-badge {{ $order->order_status }}">
+                                {{ $order->order_status === 'pending' ? 'รอดำเนินการ' : ($order->order_status === 'completed' ? 'เสร็จสิ้น' : $order->order_status) }}
                             </span>
                         </div>
                     </div>
@@ -339,7 +339,7 @@
                         <i class="bi bi-tag"></i>
                         <span>เพิ่มแบรนด์</span>
                     </a>
-                    <a href="{{ route('admin.reports.export') }}" class="action-btn">
+                    <a href="{{ route('admin.reports.export', ['type' => 'sales']) }}" class="action-btn">
                         <i class="bi bi-file-earmark-spreadsheet"></i>
                         <span>ส่งออกรายงาน</span>
                     </a>
@@ -369,6 +369,21 @@
         grid-template-columns: 1fr 2fr 350px;
         gap: 1.5rem;
         padding: 1.5rem 0;
+    }
+
+    /* ===== RESPONSIVE GRID ===== */
+    @media (max-width: 1400px) {
+        .dashboard-container {
+            grid-template-columns: 1fr 2fr 300px;
+            gap: 1rem;
+        }
+    }
+
+    @media (max-width: 1200px) {
+        .dashboard-container {
+            grid-template-columns: 1fr 2fr 280px;
+            gap: 1rem;
+        }
     }
 
     /* ===== STATS CARDS ===== */
@@ -1121,9 +1136,46 @@
     }
 
     /* ===== RESPONSIVE ===== */
+    @media (max-width: 1400px) {
+        .dashboard-container {
+            grid-template-columns: 1fr 2fr 280px;
+            gap: 1rem;
+        }
+    }
+
     @media (max-width: 1200px) {
         .dashboard-container {
-            grid-template-columns: 1fr 2fr 300px;
+            grid-template-columns: 1fr 2fr 260px;
+            gap: 1rem;
+        }
+
+        .welcome-card {
+            padding: 1.5rem;
+        }
+
+        .welcome-content h2 {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .dashboard-container {
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+        }
+
+        .dashboard-sidebar {
+            grid-column: 1 / -1;
+            order: 1;
+            margin-top: 1.5rem;
+        }
+
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome-stats {
+            flex-direction: column;
             gap: 1rem;
         }
     }
@@ -1150,10 +1202,27 @@
     @media (max-width: 768px) {
         .dashboard-container {
             padding: 1rem 0;
+            grid-template-columns: 1fr;
         }
 
         .stats-grid {
             grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
         }
 
         .welcome-card {
@@ -1169,80 +1238,41 @@
 
         .welcome-stats {
             justify-content: center;
+            gap: 1rem;
         }
 
         .quick-actions {
             justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
         }
 
         .alerts-section {
             margin: 0 -0.5rem;
         }
 
+        .alert-card {
+            margin: 0 0.5rem;
+        }
+
         .charts-grid {
             gap: 1rem;
-        }
-
-        .activity-section {
-            margin: 0 -0.5rem;
-        }
-
-        .dashboard-sidebar {
-            margin: 0 -0.5rem;
-        }
-
-        .sidebar-widget {
-            margin: 0 0.5rem;
-        }
-
-        .quick-actions-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .stat-card {
-            padding: 1rem;
-            gap: 0.75rem;
-        }
-
-        .stat-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            font-size: 1rem;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-        }
-
-        .welcome-card {
-            padding: 1rem;
-        }
-
-        .welcome-stats {
-            gap: 1rem;
-        }
-
-        .stat-mini .stat-number {
-            font-size: 1.25rem;
-        }
-
-        .stat-mini .stat-label {
-            font-size: 0.75rem;
-        }
-
-        .alert-card {
-            padding: 1rem;
-            margin: 0 0.5rem;
         }
 
         .chart-header {
             padding: 1rem 1.5rem;
         }
 
-        .charts-grid .chart-container {
+        .chart-container {
             padding: 1rem;
+        }
+
+        .activity-section {
+            margin: 0 -0.5rem;
         }
 
         .section-header {
@@ -1253,6 +1283,15 @@
             padding: 1rem 1.5rem;
         }
 
+        .dashboard-sidebar {
+            margin: 0 -0.5rem;
+            order: 1;
+        }
+
+        .sidebar-widget {
+            margin: 0 0.5rem;
+        }
+
         .widget-header {
             padding: 1rem 1.5rem;
         }
@@ -1261,12 +1300,254 @@
             padding: 1rem 1.5rem;
         }
 
-        .health-metrics {
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-btn {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dashboard-container {
+            padding: 0.5rem 0;
+        }
+
+        .stats-grid {
+            gap: 0.5rem;
+        }
+
+        .stat-card {
+            padding: 0.75rem;
+            gap: 0.5rem;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.9rem;
+            align-self: center;
+        }
+
+        .stat-content {
+            align-self: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+        }
+
+        .stat-link {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
+
+        .welcome-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-content h2 {
+            font-size: 1.25rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1rem;
+        }
+
+        .welcome-stats {
             gap: 0.75rem;
         }
 
+        .stat-mini {
+            min-width: 80px;
+        }
+
+        .stat-mini .stat-number {
+            font-size: 1rem;
+        }
+
+        .stat-mini .stat-label {
+            font-size: 0.7rem;
+        }
+
+        .quick-actions {
+            gap: 0.5rem;
+        }
+
+        .quick-action-btn {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.75rem;
+            min-width: auto;
+        }
+
+        .alert-card {
+            padding: 0.75rem 1rem;
+            margin: 0 0.25rem;
+        }
+
+        .alert-content h6 {
+            font-size: 0.9rem;
+        }
+
+        .alert-content p {
+            font-size: 0.8rem;
+        }
+
+        .chart-card {
+            margin-bottom: 1rem;
+        }
+
+        .chart-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+        }
+
+        .chart-container {
+            padding: 0.75rem;
+        }
+
+        .charts-grid {
+            gap: 0.75rem;
+        }
+
+        .activity-section {
+            margin: 0 -0.25rem;
+        }
+
+        .section-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .activity-item {
+            padding: 0.75rem 1rem;
+            gap: 0.75rem;
+        }
+
+        .activity-icon {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .activity-title {
+            font-size: 0.9rem;
+        }
+
+        .activity-description {
+            font-size: 0.8rem;
+        }
+
+        .dashboard-sidebar {
+            margin: 0 -0.25rem;
+        }
+
+        .sidebar-widget {
+            margin: 0 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .widget-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .widget-title {
+            font-size: 1rem;
+        }
+
+        .widget-content {
+            padding: 0.75rem 1rem;
+        }
+
+        .health-metrics {
+            gap: 0.5rem;
+        }
+
+        .health-item {
+            gap: 0.5rem;
+        }
+
+        .health-label {
+            font-size: 0.8rem;
+            min-width: 70px;
+        }
+
+        .health-value {
+            font-size: 0.8rem;
+            min-width: 30px;
+        }
+
         .user-item, .order-item {
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+        }
+
+        .user-time {
+            font-size: 0.75rem;
+        }
+
+        .order-header {
+            margin-bottom: 0.25rem;
+        }
+
+        .order-id {
+            font-size: 0.85rem;
+        }
+
+        .order-amount {
+            font-size: 0.85rem;
+        }
+
+        .order-customer {
+            font-size: 0.8rem;
+        }
+
+        .order-time {
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+        }
+
+        .quick-actions-grid {
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.6rem 0.4rem;
+            font-size: 0.7rem;
+        }
+
+        .action-btn i {
+            font-size: 1rem;
         }
     }
 </style>
@@ -1598,7 +1879,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearCache() {
         showNotification('กำลังล้างแคช...', 'info');
 
-        fetch('{{ route("admin.dashboard.refresh") }}', {
+        fetch('{{ route("admin.dashboard.refresh-cache") }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
