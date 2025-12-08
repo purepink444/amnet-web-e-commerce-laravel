@@ -18,6 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'overclock' => \App\Http\Middleware\OverclockMiddleware::class,
         ]);
     })
+    ->withSchedule(function ($schedule) {
+        // Database backup every day at 2 AM
+        $schedule->command('db:backup')
+                ->dailyAt('02:00')
+                ->withoutOverlapping()
+                ->runInBackground();
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
