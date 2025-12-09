@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\{
+use App\Http\Controllers\Web\Admin\{
     DashboardController,
     AdminProductController,
     AdminOrderController,
@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\{
     AdminBrandController
 };
 
-Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':admin'])
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

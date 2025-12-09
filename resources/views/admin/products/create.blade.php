@@ -599,13 +599,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== CHARACTER COUNTERS =====
     function updateCounter(input, counter, max) {
-        const length = input.value.length;
-        counter.textContent = `${length}/${max}`;
-        counter.className = length > max * 0.9 ? 'text-warning' : length === max ? 'text-danger' : 'text-muted';
+        if (input && counter) {
+            const length = input.value.length;
+            counter.textContent = `${length}/${max}`;
+            counter.className = length > max * 0.9 ? 'text-warning' : length === max ? 'text-danger' : 'text-muted';
+        }
     }
 
-    nameInput.addEventListener('input', () => updateCounter(nameInput, nameCounter, 200));
-    descriptionInput.addEventListener('input', () => updateCounter(descriptionInput, descriptionCounter, 5000));
+    if (nameInput && nameCounter) {
+        nameInput.addEventListener('input', () => updateCounter(nameInput, nameCounter, 200));
+    }
+    if (descriptionInput && descriptionCounter) {
+        descriptionInput.addEventListener('input', () => updateCounter(descriptionInput, descriptionCounter, 5000));
+    }
 
     // ===== FORM PROGRESS TRACKING =====
     function updateProgress() {
@@ -627,41 +633,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const percentage = Math.round((completed / total) * 100);
-        progressBar.style.width = `${percentage}%`;
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+        }
 
         // Enable/disable preview button
-        previewBtn.disabled = completed < total;
+        if (previewBtn) {
+            previewBtn.disabled = completed < total;
+        }
     }
 
     // ===== DRAG & DROP FUNCTIONALITY =====
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, preventDefaults, false);
-    });
+    if (uploadArea && photosInput) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            uploadArea.classList.remove('dragover');
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+        uploadArea.addEventListener('click', () => photosInput.click());
     }
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, unhighlight, false);
-    });
-
-    function highlight() {
-        uploadArea.classList.add('dragover');
+    if (selectFilesBtn && photosInput) {
+        selectFilesBtn.addEventListener('click', () => photosInput.click());
     }
-
-    function unhighlight() {
-        uploadArea.classList.remove('dragover');
-    }
-
-    uploadArea.addEventListener('drop', handleDrop, false);
-    uploadArea.addEventListener('click', () => photosInput.click());
-    selectFilesBtn.addEventListener('click', () => photosInput.click());
 
     function handleDrop(e) {
         const dt = e.dataTransfer;
@@ -669,9 +684,11 @@ document.addEventListener('DOMContentLoaded', function() {
         handleFiles(files);
     }
 
-    photosInput.addEventListener('change', function() {
-        handleFiles(this.files);
-    });
+    if (photosInput) {
+        photosInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+    }
 
     function handleFiles(files) {
         [...files].forEach(uploadFile);
@@ -813,29 +830,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===== FORM VALIDATION AND SUBMISSION =====
-    form.addEventListener('input', function() {
-        updateProgress();
-        autoSave();
-    });
+    if (form) {
+        form.addEventListener('input', function() {
+            updateProgress();
+            autoSave();
+        });
 
-    form.addEventListener('submit', function(e) {
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            e.stopPropagation();
-            form.classList.add('was-validated');
-            showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
-            return;
-        }
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
 
-        // Show loading state
-        submitBtn.classList.add('loading');
-        submitText.textContent = 'กำลังบันทึก...';
-        submitBtn.disabled = true;
+            // Show loading state
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+            }
 
-        // Clear auto-save data on successful submission
-        localStorage.removeItem('productDraft');
-        localStorage.removeItem('productDraftTime');
-    });
+            // Clear auto-save data on successful submission
+            localStorage.removeItem('productDraft');
+            localStorage.removeItem('productDraftTime');
+        });
+    }
 
     // ===== UTILITY FUNCTIONS =====
     function showNotification(message, type = 'info') {
@@ -879,19 +899,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ===== PREVIEW FUNCTIONALITY =====
-    previewBtn.addEventListener('click', function() {
-        // Basic preview functionality - could be expanded
-        const formData = new FormData(form);
-        let preview = '=== ตัวอย่างสินค้า ===\n\n';
+    if (previewBtn) {
+        previewBtn.addEventListener('click', function() {
+            // Basic preview functionality - could be expanded
+            if (form) {
+                const formData = new FormData(form);
+                let preview = '=== ตัวอย่างสินค้า ===\n\n';
 
-        preview += `รหัสสินค้า: ${formData.get('sku') || 'ไม่ได้ระบุ'}\n`;
-        preview += `ชื่อสินค้า: ${formData.get('product_name') || 'ไม่ได้ระบุ'}\n`;
-        preview += `ราคา: ${formData.get('price') || '0'} บาท\n`;
-        preview += `จำนวนคงเหลือ: ${formData.get('stock_quantity') || '0'} ชิ้น\n`;
-        preview += `รูปภาพ: ${uploadedFiles.length} รูป\n`;
+                preview += `รหัสสินค้า: ${formData.get('sku') || 'ไม่ได้ระบุ'}\n`;
+                preview += `ชื่อสินค้า: ${formData.get('product_name') || 'ไม่ได้ระบุ'}\n`;
+                preview += `ราคา: ${formData.get('price') || '0'} บาท\n`;
+                preview += `จำนวนคงเหลือ: ${formData.get('stock_quantity') || '0'} ชิ้น\n`;
+                preview += `รูปภาพ: ${uploadedFiles.length} รูป\n`;
 
-        alert(preview);
-    });
+                alert(preview);
+            }
+        });
+    }
 
     // ===== INITIALIZATION =====
     loadAutoSave();
@@ -899,15 +923,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCounter(nameInput, nameCounter, 200);
     updateCounter(descriptionInput, descriptionCounter, 5000);
 
-    // Initialize Bootstrap tabs
-    const triggerTabList = [].slice.call(document.querySelectorAll('#formTabs a'));
-    triggerTabList.forEach(function (triggerEl) {
-        const tabTrigger = new bootstrap.Tab(triggerEl);
-        triggerEl.addEventListener('click', function (event) {
-            event.preventDefault();
-            tabTrigger.show();
-        });
-    });
 });
 </script>
 @endsection

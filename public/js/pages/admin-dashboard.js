@@ -10,12 +10,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== CHART INITIALIZATION =====
     function initializeCharts() {
+        // Destroy existing charts if they exist
+        if (salesChart) {
+            salesChart.destroy();
+        }
+        if (topProductsChart) {
+            topProductsChart.destroy();
+        }
+
         // Sales Chart
-        const salesCtx = document.getElementById('salesChart');
-        const monthlySales = JSON.parse(salesCtx?.dataset?.monthlySales || '[]');
+        const salesCanvas = document.getElementById('salesChart');
+        if (!salesCanvas) return;
+
+        const monthlySales = JSON.parse(salesCanvas?.dataset?.monthlySales || '[]');
         const hasSalesData = monthlySales.some(value => value > 0);
 
-        salesChart = new Chart(salesCtx, {
+        salesChart = new Chart(salesCanvas, {
             type: 'line',
             data: {
                 labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
@@ -122,10 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Top Products Chart
-        const topProductsCtx = document.getElementById('topProductsChart');
-        const topProducts = JSON.parse(topProductsCtx?.dataset?.topProducts || '[]');
+        const topProductsCanvas = document.getElementById('topProductsChart');
+        if (!topProductsCanvas) return;
 
-        topProductsChart = new Chart(topProductsCtx, {
+        const topProducts = JSON.parse(topProductsCanvas?.dataset?.topProducts || '[]');
+
+        topProductsChart = new Chart(topProductsCanvas, {
             type: 'bar',
             data: {
                 labels: topProducts.map(p => p.product_name.length > 15 ? p.product_name.substring(0, 15) + '...' : p.product_name),
@@ -207,11 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show no data messages if needed
         if (!hasSalesData) {
-            showNoDataMessage(salesCtx.canvas.parentElement, 'ยังไม่มีข้อมูลยอดขาย', 'ข้อมูลจะแสดงเมื่อมีรายการขายเกิดขึ้น');
+            showNoDataMessage(salesCanvas.parentElement, 'ยังไม่มีข้อมูลยอดขาย', 'ข้อมูลจะแสดงเมื่อมีรายการขายเกิดขึ้น');
         }
 
         if (topProducts.length === 0) {
-            showNoDataMessage(topProductsCtx.canvas.parentElement, 'ยังไม่มีข้อมูลสินค้าขายดี', 'ข้อมูลจะแสดงเมื่อมีสินค้าถูกขาย');
+            showNoDataMessage(topProductsCanvas.parentElement, 'ยังไม่มีข้อมูลสินค้าขายดี', 'ข้อมูลจะแสดงเมื่อมีสินค้าถูกขาย');
         }
     }
 
@@ -225,11 +237,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== EXPORT FUNCTIONS =====
     function exportChart() {
         const canvas = document.getElementById('salesChart');
-        const link = document.createElement('a');
-        link.download = 'sales-chart-' + new Date().toISOString().split('T')[0] + '.png';
-        link.href = canvas.toDataURL();
-        link.click();
-        showNotification('ส่งออกกราฟสำเร็จ', 'success');
+        if (canvas) {
+            const link = document.createElement('a');
+            link.download = 'sales-chart-' + new Date().toISOString().split('T')[0] + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            showNotification('ส่งออกกราฟสำเร็จ', 'success');
+        } else {
+            showNotification('ไม่พบกราฟสำหรับส่งออก', 'error');
+        }
     }
 
     function exportDashboard() {
@@ -243,34 +259,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== REFRESH FUNCTIONS =====
     function refreshChart() {
-        const btn = document.querySelector('.btn-refresh');
+        const btn = document.querySelector('[onclick*="refreshChart"]');
+        if (!btn) return;
+
         const originalHTML = btn.innerHTML;
 
-        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
-        btn.classList.add('fa-spin');
 
         // Simulate API call
         setTimeout(() => {
             btn.innerHTML = originalHTML;
             btn.disabled = false;
-            btn.classList.remove('fa-spin');
             showNotification('รีเฟรชข้อมูลสำเร็จ', 'success');
         }, 1500);
     }
 
     function refreshTopProducts() {
-        const btn = document.querySelector('.btn-refresh[onclick*="refreshTopProducts"]');
+        const btn = document.querySelector('[onclick*="refreshTopProducts"]');
+        if (!btn) return;
+
         const originalHTML = btn.innerHTML;
 
-        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
-        btn.classList.add('fa-spin');
 
         setTimeout(() => {
             btn.innerHTML = originalHTML;
             btn.disabled = false;
-            btn.classList.remove('fa-spin');
             showNotification('รีเฟรชข้อมูลสินค้าขายดีสำเร็จ', 'success');
         }, 1500);
     }
@@ -280,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const noDataMessage = document.createElement('div');
         noDataMessage.className = 'no-data-message';
         noDataMessage.innerHTML = `
-            <i class="bi bi-graph-up display-4 mb-3 text-muted"></i>
+            <i class="fas fa-chart-line fa-3x mb-3 text-muted"></i>
             <h5 class="text-muted">${title}</h5>
             <p class="text-muted">${message}</p>
         `;
@@ -302,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         `;
         notification.innerHTML = `
-            <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;

@@ -22,15 +22,18 @@ const Toast = Swal.mixin({
 
 window.Toast = Toast;
 
-// SweetAlert2 Thai language support
-Swal.updateDefaults({
+// SweetAlert2 Thai language defaults
+const defaultSwalConfig = {
      confirmButtonText: 'ตกลง',
      cancelButtonText: 'ยกเลิก',
      customClass: {
          confirmButton: 'btn btn-primary me-2',
          cancelButton: 'btn btn-secondary'
      }
-});
+};
+
+// Create a mixin for default configuration
+window.SwalDefault = Swal.mixin(defaultSwalConfig);
 
 // Theme switching functionality
 class ThemeManager {
@@ -166,7 +169,7 @@ import './components/product.js';
 import './utils/address-selector.js';
 import './pages/payment.js';
 import './pages/checkout.js';
-import './pages/admin-dashboard.js';
+// Note: admin-dashboard.js is loaded separately in admin views
 
 // Initialize theme manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
