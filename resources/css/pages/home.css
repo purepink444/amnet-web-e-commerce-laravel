@@ -1,0 +1,154 @@
+/* ===================================
+   resources/css/pages/home.css
+   Home Page Styles
+   =================================== */
+
+/* Body styles for home page */
+body {
+    margin: 0;
+    font-family: "Prompt", sans-serif;
+    background: var(--bg-primary);
+}
+
+/* ======= HERO SECTION ======= */
+.hero {
+    background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+    color: #fff;
+    padding: 100px 20px;
+    text-align: left;
+    position: relative;
+}
+
+.hero-container {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .hero-container {
+        margin-left: 80px;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+    .hero-container {
+        margin: 0 auto;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .hero .btn-group {
+        justify-content: center;
+    }
+
+    .hero .btn-group button {
+        margin: 5px;
+    }
+}
+
+.hero .badge {
+    display: inline-block;
+    background: var(--orange-dark);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 25px;
+    line-height: 1.7;
+}
+
+.hero .btn-group button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: var(--orange-light);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--orange-primary);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: var(--gray-100);
+    color: #000;
+}
+
+/* ======= BRAND LOGO SECTION ======= */
+.brand-section {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.brand-logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+}
+
+.brand-logos img {
+    height: 60px;
+    object-fit: contain;
+    filter: brightness(0.8);
+    transition: filter var(--transition-fast);
+}
+
+.brand-logos img:hover {
+    filter: brightness(1);
+}
+
+/* Responsive brand logos */
+@media (max-width: 768px) {
+    .brand-logos {
+        gap: 20px;
+    }
+
+    .brand-logos img {
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-logos {
+        gap: 15px;
+    }
+
+    .brand-logos img {
+        height: 35px;
+    }
+}

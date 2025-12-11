@@ -1,0 +1,56 @@
+/* ===================================
+   resources/css/base/typography.css
+   Typography Styles
+   =================================== */
+
+/* Import Google Fonts - Kanit */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+     margin-top: 0;
+     margin-bottom: var(--spacing-md);
+     font-weight: var(--font-weight-bold);
+     line-height: 1.2;
+     color: var(--text-primary);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-base); }
+
+/* Paragraphs */
+p {
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Links */
+a {
+    color: var(--orange-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--orange-dark);
+}
+
+/* Display headings */
+.display-4 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.h3 {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Text utilities */
+.text-muted {
+    color: var(--text-secondary) !important;
+}

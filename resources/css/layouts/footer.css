@@ -1,0 +1,68 @@
+/* ===================================
+   resources/css/layouts/footer.css
+   Footer Layout Styles
+   =================================== */
+
+.footer {
+    background: var(--footer-bg-primary);
+    padding: 50px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    color: var(--footer-text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.footer h4 {
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.footer ul {
+    padding: 0;
+    list-style: none;
+}
+
+.footer ul li {
+    margin: 5px 0;
+}
+
+.footer ul li a {
+    text-decoration: none;
+    color: var(--footer-link);
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: var(--footer-link-hover);
+}
+
+.footer-bottom {
+    padding: 15px 20px;
+    background: var(--footer-bg-secondary);
+    color: var(--footer-text);
+    font-size: 14px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Footer Responsive Design */
+@media (max-width: 768px) {
+    .footer {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer h4 {
+        margin-top: 20px;
+    }
+}

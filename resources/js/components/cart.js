@@ -43,24 +43,41 @@ export class CartManager {
                 this.updateQuantity(productId, Math.max(1, quantity));
             });
         });
+
+        // Bind remove item buttons
+        document.querySelectorAll('.remove-item-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const productId = button.dataset.productId;
+                this.removeItem(productId);
+            });
+        });
     }
 
     async updateQuantity(productId, quantity) {
         try {
-            const response = await fetch(`/cart/update/${productId}`, {
-                method: 'POST',
+            const response = await fetch('/cart/update', {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ quantity })
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: quantity
+                })
             });
 
             const data = await response.json();
 
             if (data.success) {
                 // Update UI elements
-                this.updateCartUI(data.cart);
+                this.updateCartUI({
+                    product_id: productId,
+                    item_total: data.subtotal,
+                    total_items: data.cart_count,
+                    total_price: data.total_price
+                });
                 Toast.fire({
                     icon: 'success',
                     title: 'อัพเดทจำนวนสินค้าเรียบร้อย'
@@ -68,7 +85,7 @@ export class CartManager {
             } else {
                 Toast.fire({
                     icon: 'error',
-                    title: 'เกิดข้อผิดพลาดในการอัพเดท'
+                    title: data.message || 'เกิดข้อผิดพลาดในการอัพเดท'
                 });
             }
         } catch (error) {
@@ -105,11 +122,13 @@ export class CartManager {
 
     async removeItem(productId) {
         try {
-            const response = await fetch(`/cart/remove/${productId}`, {
+            const response = await fetch('/cart/remove', {
                 method: 'DELETE',
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
+                },
+                body: JSON.stringify({ product_id: productId })
             });
 
             const data = await response.json();
@@ -121,10 +140,16 @@ export class CartManager {
                     itemRow.remove();
                 }
 
-                this.updateCartUI(data.cart);
+                // Update cart totals
+                this.updateCartUI(data.cart || {});
                 Toast.fire({
                     icon: 'success',
                     title: 'ลบสินค้าออกจากตะกร้าเรียบร้อย'
+                });
+            } else {
+                Toast.fire({
+                    icon: 'error',
+                    title: data.message || 'เกิดข้อผิดพลาดในการลบสินค้า'
                 });
             }
         } catch (error) {

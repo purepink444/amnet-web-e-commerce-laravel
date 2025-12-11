@@ -1,0 +1,564 @@
+/* ===== ENHANCED ADMIN USERS PAGE STYLES ===== */
+
+/* Filters Section */
+.filters-section {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.filters-form {
+    width: 100%;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.search-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 250px;
+    flex: 1;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--orange-primary);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.search-btn {
+    padding: 0.5rem 0.75rem;
+    background: var(--orange-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-btn:hover {
+    background: var(--orange-dark);
+}
+
+.filter-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-width: 120px;
+    transition: border-color 0.2s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--orange-primary);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.date-filter {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.clear-filters {
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.clear-filters:hover {
+    color: var(--orange-primary);
+    background: rgba(255, 107, 53, 0.05);
+}
+
+.results-summary {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 4px solid var(--orange-primary);
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* Bulk Actions */
+.bulk-actions {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.bulk-select {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.bulk-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--orange-primary);
+}
+
+.bulk-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bulk-action-select {
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    min-width: 140px;
+}
+
+.bulk-submit {
+    padding: 0.375rem 0.75rem;
+    background: var(--orange-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.bulk-submit:hover {
+    background: var(--orange-dark);
+}
+
+/* Table Styles */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.users-table thead tr {
+    background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.users-table thead th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.users-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+    background-color: rgba(255, 107, 53, 0.02);
+}
+
+.checkbox-col {
+    width: 40px;
+    text-align: center;
+}
+
+.avatar-col {
+    width: 80px;
+    text-align: center;
+}
+
+.user-avatar {
+    display: inline-block;
+}
+
+.avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+    transition: transform 0.2s ease;
+}
+
+.avatar-img:hover {
+    transform: scale(1.1);
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange-primary), var(--orange-dark));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.sort-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 600;
+}
+
+.sort-link:hover {
+    color: rgba(255,255,255,0.9);
+}
+
+.user-info strong {
+    display: block;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.user-email {
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.user-details {
+    min-width: 150px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.user-location {
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.contact-info {
+    min-width: 140px;
+}
+
+.contact-info div {
+    margin-bottom: 0.25rem;
+}
+
+.role-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.role-badge.admin {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.role-badge.member {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.status-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.inactive {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.registration-date {
+    min-width: 100px;
+}
+
+.registration-date div:first-child {
+    font-weight: 500;
+    margin-bottom: 0.125rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: center;
+}
+
+.btn-view, .btn-edit, .btn-delete {
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-view {
+    background: #0ea5e9;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #0284c7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3);
+}
+
+.btn-edit {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Pagination */
+.pagination-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-wrapper .pagination {
+    margin: 0;
+}
+
+.pagination-wrapper .page-link {
+    color: var(--orange-primary);
+    border-color: #dee2e6;
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.125rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.pagination-wrapper .page-link:hover {
+    color: var(--orange-dark);
+    background: rgba(255, 107, 53, 0.05);
+    border-color: var(--orange-primary);
+}
+
+.pagination-wrapper .page-item.active .page-link {
+    background: var(--orange-primary);
+    border-color: var(--orange-primary);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group {
+        min-width: auto;
+    }
+
+    .filter-group {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-section {
+        padding: 1rem;
+    }
+
+    .filters-row {
+        gap: 0.75rem;
+    }
+
+    .search-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+
+    .filter-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .clear-filters {
+        justify-content: center;
+    }
+
+    .bulk-actions {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .bulk-buttons {
+        justify-content: center;
+    }
+
+    .users-table {
+        font-size: 0.8rem;
+    }
+
+    .users-table thead th,
+    .users-table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Hide less important columns on mobile */
+    .users-table thead th:not(.checkbox-col):not(.avatar-col):not(:nth-child(4)):not(:nth-child(10)) {
+        display: none;
+    }
+
+    .users-table tbody td:not(.checkbox-col):not(.avatar-col):not(:nth-child(4)):not(:nth-child(10)) {
+        display: none;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .user-details, .contact-info, .registration-date {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-container {
+        padding: 1rem;
+    }
+
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .filters-section {
+        padding: 0.75rem;
+    }
+
+    .bulk-actions {
+        padding: 0.75rem;
+    }
+
+    .users-table {
+        font-size: 0.75rem;
+    }
+
+    .users-table thead th,
+    .users-table tbody td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .avatar-img, .avatar-placeholder {
+        width: 35px;
+        height: 35px;
+    }
+
+    .role-badge, .status-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}

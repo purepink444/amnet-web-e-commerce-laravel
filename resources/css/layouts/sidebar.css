@@ -1,0 +1,129 @@
+/* ===================================
+   resources/css/layouts/sidebar.css
+   Sidebar Layout Styles
+   =================================== */
+
+/* Account Pages (Wireframe Style) */
+.wf-sidebar-card {
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    transition: background 0.3s ease;
+}
+
+.wf-sidebar-item {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.wf-sidebar-item:hover {
+    background: var(--bg-primary);
+    transform: translateY(-1px);
+}
+
+.wf-sidebar-item.active {
+    background: var(--bg-primary);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.wf-main-header {
+    background: var(--bg-secondary);
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: background 0.3s ease;
+}
+
+.wf-main-panel {
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 450px;
+    transition: background 0.3s ease;
+}
+
+.wf-separator {
+    height: 40px;
+    background: var(--text-primary);
+    border-radius: 4px;
+    margin: 40px 0;
+}
+
+/* Override table styles for wireframe */
+.wf-main-panel .table {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Settings page specific styles */
+.settings-section {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-primary);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.settings-section h6 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.settings-section .form-check {
+    margin-bottom: 10px;
+}
+
+.settings-section .form-check-label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.btn-settings {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-settings:hover {
+    background: var(--text-secondary);
+    transform: translateY(-1px);
+}
+
+.info-box {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-primary);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.info-box strong {
+    color: var(--text-primary);
+}

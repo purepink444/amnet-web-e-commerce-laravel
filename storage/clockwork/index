@@ -247,3 +247,8 @@
 1765185369-1941-612236504,1765185369.0889,GET,/product,App\Http\Controllers\Client\ClientProductController@index,200,432.82914161682,request
 1765185804-9772-1992584120,1765185804.8688,GET,/product,App\Http\Controllers\Client\ClientProductController@index,200,583.06384086609,request
 1765185810-2854-1167081042,1765185810.2457,GET,/product/16,App\Http\Controllers\Client\ClientProductController@show,200,1643.3889865875,request
+1765347175-8055-1153583654,1765347173.5042,GET,/.well-known/appspecific/com.chrome.devtools.json,Closure,404,6716.9120311737,request
+1765347498-4126-1035623527,1765347498.2737,GET,/product,App\Http\Controllers\Web\Client\ClientProductController@index,500,4452.6410102844,request
+1765347503-2662-1235222747,1765347502.8191,GET,/.well-known/appspecific/com.chrome.devtools.json,Closure,404,1046.4639663696,request
+1765347748-4950-596759389,1765347748.3039,GET,/product,App\Http\Controllers\Client\ClientProductController@index,200,1814.759016037,request
+1765347750-6615-410198880,1765347750.2684,GET,/.well-known/appspecific/com.chrome.devtools.json,Closure,404,867.93303489685,request

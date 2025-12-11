@@ -1,0 +1,143 @@
+/* ===================================
+   resources/css/components/form.css
+   Form Component Styles
+   =================================== */
+
+.form-control {
+     display: block;
+     width: 100%;
+     padding: 0.5rem 0.75rem;
+     font-size: var(--font-size-base);
+     line-height: 1.5;
+     color: var(--text-primary);
+     background-color: var(--bg-secondary);
+     border: 2px solid var(--border-secondary);
+     border-radius: var(--radius-md);
+     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+    border-color: var(--orange-primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+.form-label {
+     display: inline-block;
+     margin-bottom: 0.5rem;
+     font-weight: var(--font-weight-medium);
+     color: var(--text-secondary);
+}
+
+.invalid-feedback {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: var(--font-size-sm);
+    color: var(--danger);
+}
+
+.is-invalid {
+    border-color: var(--danger);
+}
+
+/* Login/Register specific styles */
+.login-input {
+    width: 100%;
+    background: var(--gray-200);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    text-align: left;
+    border: none;
+    color: var(--text-primary);
+    transition: background-color var(--transition-fast);
+}
+
+.login-input:focus {
+    outline: none;
+    background: var(--gray-100);
+    box-shadow: 0 0 0 2px var(--orange-primary);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 20px;
+    border-radius: 16px;
+    background: var(--orange-light);
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-family: 'Kanit', sans-serif;
+    transition: background-color var(--transition-fast);
+}
+
+.login-btn:hover {
+    background: var(--orange-primary);
+    transform: translateY(-1px);
+}
+
+/* Register form styles */
+.register-form .form-label {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.register-form .form-input {
+    width: 100%;
+    background: var(--gray-200);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.register-form select.form-input {
+    font-weight: normal;
+}
+
+.register-form .form-input:focus {
+    outline: 3px solid var(--orange-primary);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.25);
+}
+
+.register-btn {
+    width: 200px;
+    padding: 12px;
+    border: none;
+    background: var(--orange-light);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: 'Kanit', sans-serif;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.register-btn:hover {
+    background: var(--orange-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Name and location rows for forms */
+.name-row, .location-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.name-row .login-input, .location-row .login-input {
+    flex: 1;
+}
+
+.name-row select {
+    flex: 0 0 80px;
+}

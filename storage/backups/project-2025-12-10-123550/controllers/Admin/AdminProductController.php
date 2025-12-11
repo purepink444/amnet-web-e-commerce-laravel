@@ -1,0 +1,497 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\{Product, Category, Brand, ProductImage};
+use Illuminate\Http\{Request, JsonResponse};
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\{DB, Log, Storage};
+
+class AdminProductController extends Controller
+{
+    /**
+     * Display paginated products list with proper ordering
+     */
+    public function index(Request $request)
+    {
+        $sortBy = $request->get('sort', 'product_id'); // Default sort by ID
+        $sortDirection = $request->get('direction', 'asc'); // Default ascending for ID
+
+        // Validate sort parameters
+        $allowedSorts = ['product_id', 'product_name', 'price', 'stock_quantity', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'product_id';
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        $query = Product::with(['category', 'brand', 'images']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('product_name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhere('product_id', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by brand
+        if ($request->filled('brand')) {
+            $query->where('brand_id', $request->brand);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $products = $query->orderBy($sortBy, $sortDirection)
+            ->paginate(15)
+            ->appends($request->query()); // Preserve query parameters in pagination
+
+        return view('admin.products.index', compact('products', 'sortBy', 'sortDirection'));
+    }
+
+    /**
+     * Show create product form
+     */
+    public function create()
+    {
+        return view('admin.products.create', [
+            'categories' => Category::select('category_id', 'category_name')->get(),
+            'brands' => Brand::select('brand_id', 'brand_name')->get()
+        ]);
+    }
+
+    /**
+     * Store new product
+     */
+    public function store(Request $request)
+    {
+        $validated = $this->validateProduct($request);
+
+        // Handle photo uploads
+        $uploadedImages = [];
+        if ($request->hasFile('photos')) {
+            $files = $request->file('photos');
+            $isFirst = true;
+
+            // Allowed image extensions
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+            foreach ($files as $file) {
+                // Manual file type check
+                $extension = strtolower($file->getClientOriginalExtension());
+                if (!in_array($extension, $allowedExtensions)) {
+                    return back()->withInput()->with('error', 'ไฟล์ต้องเป็นรูปภาพเท่านั้น (jpg, jpeg, png, gif)');
+                }
+
+                // Get file info before moving
+                $fileSize = $file->getSize();
+                $originalName = $file->getClientOriginalName();
+
+                // Store file using native PHP functions to avoid MIME type detection
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $fullPath = public_path('storage/products/' . $filename);
+
+                // Ensure directory exists
+                $directory = dirname($fullPath);
+                if (!is_dir($directory)) {
+                    mkdir($directory, 0755, true);
+                }
+
+                // Move uploaded file
+                $file->move($directory, $filename);
+                $path = 'products/' . $filename;
+
+                $imageData = [
+                    'image_path' => $path,
+                    'image_filename' => $filename,
+                    'original_filename' => $originalName,
+                    'file_size' => $fileSize,
+                    'mime_type' => 'image/' . $extension,
+                    'is_primary' => $isFirst, // First image is primary
+                    'display_order' => count($uploadedImages),
+                    'uploaded_by' => auth()->id(),
+                ];
+
+                // Skip image dimensions for now - can be added later if needed
+                // Image dimensions require fileinfo extension which may not be available
+
+                $uploadedImages[] = $imageData;
+                $isFirst = false;
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $product = Product::create($validated);
+            Log::info('Product created', ['product_id' => $product->product_id]);
+
+            // Create product images
+            if (!empty($uploadedImages)) {
+                Log::info('Creating product images', ['count' => count($uploadedImages)]);
+                foreach ($uploadedImages as $imageData) {
+                    Log::info('Creating image', $imageData);
+                    $image = $product->images()->create($imageData);
+                    Log::info('Image created', ['image_id' => $image->image_id]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'เพิ่มสินค้าสำเร็จ');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Product creation failed: ' . $e->getMessage());
+            Log::error('Product creation stack trace: ' . $e->getTraceAsString());
+
+            return back()
+                ->withInput()
+                ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get product data for modal (AJAX)
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $product = Product::with(['category:category_id,category_name', 'brand:brand_id,brand_name'])
+                ->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'product' => $product
+            ]);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ไม่พบสินค้า'
+            ], 404);
+        }
+    }
+
+    /**
+     * Show edit product form
+     */
+    public function edit(int $id)
+    {
+        $product = Product::with('images')->findOrFail($id);
+
+        return view('admin.products.edit', [
+            'product' => $product,
+            'categories' => Category::select('category_id', 'category_name')->get(),
+            'brands' => Brand::select('brand_id', 'brand_name')->get()
+        ]);
+    }
+
+    /**
+     * Update product (supports both Form and AJAX)
+     */
+    public function update(Request $request, int $id)
+    {
+        $validated = $this->validateProduct($request);
+
+        try {
+            DB::beginTransaction();
+
+            $product = Product::findOrFail($id);
+
+            // Handle photo uploads
+            $uploadedImages = [];
+            if ($request->hasFile('photos')) {
+                $files = $request->file('photos');
+                $currentOrder = $product->images()->max('display_order') ?? 0;
+
+                // Allowed image extensions
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+                foreach ($files as $file) {
+                    // Manual file type check
+                    $extension = strtolower($file->getClientOriginalExtension());
+                    if (!in_array($extension, $allowedExtensions)) {
+                        return back()->withInput()->with('error', 'ไฟล์ต้องเป็นรูปภาพเท่านั้น (jpg, jpeg, png, gif)');
+                    }
+
+                    // Get file info before moving
+                    $fileSize = $file->getSize();
+                    $originalName = $file->getClientOriginalName();
+
+                    // Store file using native PHP functions to avoid MIME type detection
+                    $filename = time() . '_' . uniqid() . '.' . $extension;
+                    $fullPath = public_path('storage/products/' . $filename);
+
+                    // Ensure directory exists
+                    $directory = dirname($fullPath);
+                    if (!is_dir($directory)) {
+                        mkdir($directory, 0755, true);
+                    }
+
+                    // Move uploaded file
+                    $file->move($directory, $filename);
+                    $path = 'products/' . $filename;
+
+                    $imageData = [
+                        'image_path' => $path,
+                        'image_filename' => $filename,
+                        'original_filename' => $originalName,
+                        'file_size' => $fileSize,
+                        'mime_type' => 'image/' . $extension,
+                        'is_primary' => false, // New images are not primary by default
+                        'display_order' => ++$currentOrder,
+                        'uploaded_by' => auth()->id(),
+                    ];
+
+                    // Skip image dimensions for now - can be added later if needed
+                    // Image dimensions require fileinfo extension which may not be available
+
+                    $uploadedImages[] = $imageData;
+                }
+            }
+
+            $product->update($validated);
+
+            // Create new product images
+            if (!empty($uploadedImages)) {
+                foreach ($uploadedImages as $imageData) {
+                    $product->images()->create($imageData);
+                }
+            }
+
+            DB::commit();
+
+            // AJAX Response
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'อัพเดทสินค้าสำเร็จ',
+                    'product' => $product->load(['category', 'brand'])
+                ]);
+            }
+
+            // Form Response
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'อัพเดทสินค้าสำเร็จ');
+
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+
+            return $request->expectsJson()
+                ? response()->json(['success' => false, 'message' => 'ไม่พบสินค้า'], 404)
+                : back()->with('error', 'ไม่พบสินค้า');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Product update failed: ' . $e->getMessage());
+
+            return $request->expectsJson()
+                ? response()->json(['success' => false, 'message' => 'เกิดข้อผิดพลาด'], 500)
+                : back()->withInput()->with('error', 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        }
+    }
+
+    /**
+     * Delete product
+     */
+    public function destroy(int $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $product = Product::findOrFail($id);
+
+            // Check if product has been ordered (exists in order_items)
+            if ($product->orderItems()->exists()) {
+                DB::rollBack();
+                return back()->with('error', 'ไม่สามารถลบสินค้าได้ เนื่องจากมีประวัติการสั่งซื้อ');
+            }
+
+            // Delete related data
+            $product->images()->delete();
+            $product->cartItems()->delete();
+            $product->reviews()->delete();
+            $product->wishlists()->delete();
+
+            // Delete photo file if exists
+            if ($product->photo_path && Storage::disk('public')->exists($product->photo_path)) {
+                Storage::disk('public')->delete($product->photo_path);
+            }
+
+            $product->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'ลบสินค้าสำเร็จ');
+
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return back()->with('error', 'ไม่พบสินค้า');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Product deletion failed: ' . $e->getMessage());
+
+            return back()->with('error', 'เกิดข้อผิดพลาดในการลบสินค้า');
+        }
+    }
+
+    /**
+     * Validate product data
+     */
+    private function validateProduct(Request $request): array
+    {
+        $validated = $request->validate([
+            'sku' => ['required', 'string', 'max:100', 'unique:products,sku', 'regex:/^[A-Za-z0-9\-_]+$/'],
+            'product_name' => ['required', 'string', 'max:200'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'price' => ['required', 'numeric', 'min:0', 'max:999999999.99'],
+            'stock_quantity' => ['required', 'integer', 'min:0', 'max:999999'],
+            'category_id' => ['required', 'exists:categories,category_id'],
+            'brand_id' => ['nullable', 'exists:brands,brand_id'],
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['max:2048'],
+            'status' => ['nullable', 'in:active,inactive'],
+        ], [
+            'sku.required' => 'กรุณาระบุรหัสสินค้า (SKU)',
+            'sku.unique' => 'รหัสสินค้านี้ถูกใช้งานแล้ว',
+            'sku.regex' => 'รหัสสินค้าต้องประกอบด้วยตัวอักษร ตัวเลข ขีดกลาง และขีดล่างเท่านั้น',
+            'product_name.required' => 'กรุณาระบุชื่อสินค้า',
+            'price.required' => 'กรุณาระบุราคา',
+            'price.min' => 'ราคาต้องมากกว่าหรือเท่ากับ 0',
+            'stock_quantity.required' => 'กรุณาระบุจำนวนสินค้า',
+            'category_id.required' => 'กรุณาเลือกหมวดหมู่',
+            'category_id.exists' => 'หมวดหมู่ไม่ถูกต้อง',
+            'brand_id.exists' => 'แบรนด์ไม่ถูกต้อง',
+            'photo.mimes' => 'ไฟล์ต้องเป็น jpeg, png, jpg หรือ gif',
+            'photo.max' => 'ขนาดไฟล์ต้องไม่เกิน 2MB',
+        ]);
+
+        $validated['status'] ??= 'active';
+
+        return $validated;
+    }
+
+    /**
+     * Handle bulk actions
+     */
+    public function bulk(Request $request)
+    {
+        $request->validate([
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'integer|exists:products,product_id',
+            'action' => 'required|in:activate,deactivate,delete'
+        ]);
+
+        $productIds = $request->product_ids;
+        $action = $request->action;
+
+        try {
+            DB::beginTransaction();
+
+            switch ($action) {
+                case 'activate':
+                    Product::whereIn('product_id', $productIds)->update(['status' => 'active']);
+                    $message = 'เปิดใช้งานสินค้าเรียบร้อยแล้ว';
+                    break;
+
+                case 'deactivate':
+                    Product::whereIn('product_id', $productIds)->update(['status' => 'inactive']);
+                    $message = 'ปิดใช้งานสินค้าเรียบร้อยแล้ว';
+                    break;
+
+                case 'delete':
+                    // Check if any products have been ordered
+                    $orderedProducts = Product::whereIn('product_id', $productIds)
+                        ->whereHas('orderItems')
+                        ->pluck('product_name')
+                        ->toArray();
+
+                    if (!empty($orderedProducts)) {
+                        return back()->with('error', 'ไม่สามารถลบสินค้าที่มีประวัติการสั่งซื้อได้: ' . implode(', ', $orderedProducts));
+                    }
+
+                    // Delete related data and products
+                    foreach ($productIds as $productId) {
+                        $product = Product::find($productId);
+                        if ($product) {
+                            $product->images()->delete();
+                            $product->cartItems()->delete();
+                            $product->reviews()->delete();
+                            $product->wishlists()->delete();
+                            $product->delete();
+                        }
+                    }
+                    $message = 'ลบสินค้าเรียบร้อยแล้ว';
+                    break;
+            }
+
+            DB::commit();
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk action failed: ' . $e->getMessage());
+
+            return back()->with('error', 'เกิดข้อผิดพลาดในการดำเนินการ');
+        }
+    }
+
+    /**
+     * Delete a product image
+     */
+    public function deleteImage(int $imageId)
+    {
+        try {
+            $image = ProductImage::findOrFail($imageId);
+
+            // Delete file from storage
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            // If this was the primary image, make another image primary
+            if ($image->is_primary) {
+                $nextImage = $image->product->images()->where('image_id', '!=', $imageId)->first();
+                if ($nextImage) {
+                    $nextImage->update(['is_primary' => true]);
+                }
+            }
+
+            $image->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบรูปภาพสำเร็จ'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Image deletion failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'เกิดข้อผิดพลาดในการลบรูปภาพ'
+            ], 500);
+        }
+    }
+}

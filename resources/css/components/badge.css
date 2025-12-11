@@ -1,0 +1,12 @@
+/* ===================================
+   resources/css/components/badge.css
+   Badge Component Styles
+   =================================== */
+
+.badge {
+    font-family: 'Kanit', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+}

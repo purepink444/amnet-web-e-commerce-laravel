@@ -38,7 +38,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($cart->items as $item)
-                                    <tr>
+                                    <tr data-product-id="{{ $item->product_id }}">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <img src="{{ $item->product->image_url ? asset('storage/' . $item->product->image_url) : 'https://via.placeholder.com/60x60?text=No+Image' }}"
@@ -56,23 +56,27 @@
                                         </td>
                                         <td class="text-center align-middle">
                                             <div class="input-group input-group-sm" style="width: 100px; margin: 0 auto;">
-                                                <button class="btn btn-outline-secondary btn-sm" type="button"
-                                                        onclick="updateQuantity({{ $item->product_id }}, {{ $item->quantity - 1 }})"
+                                                <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                        type="button"
+                                                        data-action="decrease"
+                                                        data-product-id="{{ $item->product_id }}"
                                                         {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
-                                                <input type="number" class="form-control text-center"
+                                                <input type="number" class="form-control text-center quantity-input"
                                                        value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock_quantity }}"
-                                                       onchange="updateQuantity({{ $item->product_id }}, this.value)">
-                                                <button class="btn btn-outline-secondary btn-sm" type="button"
-                                                        onclick="updateQuantity({{ $item->product_id }}, {{ $item->quantity + 1 }})"
+                                                       data-product-id="{{ $item->product_id }}">
+                                                <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                        type="button"
+                                                        data-action="increase"
+                                                        data-product-id="{{ $item->product_id }}"
                                                         {{ $item->quantity >= $item->product->stock_quantity ? 'disabled' : '' }}>+</button>
                                             </div>
                                         </td>
-                                        <td class="text-center align-middle fw-bold">
+                                        <td class="text-center align-middle fw-bold item-total">
                                             ฿{{ number_format($item->subtotal, 2) }}
                                         </td>
                                         <td class="text-center align-middle">
-                                            <button class="btn btn-outline-danger btn-sm"
-                                                    onclick="removeItem({{ $item->product_id }})">
+                                            <button class="btn btn-outline-danger btn-sm remove-item-btn"
+                                                    data-product-id="{{ $item->product_id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>

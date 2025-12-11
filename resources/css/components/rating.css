@@ -1,0 +1,19 @@
+/* ===================================
+   resources/css/components/rating.css
+   Rating Component Styles
+   =================================== */
+
+.rating {
+    margin-bottom: 0.75rem;
+}
+
+.rating i {
+    font-size: 0.8rem;
+    margin-right: 2px;
+}
+
+.rating small {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-left: 0.25rem;
+}

@@ -1,27 +1,21 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Show')
+@section('title', 'รายละเอียดสินค้า')
 
 @section('content')
 <div class="container py-4">
-    <h1>Show</h1>
-    <!-- TODO: เพิ่มเนื้อหาที่นี่ -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="mb-4">รายละเอียดสินค้า</h1>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        หน้านี้กำลังอยู่ระหว่างการพัฒนา
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-@endsection 
-@section('title', 'รายละเอียดสินค้า') 
- 
-@section('content') 
-<div class="container py-4"> 
-    <h1>รายละเอียดสินค้า</h1> 
-    < เพิ่มเนื้อหาที่นี่ --> 
-</div> 
-@endsection 
- 
-@section('title', 'รายละเอียดสินค้า') 
- 
-@section('content') 
-<div class="container py-4"> 
-    <h1>รายละเอียดสินค้า</h1> 
-    < เพิ่มเนื้อหาที่นี่ --> 
-</div> 
-@endsection 
+@endsection

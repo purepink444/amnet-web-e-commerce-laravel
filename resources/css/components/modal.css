@@ -1,0 +1,66 @@
+/* ===================================
+   resources/css/components/modal.css
+   Modal Component Styles
+   =================================== */
+
+/* Alert Component */
+.alert {
+    position: relative;
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+.alert-content {
+    display: flex;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.alert-content i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert-message {
+    flex: 1;
+}
+
+.alert-dismissible {
+    padding-right: 3rem;
+}
+
+.alert .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    color: #842029;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    color: #664d03;
+}
+
+.alert-info {
+    background-color: #cff4fc;
+    border-color: #b6effb;
+    color: #055160;
+}

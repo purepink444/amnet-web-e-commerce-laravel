@@ -1,0 +1,78 @@
+/* ===================================
+   resources/css/layouts/grid.css
+   Grid Layout Styles
+   =================================== */
+
+/* Product grid responsive adjustments */
+@media (min-width: 1200px) {
+    .col-xl-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .col-lg-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .product-card .card-img-top {
+        height: 150px;
+    }
+
+    .product-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .product-card .card-title {
+        font-size: 0.9rem;
+    }
+
+    .product-card .card-text {
+        font-size: 0.8rem;
+    }
+
+    .product-card .h5 {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-card .card-body {
+        padding: 0.5rem;
+    }
+
+    .product-card .card-title {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 1;
+    }
+
+    .product-card .card-text {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 1;
+    }
+
+    .rating small {
+        font-size: 0.7rem;
+    }
+
+    .product-card .btn-primary {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}

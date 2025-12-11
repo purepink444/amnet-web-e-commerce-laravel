@@ -1,0 +1,8 @@
+/* ===================================
+   resources/css/pages/product-list.css
+   Product List Page Styles
+   =================================== */
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%) !important;
+}
