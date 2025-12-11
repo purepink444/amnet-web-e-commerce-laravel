@@ -44,8 +44,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // ✅ Custom Middleware - ใช้ตัวเดียวรับ parameter
-        'role' => \App\Http\Middleware\RolesMiddleware::class,
+        // ✅ Custom Middleware - ใช้ตัวเดียวรับ parameter (moved to bootstrap/app.php in Laravel 11)
+        // 'role' => \App\Http\Middleware\RolesMiddleware::class,
     ];
 
     /**

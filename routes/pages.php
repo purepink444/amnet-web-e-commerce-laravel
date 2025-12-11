@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\PaymentController;
+use App\Http\Controllers\Web\Client\PaymentController;
 
 Route::prefix('pages')->name('pages.')->group(function () {
     Route::view('/payment', 'pages.payment')->name('payment');

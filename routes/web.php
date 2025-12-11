@@ -1,7 +1,7 @@
 <?php
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Web\Auth\RegisterController;
+use App\Http\Controllers\Web\Auth\LoginController;
+use App\Http\Controllers\Web\HomeController;
 
 // Public + Guest Routes
 require __DIR__.'/pages.php';

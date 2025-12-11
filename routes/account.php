@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Web\Auth\LoginController;
 use App\Http\Controllers\Account\{ProfileController, OrderController, WishlistController, SettingsController};
-use App\Http\Controllers\Client\{CartController, CheckoutController};
+use App\Http\Controllers\Web\Client\{CartController, CheckoutController};
 
 Route::middleware(['auth', \App\Http\Middleware\RolesMiddleware::class . ':member,admin'])
     ->prefix('account')

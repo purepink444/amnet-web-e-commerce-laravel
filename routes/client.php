@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\{CartController, ClientProductController, CheckoutController, ReviewController, DiagnosticController};
+use App\Http\Controllers\Web\Client\{CartController, ClientProductController, CheckoutController, ReviewController, DiagnosticController, PaymentController};
 
 Route::get('/', fn() => view('home'))->name('home');
 
@@ -41,11 +41,5 @@ Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
 });
 
 
-// API Routes (client related)
-Route::prefix('api')->name('api.')->middleware('throttle:60,1')->group(function () {
-    Route::get('/products/featured', [ClientProductController::class, 'getFeatured'])->name('products.featured');
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
-    });
-});
+// Note: API routes have been moved to routes/api.php for proper separation
+// All API endpoints are now available under /api/v1/ prefix

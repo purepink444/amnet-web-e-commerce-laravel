@@ -12,10 +12,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // ✅ ลงทะเบียน middleware alias
+        // ✅ ลงทะเบียน middleware alias - รวมทั้งหมดในที่เดียว
         $middleware->alias([
             'role' => \App\Http\Middleware\RolesMiddleware::class,
             'overclock' => \App\Http\Middleware\OverclockMiddleware::class,
+            'secure.auth' => \App\Http\Middleware\SecureAuth::class,
+            'throttle.api' => \Illuminate\Routing\Middleware\ThrottleRequests::class.':60,1',
+            'throttle.login' => \Illuminate\Routing\Middleware\ThrottleRequests::class.':5,15',
+            'throttle.password.reset' => \Illuminate\Routing\Middleware\ThrottleRequests::class.':3,60',
+        ]);
+
+        // Security headers and performance monitoring for all requests
+        $middleware->use([
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\PerformanceMonitor::class,
         ]);
     })
     ->withSchedule(function ($schedule) {

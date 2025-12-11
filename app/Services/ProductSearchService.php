@@ -40,43 +40,54 @@ class ProductSearchService
 
     /**
      * Apply filters using database indexes for O(log n) performance
+     * Optimized for PostgreSQL with proper index utilization
      */
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        // Category filter - O(log n) with index
+        // Use composite index: idx_products_status_price_stock
+        $query->where('status', 'active');
+
+        // Category filter - uses idx_products_category_brand
         if (!empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
-        // Brand filter - O(log n) with index
+        // Brand filter - uses idx_products_category_brand
         if (!empty($filters['brand_id'])) {
             $query->where('brand_id', $filters['brand_id']);
         }
 
-        // Price range filter - O(log n) with index
+        // Price range filter - uses idx_products_status_price_stock
         if (!empty($filters['min_price']) || !empty($filters['max_price'])) {
             $query->whereBetween('price', [
                 $filters['min_price'] ?? 0,
-                $filters['max_price'] ?? PHP_INT_MAX
+                $filters['max_price'] ?? 999999999.99
             ]);
         }
 
-        // Status filter - O(log n) with composite index
-        $query->where('status', 'active');
-
-        // Stock availability filter
+        // Stock availability filter - uses partial index idx_products_in_stock
         if (isset($filters['in_stock']) && $filters['in_stock']) {
             $query->where('stock_quantity', '>', 0);
         }
 
-        // Full-text search - O(n) but optimized with GIN index
+        // Optimized full-text search using trigram indexes
         if (!empty($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
-                // Use PostgreSQL full-text search for better performance
-                $q->whereRaw("to_tsvector('english', product_name || ' ' || coalesce(description, '')) @@ plainto_tsquery('english', ?)", [$searchTerm])
-                  ->orWhere('product_name', 'ILIKE', "%{$searchTerm}%");
-            });
+            $searchTerm = trim($filters['search']);
+
+            // Sanitize search term to prevent SQL injection
+            $searchTerm = preg_replace('/[^\p{L}\p{N}\s\-_]/u', '', $searchTerm);
+
+            if (strlen($searchTerm) >= 2) {
+                $query->where(function ($q) use ($searchTerm) {
+                    // Use trigram similarity for better performance (uses idx_products_name_trgm)
+                    $q->whereRaw("product_name % ?", [$searchTerm])
+                      ->orWhereRaw("similarity(product_name, ?) > 0.3", [$searchTerm])
+                      // Fallback to ILIKE for exact matches
+                      ->orWhere('product_name', 'ILIKE', '%' . $searchTerm . '%')
+                      // Search in SKU with exact match
+                      ->orWhere('sku', 'ILIKE', $searchTerm . '%');
+                });
+            }
         }
 
         return $query;
