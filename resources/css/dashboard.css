@@ -1171,4 +1171,44 @@
     .action-btn i {
         font-size: 1rem;
     }
-}
+}  
+/* Additional spacing */  
+.dashboard-main {  
+    margin-top: 1rem;  
+} 
+  
+/* Dark Mode Support */  
+[data-theme="dark"] .stat-card,  
+[data-theme="dark"] .chart-card,  
+[data-theme="dark"] .summary-sidebar,  
+[data-theme="dark"] .activity-section,  
+[data-theme="dark"] .sidebar-widget {  
+    background: #1f2937;  
+    border-color: #374151;  
+}  
+  
+[data-theme="dark"] .stat-card::before {  
+    background: linear-gradient(135deg, #ff6b35 0%, #e85d2a 100%);  
+}  
+  
+[data-theme="dark"] .stat-value {  
+    color: #f9fafb;  
+}  
+  
+[data-theme="dark"] .stat-label {  
+    color: #d1d5db;  
+}  
+  
+[data-theme="dark"] .chart-header,  
+[data-theme="dark"] .section-header,  
+[data-theme="dark"] .widget-header {  
+    border-color: #374151;  
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);  
+}  
+  
+[data-theme="dark"] .chart-title,  
+[data-theme="dark"] .section-title,  
+[data-theme="dark"] .widget-title,  
+[data-theme="dark"] .summary-title {  
+    color: #f9fafb;  
+} 

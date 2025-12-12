@@ -3,6 +3,7 @@
 @section('title', 'สมัครสมาชิก')
 
 @section('content')
+<div class="container">
 <div class="login-container">
     <div class="login-card">
         <img src="/mnt/data/2d1956aa-d7e5-4cdb-93ab-df858379fc06.png" class="login-logo" alt="Logo" />
@@ -32,10 +33,10 @@
                 <select name="province" id="province" class="login-input" required>
                     <option value="">เลือกจังหวัด</option>
                 </select>
-                <select name="district" id="district" class="login-input" disabled required>
+                <select name="district" id="district" class="login-input" required>
                     <option value="">เลือกอำเภอ</option>
                 </select>
-                <select name="subdistrict" id="subdistrict" class="login-input" disabled required>
+                <select name="subdistrict" id="subdistrict" class="login-input" required>
                     <option value="">เลือกตำบล</option>
                 </select>
             </div>
@@ -57,5 +58,10 @@
         </form>
     </div>
 </div>
+</div>
 
+@endsection
+
+@section('scripts')
+ <script src="{{ asset('js/pages/thailand.js') }}></script> <script> document.addEventListener('DOMContentLoaded', function() { const provinceSelect = document.getElementById('province'); thaiProvinces.forEach(function(province) { const option = document.createElement('option'); option.value = province; option.textContent = province; provinceSelect.appendChild(option); }); }); </script> 
 @endsection

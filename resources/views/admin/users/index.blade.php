@@ -279,10 +279,10 @@
 }
 
 .filters-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
     gap: 1rem;
-    align-items: flex-end;
-    flex-wrap: wrap;
+    align-items: end;
 }
 
 .search-group {
@@ -603,10 +603,15 @@
     margin-bottom: 0.125rem;
 }
 
+.users-table th:last-child {
+    width: 140px;
+    min-width: 140px;
+}
+
 .action-buttons {
     display: flex;
     gap: 0.375rem;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .btn-view, .btn-edit, .btn-delete {

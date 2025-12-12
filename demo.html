@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Components Demo - แสดง CSS & JS</title>
+
+    <!-- โหลด CSS จากโครงสร้างโปรเจค -->
+    <link rel="stylesheet" href="resources/css/app.css">
+
+    <!-- SweetAlert2 สำหรับ notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Axios สำหรับ API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-50 p-8">
+
+    <h1 class="text-3xl font-bold mb-8 text-center text-orange-600">🎯 Web Components Demo - แสดง CSS & JS</h1>
+
+    <div class="max-w-6xl mx-auto space-y-8">
+
+        <!-- ปุ่ม Button Component -->
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">🔘 Button Component</h2>
+            <p class="text-gray-600 mb-4">แสดงปุ่มต่างๆ ที่สร้างด้วย Web Component พร้อม CSS styling</p>
+            <div class="flex flex-wrap gap-4">
+                <ui-button variant="primary" size="md">
+                    <span slot="prefix">🚀</span>
+                    Primary Button
+                    <span slot="suffix">→</span>
+                </ui-button>
+
+                <ui-button variant="secondary" size="md">Secondary Button</ui-button>
+                <ui-button variant="outline" size="md">Outline Button</ui-button>
+                <ui-button variant="danger" size="md">Danger Button</ui-button>
+                <ui-button variant="ghost" size="md">Ghost Button</ui-button>
+            </div>
+
+            <div class="mt-4 flex gap-4">
+                <ui-button variant="primary" size="sm">Small</ui-button>
+                <ui-button variant="primary" size="md">Medium</ui-button>
+                <ui-button variant="primary" size="lg">Large</ui-button>
+                <ui-button variant="primary" size="xl">Extra Large</ui-button>
+            </div>
+
+            <div class="mt-4">
+                <ui-button variant="primary" size="lg" loading="true">Loading State</ui-button>
+            </div>
+        </section>
+
+        <!-- Product Card Component -->
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">🛍️ Product Card Component</h2>
+            <p class="text-gray-600 mb-4">แสดงการ์ดสินค้าที่สร้างด้วย Web Component พร้อมฟังก์ชันการทำงาน</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Product Card 1 - แสดงราคาลด -->
+                <product-card product='{
+                    "id": 1,
+                    "name": "iPhone 15 Pro Max",
+                    "brand": "Apple",
+                    "price": 45900,
+                    "originalPrice": 49900,
+                    "image": "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400",
+                    "rating": 4.8,
+                    "reviewCount": 1250,
+                    "isInStock": true
+                }'></product-card>
+
+                <!-- Product Card 2 - Compact mode -->
+                <product-card
+                    product='{
+                        "id": 2,
+                        "name": "MacBook Air M3",
+                        "brand": "Apple",
+                        "price": 45900,
+                        "image": "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400",
+                        "rating": 4.9,
+                        "reviewCount": 890,
+                        "isInStock": true
+                    }'
+                    compact="true">
+                </product-card>
+
+                <!-- Product Card 3 - Out of Stock -->
+                <product-card
+                    product='{
+                        "id": 3,
+                        "name": "iPad Pro 12.9",
+                        "brand": "Apple",
+                        "price": 49900,
+                        "image": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400",
+                        "rating": 4.7,
+                        "reviewCount": 654,
+                        "isInStock": false
+                    }'
+                    show-wishlist="false">
+                </product-card>
+
+                <!-- Product Card 4 - ไม่มี rating -->
+                <product-card product='{
+                    "id": 4,
+                    "name": "AirPods Pro",
+                    "brand": "Apple",
+                    "price": 8900,
+                    "image": "https://images.unsplash.com/photo-1606220945770-b5b6c2c9f188?w=400",
+                    "isInStock": true
+                }'></product-card>
+
+            </div>
+        </section>
+
+        <!-- Interactive Demo -->
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">🎮 Interactive Demo</h2>
+            <p class="text-gray-600 mb-4">ทดสอบการทำงานของ Web Components</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ทดสอบปุ่ม Loading:</label>
+                    <ui-button id="test-loading-btn" variant="primary" size="md">Click to Load</ui-button>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ทดสอบการเปลี่ยน Attributes:</label>
+                    <div class="flex gap-2">
+                        <button onclick="changeButtonVariant('primary')" class="px-3 py-1 bg-orange-500 text-white rounded">Primary</button>
+                        <button onclick="changeButtonVariant('secondary')" class="px-3 py-1 bg-gray-500 text-white rounded">Secondary</button>
+                        <button onclick="changeButtonVariant('danger')" class="px-3 py-1 bg-red-500 text-white rounded">Danger</button>
+                    </div>
+                    <ui-button id="dynamic-btn" variant="primary" size="md" class="mt-2">Dynamic Button</ui-button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Examples -->
+        <section class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">📝 วิธีใช้งาน Web Components</h2>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-medium mb-2">Button Component:</h3>
+                    <pre class="bg-gray-100 p-4 rounded text-sm overflow-x-auto"><code><ui-button variant="primary" size="md">
+  <span slot="prefix">🚀</span>
+  Button Text
+  <span slot="suffix">→</span>
+</ui-button>
+
+<!-- Attributes ที่ใช้ได้ -->
+<ui-button
+  variant="primary|secondary|outline|ghost|danger"
+  size="sm|md|lg|xl"
+  loading="true|false"
+  disabled>
+</ui-button></code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-medium mb-2">Product Card Component:</h3>
+                    <pre class="bg-gray-100 p-4 rounded text-sm overflow-x-auto"><code><product-card
+  product='{JSON.stringify(productData)}'
+  compact="true|false"
+  show-wishlist="true|false">
+</product-card>
+
+<!-- Product Data Structure -->
+{
+  "id": 1,
+  "name": "Product Name",
+  "brand": "Brand Name",
+  "price": 1000,
+  "originalPrice": 1200, // optional
+  "image": "image-url",
+  "rating": 4.5, // optional
+  "reviewCount": 100, // optional
+  "isInStock": true
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Info -->
+        <section class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-800">📊 Performance & Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="font-medium text-blue-700 mb-2">✅ Web Components Features:</h3>
+                    <ul class="text-sm text-blue-600 space-y-1">
+                        <li>• Shadow DOM - CSS Encapsulation</li>
+                        <li>• Custom Elements - Native HTML</li>
+                        <li>• Lifecycle Callbacks</li>
+                        <li>• Attribute Observation</li>
+                        <li>• Event Handling</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-medium text-blue-700 mb-2">🎨 Styling & UX:</h3>
+                    <ul class="text-sm text-blue-600 space-y-1">
+                        <li>• Responsive Design</li>
+                        <li>• Accessibility (ARIA, Keyboard)</li>
+                        <li>• Loading States</li>
+                        <li>• Hover Effects</li>
+                        <li>• Theme Support</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Load Components and Services -->
+    <script type="module">
+        // โหลด Services ก่อน
+        import './resources/js/services/CartService.js';
+        import './resources/js/services/WishlistService.js';
+        import './resources/js/utils/api.js';
+        import './resources/js/utils/dom.js';
+        import './resources/js/utils/performance.js';
+
+        // โหลด Web Components
+        import './resources/js/components/Button.js';
+        import './resources/js/components/ProductCard.js';
+
+        console.log('🎉 All Web Components and Services loaded successfully!');
+
+        // Setup interactive demo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Test loading button
+            const loadingBtn = document.getElementById('test-loading-btn');
+            if (loadingBtn) {
+                loadingBtn.addEventListener('button-click', () => {
+                    loadingBtn.setAttribute('loading', 'true');
+                    setTimeout(() => {
+                        loadingBtn.removeAttribute('loading');
+                        Swal.fire('Success!', 'Button loading test completed!', 'success');
+                    }, 2000);
+                });
+            }
+        });
+
+        // Global functions for demo
+        window.changeButtonVariant = (variant) => {
+            const btn = document.getElementById('dynamic-btn');
+            if (btn) {
+                btn.setAttribute('variant', variant);
+            }
+        };
+    </script>
+
+</body>
+</html>

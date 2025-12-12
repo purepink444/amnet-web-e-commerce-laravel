@@ -33,7 +33,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <!-- Core CSS -->
-    @vite(['resources/css/variables.css', 'resources/css/components.css', 'resources/css/app.css'])
+    @vite(['resources/css/variables.css', 'resources/css/app.css'])
 
     @stack('styles')
     @yield('head')

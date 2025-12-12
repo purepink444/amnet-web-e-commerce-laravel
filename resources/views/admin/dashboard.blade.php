@@ -231,8 +231,7 @@
 
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/admin-modern.css') }}">
-<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@vite(['resources/css/admin-modern.css', 'resources/css/dashboard.css'])
 @endsection
 
 
@@ -240,5 +239,5 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script src="{{ asset('js/pages/admin-dashboard.js') }}"></script>
+@vite(['resources/js/pages/admin-dashboard.js'])
 @endsection

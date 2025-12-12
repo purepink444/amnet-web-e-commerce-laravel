@@ -1,4 +1,4 @@
-@extends('layouts.default')
+ต@extends('layouts.default')
 
 @section('title', 'สินค้า')
 
@@ -9,7 +9,7 @@
         <div class="row align-items-center">
             <div class="col-lg-8">
                 <h1 class="display-4 fw-bold text-white mb-3">
-                    <i class="bi bi-bag-check me-3"></i>สินค้าของเรา
+                    🛍️ สินค้าของเรา
                 </h1>
                 <p class="lead text-white-50">
                     เลือกซื้อสินค้าคุณภาพ พร้อมบริการหลังการขายที่ดีที่สุด
@@ -101,7 +101,7 @@
                 $imageUrl = $product->photo_path ? \Storage::url($product->photo_path) : 'https://via.placeholder.com/300x300?text=No+Image';
             @endphp
 
-            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
+            <div class="product-card-wrapper">
                 <div class="product-card">
                     @if($product->stock_quantity <= 0)
                         <div class="stock-badge out-of-stock">
@@ -117,7 +117,7 @@
                         <img src="{{ $imageUrl }}" alt="{{ $product->product_name }}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image';">
                         <div class="product-overlay">
                             <a href="{{ route('client.products.show', $product->getKey()) }}" class="btn btn-white btn-sm">
-                                <i class="bi bi-eye me-1"></i>ดูรายละเอียด
+                                👁️ ดูรายละเอียด
                             </a>
                         </div>
                     </div>
@@ -139,14 +139,14 @@
                             <div class="product-actions">
                                 @if($product->stock_quantity > 0)
                                     <a href="{{ route('client.products.show', $product->getKey()) }}" class="btn btn-green btn-sm">
-                                        <i class="bi bi-bag-check me-1"></i>ซื้อสินค้า
+                                        🛒 ซื้อสินค้า
                                     </a>
                                     <button class="btn btn-orange btn-sm add-to-cart" onclick="addToCart({{ $product->getKey() }})">
-                                        <i class="bi bi-cart-plus me-1"></i>เพิ่มสินค้า
+                                        ➕ เพิ่มสินค้า
                                     </button>
                                 @else
                                     <button class="btn btn-secondary btn-sm w-100" disabled>
-                                        <i class="bi bi-x-circle me-1"></i>สินค้าหมด
+                                        ❌ สินค้าหมด
                                     </button>
                                 @endif
                             </div>
@@ -553,6 +553,12 @@ function showToast(message, type = 'info') {
     text-decoration: none;
 }
 
+.btn-green, .btn-orange {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .add-to-cart {
     font-size: 1.1rem;
 }
@@ -566,8 +572,12 @@ function showToast(message, type = 'info') {
 /* Grid/List View */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
     gap: 1.5rem;
+}
+
+.product-card-wrapper {
+    margin-bottom: 1.5rem;
 }
 
 .products-grid.list-view {

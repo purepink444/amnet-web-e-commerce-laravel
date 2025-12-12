@@ -1,0 +1,30 @@
+/* Theme Toggle Button */
+.theme-toggle-fallback {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    width: 60px;
+    height: 60px;
+    background: #ff6b35;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    color: white;
+    font-size: 20px;
+}
+
+.theme-toggle-fallback:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.6);
+}
+
+/* Theme transition */
+.theme-transition * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}

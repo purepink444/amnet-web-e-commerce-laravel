@@ -163,13 +163,58 @@ class ThemeManager {
      }
 }
 
-// Import additional modules
-import './components/cart.js';
-import './components/product.js';
-import './utils/address-selector.js';
-import './pages/payment.js';
-import './pages/checkout.js';
-// Note: admin-dashboard.js is loaded separately in admin views
+// Import critical modules immediately
+import './services/CartService.js';
+import './services/WishlistService.js';
+import './utils/api.js';
+import './utils/dom.js';
+import './utils/performance.js';
+
+// Lazy load non-critical components
+const loadComponent = async (componentPath) => {
+    try {
+        await import(componentPath);
+    } catch (error) {
+        console.warn(`Failed to load component: ${componentPath}`, error);
+    }
+};
+
+// Load components when needed
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load essential components
+    await Promise.all([
+        loadComponent('./components/Button.js'),
+        loadComponent('./components/ProductCard.js')
+    ]);
+
+    // Load cart component only if cart elements exist
+    if (document.querySelector('[data-cart-toggle], [data-cart-dropdown], [data-cart-count]')) {
+        await loadComponent('./components/cart.js');
+    }
+
+    // Load admin components only on admin pages
+    if (window.location.pathname.startsWith('/admin')) {
+        // Admin components would be loaded here
+    }
+
+    // Load services on demand
+    const loadService = async (servicePath) => {
+        try {
+            await import(servicePath);
+        } catch (error) {
+            console.warn(`Failed to load service: ${servicePath}`, error);
+        }
+    };
+
+    // Load product and order services when product/order pages are accessed
+    if (document.querySelector('[data-products], .product-card, [data-search-form]')) {
+        await loadService('./services/ProductService.js');
+    }
+
+    if (document.querySelector('[data-cart-form], [data-order-form]')) {
+        await loadService('./services/OrderService.js');
+    }
+});
 
 // Initialize theme manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

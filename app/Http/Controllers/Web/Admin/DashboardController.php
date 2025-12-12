@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Web\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\CacheService;
+use App\Services\DataStructureService;
+use App\Models\Order;
+use App\Models\User;
+use App\Models\Product;
 
 class DashboardController extends Controller
 {
-<<<<<<< HEAD:app/Http/Controllers/Admin/DashboardController.php
-    //
-=======
     protected CacheService $cacheService;
     protected DataStructureService $dataStructureService;
 
@@ -200,7 +202,7 @@ class DashboardController extends Controller
     /**
      * Get today's statistics
      */
-    private function getTodayStats(): array
+     private function getTodayStats(): array
     {
         $today = today();
 
@@ -253,5 +255,4 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('success', 'Cache ถูก refresh และ warm up แล้ว');
     }
->>>>>>> cb47fda074d7e5ea968584f36221719f7138d02c:app/Http/Controllers/Web/Admin/DashboardController.php
 }

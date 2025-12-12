@@ -15,9 +15,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/admin-modern.css', 'resources/js/app.js'])
 
     @yield('styles')
+    font-family: 'Kanit', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+    font-family: 'Kanit', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
 
 </head>
 <body>
@@ -147,7 +157,116 @@
                 </div>
             </header>
 
-            <!-- Page Content -->
+            <!-- Page Content -->            <!-- Page Header -->            <div class="admin-page-header">                <h1 class="admin-page-title">@yield('title', 'Dashboard')</h1>                <p class="admin-page-subtitle">@yield('subtitle', '??????????????????')</p>            </div>
+            <div class="admin-content">
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.products.index') }}" class="admin-nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-box-seam"></i>
+                        <span>จัดการสินค้า</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.categories.index') }}" class="admin-nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-tags"></i>
+                        <span>จัดการหมวดหมู่</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.brands.index') }}" class="admin-nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-copyright"></i>
+                        <span>จัดการแบรนด์</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.orders.index') }}" class="admin-nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-receipt"></i>
+                        <span>จัดการคำสั่งซื้อ</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-users"></i>
+                        <span>จัดการผู้ใช้</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item">
+                    <a href="{{ route('admin.reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                        <i class="admin-nav-icon fas fa-chart-line"></i>
+                        <span>รายงาน</span>
+                    </a>
+                </div>
+                <div class="admin-nav-item" style="margin-top: auto;">
+                    <a href="{{ route('home') }}" class="admin-nav-link">
+                        <i class="admin-nav-icon fas fa-home"></i>
+                        <span>กลับหน้าหลัก</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div class="admin-topbar-left">
+                    <button class="admin-menu-toggle" id="sidebarToggle" aria-label="เปิดเมนู">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <nav class="admin-breadcrumb">
+                        <span class="admin-breadcrumb-item">Admin Panel</span>
+                        <span class="admin-breadcrumb-item active">@yield('title', 'Dashboard')</span>
+                    </nav>
+                </div>
+
+                <div class="admin-topbar-right">
+                    <button class="theme-toggle" id="themeToggle" aria-label="เปลี่ยนธีม">
+                        <i class="fas fa-moon"></i>
+                    </button>
+
+                    <div class="admin-user-menu">
+                        <button class="admin-user-trigger" id="userMenuTrigger">
+                            <div class="admin-user-avatar">
+                                {{ strtoupper(substr(auth()->user()->username, 0, 1)) }}
+                            </div>
+                            <div class="admin-user-info">
+                                <div class="admin-user-name">{{ auth()->user()->username }}</div>
+                                <div class="admin-user-role">Administrator</div>
+                            </div>
+                            <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
+                        </button>
+
+                        <div class="admin-user-dropdown" id="userDropdown">
+                            <a href="{{ route('admin.dashboard') }}" class="admin-dropdown-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ route('admin.products.index') }}" class="admin-dropdown-item">
+                                <i class="fas fa-box-seam"></i>
+                                <span>จัดการสินค้า</span>
+                            </a>
+                            <a href="{{ route('admin.users.index') }}" class="admin-dropdown-item">
+                                <i class="fas fa-users"></i>
+                                <span>จัดการผู้ใช้</span>
+                            </a>
+                            <a href="{{ route('admin.orders.index') }}" class="admin-dropdown-item">
+                                <i class="fas fa-receipt"></i>
+                                <span>จัดการคำสั่งซื้อ</span>
+                            </a>
+                            <div class="admin-dropdown-divider"></div>
+                            <form action="{{ route('account.logout') }}" method="POST" style="margin: 0;">
+                                @csrf
+                                <button type="submit" class="admin-dropdown-item danger" style="width: 100%; border: none; background: none; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>ออกจากระบบ</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->            <!-- Page Header -->            <div class="admin-page-header">                <h1 class="admin-page-title">@yield('title', 'Dashboard')</h1>                <p class="admin-page-subtitle">@yield('subtitle', '??????????????????')</p>            </div>
             <div class="admin-content">
                 <!-- Page Header -->
                 <div class="admin-page-header">
@@ -218,6 +337,7 @@
         const main = document.querySelector('.admin-main');
 
         // Load sidebar state
+        localStorage.setItem('admin-sidebar-collapsed', 'false'); // Reset to open
         const sidebarCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
         if (sidebarCollapsed) {
             sidebar.classList.add('collapsed');

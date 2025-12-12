@@ -18,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/variables.css', 'resources/css/app.css', 'resources/js/app.js'])
 
     
     @yield('styles')
@@ -42,8 +42,57 @@
     <!-- Bootstrap 5.3 JS Bundle (รวม Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Vite JavaScript -->
-    @vite(['resources/js/app.js'])
+
+    <!-- Custom Scripts -->
+    @yield('scripts')
+
+    <!-- Theme Toggle Button (Fallback) -->
+    <button id="theme-toggle-fallback" class="theme-toggle-fallback" onclick="toggleThemeFallback()">
+        ??
+    </button>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'My Laravel App')</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Google Fonts - Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Vite Assets -->
+    @vite(['resources/css/variables.css', 'resources/css/app.css', 'resources/js/app.js'])
+
+    
+    @yield('styles')
+</head>
+<body>
+    <header>
+        @include('includes.navbar')
+    </header>
+
+    <main>
+        @yield('content')
+    </main>
+
+    <footer>
+        @include('includes.footer')
+    </footer>
+    
+    <!-- jQuery (ต้องโหลดก่อน Thailand.js) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Bootstrap 5.3 JS Bundle (รวม Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <!-- Custom Scripts -->
     @yield('scripts')

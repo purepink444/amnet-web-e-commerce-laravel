@@ -12,8 +12,8 @@ require __DIR__.'/client.php';
 require __DIR__.'/account.php';
 require __DIR__.'/admin.php';
 
-// OVERCLOCK ROUTES - EXTREME PERFORMANCE MODE
-require __DIR__.'/overclock.php';
+// OVERCLOCK ROUTES - EXTREME PERFORMANCE MODE (DISABLED - DEMO FEATURE)
+// require __DIR__.'/overclock.php';
 
 
 // Checkout Routes (redirect to account checkout)

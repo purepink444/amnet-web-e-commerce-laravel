@@ -15,6 +15,7 @@
 .footer h4 {
     margin-bottom: 12px;
     font-weight: 600;
+    color: aliceblue;
 }
 
 .footer ul {
@@ -43,7 +44,7 @@
     color: var(--footer-text);
     font-size: 14px;
     text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 0, 0, 0.1);
     transition: background 0.3s ease, color 0.3s ease;
 }
 

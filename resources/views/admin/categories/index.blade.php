@@ -207,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function bulkUpdateStatus(status) {
     const form = document.getElementById('bulkForm');
-    form.action = '{{ route("admin.categories.index") }}';
-    form.innerHTML = '@csrf <input type="hidden" name="status" value="' + status + '">';
+    form.action = '\{\{ route\("admin\.categories\.bulk-update-status"\) \}\}';
+    form.innerHTML = '@csrf <input type="hidden" name="status" value="' \+ status \+ '"><input type="hidden" name="_method" value="PATCH">';
 
     // Add selected IDs
     document.querySelectorAll('.category-checkbox:checked').forEach(checkbox => {

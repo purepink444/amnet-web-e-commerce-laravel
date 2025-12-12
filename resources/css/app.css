@@ -15,7 +15,7 @@
 @import './components/badge.css';
 @import './components/rating.css';
 @import './components/modal.css';
-@import './components/breadcrumb.css';
+@import './components/breadcrumb.css';@import './components/theme-toggle.css';
 
 /* Layout styles */
 @import './layouts/header.css';

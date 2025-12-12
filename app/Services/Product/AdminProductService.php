@@ -19,8 +19,8 @@ class AdminProductService
     public function getPaginatedProducts(array $filters = [], array $sortOptions = []): LengthAwarePaginator
     {
         $query = Product::with([
-            'category:id,category_name',
-            'brand:id,brand_name',
+            'category:category_id,category_name',
+            'brand:brand_id,brand_name',
             'images' => fn($q) => $q->select('product_id', 'image_path', 'is_primary')
                                    ->orderBy('is_primary', 'desc')
                                    ->orderBy('display_order')
@@ -55,8 +55,8 @@ class AdminProductService
     public function getProductForModal(int $productId): Product
     {
         return Product::with([
-            'category:id,category_name',
-            'brand:id,brand_name'
+            'category:category_id,category_name',
+            'brand:brand_id,brand_name'
         ])->findOrFail($productId);
     }
 

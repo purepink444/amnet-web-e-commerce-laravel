@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #ff6b35 0%, #e85d2a 100%); box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold fs-4" href="{{ url('/') }}">
-            <i class="bi bi-shop me-2"></i>
+            🏪
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -14,22 +14,22 @@
                 <!-- Public Links -->
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ url('/') }}">
-                        <i class="bi bi-house-door me-1"></i>Home
+                        🏠 Home
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ url('/product') }}">
-                        <i class="bi bi-bag me-1"></i>Products
+                        🛍️ Products
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ url('/news') }}">
-                        <i class="bi bi-newspaper me-1"></i>News
+                        📰 News
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ url('/support') }}">
-                        <i class="bi bi-headset me-1"></i>Support
+                        🎧 Support
                     </a>
                 </li>
 
@@ -37,12 +37,12 @@
                 @guest
                     <li class="nav-item">
                         <a class="nav-link text-white fw-semibold px-3 btn-register" href="{{ route('register') }}">
-                            <i class="bi bi-person-plus me-1"></i>Register
+                            👤 Register
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white fw-semibold px-3" href="{{ route('login') }}">
-                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            🔐 Login
                         </a>
                     </li>
                 @endguest
@@ -55,7 +55,7 @@
                     @if($user->role_id == 1)
                         <li class="nav-item">
                             <a class="nav-link text-white fw-semibold px-3" href="{{ route('admin.dashboard') }}">
-                                <i class="bi bi-speedometer2 me-1"></i>Admin Dashboard
+                                📊 Admin Dashboard
                             </a>
                         </li>
                     @endif
@@ -64,7 +64,7 @@
                     @if($user->role_id == 2)
                         <li class="nav-item">
                             <a class="nav-link text-white fw-semibold px-3" href="{{ route('account.orders.index') }}">
-                                <i class="bi bi-bag-check me-1"></i>My Orders
+                                📦 My Orders
                             </a>
                         </li>
                     @endif
@@ -73,7 +73,7 @@
                 <!-- Language -->
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ url('/language') }}">
-                        <i class="bi bi-globe me-1"></i>ภาษา
+                        🌐 ภาษา
                     </a>
                 </li>
 
@@ -86,7 +86,7 @@
             <ul class="navbar-nav me-3">
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3 position-relative" href="{{ route('account.cart.index') }}">
-                        <i class="bi bi-cart3 me-1"></i>
+                        🛒
                         <span class="visually-hidden">ตะกร้าสินค้า</span>
                         <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="cart-counter">
                             @php
@@ -105,7 +105,7 @@
                 @php $user = auth()->user(); @endphp
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white fw-semibold px-3" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle me-1"></i>{{ $user->username }}
+                        👤 {{ $user->username }}
                         <span class="badge bg-light text-dark ms-1">{{ $user->role_id == 1 ? 'Admin' : 'Member' }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown" style="z-index: 1050;">
@@ -136,7 +136,7 @@
             @else
                 <li class="nav-item">
                     <a class="nav-link text-white fw-semibold px-3" href="{{ route('login') }}">
-                        <i class="bi bi-person-circle me-1"></i>เข้าสู่ระบบ
+                        🔐 เข้าสู่ระบบ
                     </a>
                 </li>
             @endauth

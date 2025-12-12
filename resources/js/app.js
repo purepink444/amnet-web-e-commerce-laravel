@@ -135,21 +135,32 @@ class ECommerceApp {
     /**
      * Render products in container
      */
-    renderProducts(container, products, config = {}) {
+    async renderProducts(container, products, config = {}) {
         if (!products || products.length === 0) {
             container.innerHTML = '<div class="no-products">No products found.</div>';
             return;
+        }
+
+        // Ensure ProductCard component is loaded
+        if (!customElements.get('product-card')) {
+            try {
+                await import('./components/ProductCard.js');
+            } catch (error) {
+                console.error('Failed to load ProductCard component:', error);
+                container.innerHTML = '<div class="error">Failed to load product components.</div>';
+                return;
+            }
         }
 
         const grid = document.createElement('div');
         grid.className = `products-grid ${config.layout || 'grid-cols-1 md:grid-cols-3 lg:grid-cols-4'}`;
 
         products.forEach(product => {
-            const card = new ProductCard(product, {
-                compact: config.compact || false,
-                showWishlist: config.showWishlist !== false
-            });
-            grid.appendChild(card.render());
+            const card = document.createElement('product-card');
+            card.setAttribute('product', JSON.stringify(product));
+            card.setAttribute('compact', config.compact || false);
+            card.setAttribute('show-wishlist', config.showWishlist !== false);
+            grid.appendChild(card);
         });
 
         container.innerHTML = '';

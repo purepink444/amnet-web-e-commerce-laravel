@@ -1,14 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', '')
+@section('title', 'จัดการสินค้า')
 
 @section('content')
-<!-- Page Header -->
-<div class="admin-page-header">
-    <h1 class="admin-page-title">จัดการสินค้า</h1>
-    <p class="admin-page-subtitle">จัดการสินค้าทั้งหมดในระบบของคุณ</p>
-</div>
-
 <!-- Filters and Actions -->
 <div class="admin-card admin-mb-4">
     <div class="admin-card-body">
