@@ -47,5 +47,52 @@
     </div>
 </div>
 
+<!-- ================================
+      Services Section
+================================ -->
+<section class="services-section py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">บริการของเรา</h2>
+            <p class="text-muted">ให้บริการครบครันในด้านระบบเครือข่ายและความปลอดภัย</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    🌐
+                </div>
+                <h3>ระบบเครือข่าย</h3>
+                <p>ติดตั้งและบำรุงรักษาระบบเครือข่ายสำหรับองค์กรทุกขนาด</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    📹
+                </div>
+                <h3>กล้องวงจรปิด</h3>
+                <p>ติดตั้งระบบกล้องวงจรปิดคุณภาพสูง พร้อมการดูแลหลังการขาย</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    📶
+                </div>
+                <h3>อินเทอร์เน็ตไร้สาย</h3>
+                <p>ติดตั้งและปรับแต่งระบบ WiFi ให้ครอบคลุมทุกพื้นที่</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    🛡️
+                </div>
+                <h3>ความปลอดภัย</h3>
+                <p>ให้คำปรึกษาและติดตั้งระบบรักษาความปลอดภัยครบวงจร</p>
+            </div>
+        </div>
+
+    </div>
+</section>
 
 @endsection

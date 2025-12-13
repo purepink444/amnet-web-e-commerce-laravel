@@ -259,6 +259,7 @@
         @endif
     </div>
 </div>
+@endsection
 
 @section('styles')
 <style>
@@ -837,6 +838,7 @@
     }
 }
 </style>
+@endsection
 
 @section('scripts')
 <script>
@@ -989,5 +991,4 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSelectAllState();
 });
 </script>
-@endsection
 @endsection
