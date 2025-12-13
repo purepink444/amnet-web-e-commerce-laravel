@@ -51,14 +51,14 @@ class AdminBrandController extends Controller
         $validated = $request->validate([
             'brand_name' => 'required|string|max:255|unique:brands,brand_name',
             'description' => 'nullable|string|max:1000',
-            'brand_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:active,inactive',
         ]);
 
         // Handle logo upload
-        if ($request->hasFile('brand_logo')) {
-            $logoName = time() . '_' . Str::slug($request->brand_name) . '.' . $request->brand_logo->extension();
-            $validated['brand_logo'] = $request->brand_logo->storeAs('brands', $logoName, 'public');
+        if ($request->hasFile('logo_url')) {
+            $logoName = time() . '_' . Str::slug($request->brand_name) . '.' . $request->logo_url->extension();
+            $validated['logo_url'] = $request->logo_url->storeAs('brands', $logoName, 'public');
         }
 
         Brand::create($validated);
@@ -95,19 +95,19 @@ class AdminBrandController extends Controller
         $validated = $request->validate([
             'brand_name' => 'required|string|max:255|unique:brands,brand_name,' . $brand->brand_id . ',brand_id',
             'description' => 'nullable|string|max:1000',
-            'brand_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:active,inactive',
         ]);
 
         // Handle logo upload
-        if ($request->hasFile('brand_logo')) {
+        if ($request->hasFile('logo_url')) {
             // Delete old logo
-            if ($brand->brand_logo && Storage::disk('public')->exists($brand->brand_logo)) {
-                Storage::disk('public')->delete($brand->brand_logo);
+            if ($brand->logo_url && Storage::disk('public')->exists($brand->logo_url)) {
+                Storage::disk('public')->delete($brand->logo_url);
             }
 
-            $logoName = time() . '_' . Str::slug($request->brand_name) . '.' . $request->brand_logo->extension();
-            $validated['brand_logo'] = $request->brand_logo->storeAs('brands', $logoName, 'public');
+            $logoName = time() . '_' . Str::slug($request->brand_name) . '.' . $request->logo_url->extension();
+            $validated['logo_url'] = $request->logo_url->storeAs('brands', $logoName, 'public');
         }
 
         $brand->update($validated);
@@ -128,8 +128,8 @@ class AdminBrandController extends Controller
         }
 
         // Delete logo
-        if ($brand->brand_logo && Storage::disk('public')->exists($brand->brand_logo)) {
-            Storage::disk('public')->delete($brand->brand_logo);
+        if ($brand->logo_url && Storage::disk('public')->exists($brand->logo_url)) {
+            Storage::disk('public')->delete($brand->logo_url);
         }
 
         $brand->delete();
@@ -160,8 +160,8 @@ class AdminBrandController extends Controller
             }
 
             // Delete logo
-            if ($brand->brand_logo && Storage::disk('public')->exists($brand->brand_logo)) {
-                Storage::disk('public')->delete($brand->brand_logo);
+            if ($brand->logo_url && Storage::disk('public')->exists($brand->logo_url)) {
+                Storage::disk('public')->delete($brand->logo_url);
             }
 
             $brand->delete();

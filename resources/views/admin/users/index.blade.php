@@ -210,17 +210,17 @@
                                 <td>
                                     <div class="action-buttons">
                                         <a href="{{ route('admin.users.show', $user->user_id) }}" class="btn-view" title="ดูรายละเอียด">
-                                            <i class="bi bi-eye"></i>
+                                            <i class="bi bi-eye"></i> ดู
                                         </a>
                                         <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn-edit" title="แก้ไข">
-                                            <i class="bi bi-pencil"></i>
+                                            <i class="bi bi-pencil"></i> แก้ไข
                                         </a>
                                         <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-delete" title="ลบ"
                                                     onclick="return confirm('ต้องการลบผู้ใช้นี้หรือไม่?')">
-                                                <i class="bi bi-trash"></i>
+                                                <i class="bi bi-trash"></i> ลบ
                                             </button>
                                         </form>
                                     </div>
@@ -611,13 +611,13 @@
 
 .action-buttons {
     display: flex;
-    gap: 0.375rem;
+    gap: 0.5rem;
     justify-content: flex-start;
 }
 
 .btn-view, .btn-edit, .btn-delete {
-    padding: 0.5rem;
-    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -626,6 +626,8 @@
     transition: all 0.2s ease;
     border: none;
     cursor: pointer;
+    gap: 0.375rem;
+    white-space: nowrap;
 }
 
 .btn-view {

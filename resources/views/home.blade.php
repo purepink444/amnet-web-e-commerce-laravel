@@ -3,6 +3,9 @@
 @section('title', 'Amnet Web')
 
 @section('content')
+@php
+    $brands = \App\Models\Brand::where('is_active', true)->get();
+@endphp
 <!-- HERO SECTION -->
 <section class="hero">
     <div class="hero-container">
@@ -32,16 +35,11 @@
         </div>
 
         <div class="brand-logos">
-            <img src="{{ asset('images/brands/dahua.png') }}" alt="Dahua">
-            <img src="{{ asset('images/brands/hikvision.png') }}" alt="Hikvision">
-            <img src="{{ asset('images/brands/ruijie.png') }}" alt="Ruijie">
-            <img src="{{ asset('images/brands/mikrotik.png') }}" alt="Mikrotik">
-            <img src="{{ asset('images/brands/reyee.png') }}" alt="Reyee">
-            <img src="{{ asset('images/brands/h3c.png') }}" alt="H3C">
-            <img src="{{ asset('images/brands/megvii.png') }}" alt="MEGVII">
-            <img src="{{ asset('images/brands/bdcom.png') }}" alt="BDCOM">
-            <img src="{{ asset('images/brands/uniview.png') }}" alt="Uniview">
-            <img src="{{ asset('images/brands/samcom.png') }}" alt="Samcom">
+            @foreach($brands as $brand)
+                @if($brand->logo_url)
+                    <img src="{{ asset($brand->logo_url) }}" alt="{{ $brand->brand_name }}">
+                @endif
+            @endforeach
         </div>
 
     </div>

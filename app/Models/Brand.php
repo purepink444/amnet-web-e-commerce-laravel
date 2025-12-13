@@ -11,9 +11,9 @@ class Brand extends Model
     
     protected $fillable = [
         'brand_name',
-        'brand_logo',
+        'logo_url',
         'description',
-        'status',
+        'is_active',
     ];
 
     /**

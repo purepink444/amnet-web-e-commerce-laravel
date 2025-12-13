@@ -23,8 +23,8 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="text-center mb-4">
-                                @if($brand->brand_logo)
-                                    <img src="{{ asset('storage/' . $brand->brand_logo) }}"
+                                @if($brand->logo_url)
+                                    <img src="{{ asset($brand->logo_url) }}"
                                          alt="{{ $brand->brand_name }}"
                                          class="img-fluid rounded shadow" style="max-width: 300px;">
                                 @else

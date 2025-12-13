@@ -73,8 +73,8 @@
                                                form="bulkForm">
                                     </td>
                                     <td>
-                                        @if($brand->brand_logo)
-                                            <img src="{{ asset('storage/' . $brand->brand_logo) }}"
+                                        @if($brand->logo_url)
+                                            <img src="{{ asset($brand->logo_url) }}"
                                                  alt="{{ $brand->brand_name }}"
                                                  class="img-thumbnail" width="50" height="50">
                                         @else

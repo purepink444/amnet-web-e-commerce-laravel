@@ -15,33 +15,63 @@ class BrandSeeder extends Seeder
      */
     public function run(): void
     {
-        Brand::firstOrCreate(['brand_name' => 'UNV'], [
-            'logo_url' => null,
-            'description' => 'UNV - กล้องวงจรปิดคุณภาพสูง',
+        Brand::updateOrCreate(['brand_name' => 'Dahua'], [
+            'logo_url' => 'images/brands/dahua.png',
+            'description' => 'Dahua - กล้องวงจรปิดและระบบรักษาความปลอดภัย',
             'is_active' => true,
         ]);
 
-        Brand::firstOrCreate(['brand_name' => 'Ruijie'], [
-            'logo_url' => null,
+        Brand::updateOrCreate(['brand_name' => 'Hikvision'], [
+            'logo_url' => 'images/brands/hikvision.png',
+            'description' => 'Hikvision - ผู้นำด้านกล้องวงจรปิด',
+            'is_active' => true,
+        ]);
+
+        Brand::updateOrCreate(['brand_name' => 'Ruijie'], [
+            'logo_url' => 'images/brands/ruijie.png',
             'description' => 'Ruijie Networks - อุปกรณ์เครือข่าย',
             'is_active' => true,
         ]);
 
-        Brand::firstOrCreate(['brand_name' => 'H3C'], [
-            'logo_url' => null,
+        Brand::updateOrCreate(['brand_name' => 'Mikrotik'], [
+            'logo_url' => 'images/brands/mikrotik.png',
+            'description' => 'Mikrotik - Router และอุปกรณ์เครือข่าย',
+            'is_active' => true,
+        ]);
+
+        Brand::updateOrCreate(['brand_name' => 'Reyee'], [
+            'logo_url' => 'images/brands/reyee.png',
+            'description' => 'Reyee - ระบบเครือข่ายไร้สาย',
+            'is_active' => true,
+        ]);
+
+        Brand::updateOrCreate(['brand_name' => 'H3C'], [
+            'logo_url' => 'images/brands/h3c.png',
             'description' => 'H3C - Enterprise Network Solutions',
             'is_active' => true,
         ]);
 
-        Brand::firstOrCreate(['brand_name' => 'Tiandy'], [
-            'logo_url' => null,
-            'description' => 'Tiandy - AI Security Camera',
+        Brand::updateOrCreate(['brand_name' => 'MEGVII'], [
+            'logo_url' => 'images/brands/megvii.png',
+            'description' => 'MEGVII - AI และ Computer Vision',
             'is_active' => true,
         ]);
 
-        Brand::firstOrCreate(['brand_name' => 'SAMCOM'], [
-            'logo_url' => null,
-            'description' => 'SAMCOM - AI Camera Solutions',
+        Brand::updateOrCreate(['brand_name' => 'BDCOM'], [
+            'logo_url' => 'images/brands/bdcom.png',
+            'description' => 'BDCOM - Optical Communication',
+            'is_active' => true,
+        ]);
+
+        Brand::updateOrCreate(['brand_name' => 'Uniview'], [
+            'logo_url' => 'images/brands/uniview.png',
+            'description' => 'Uniview - กล้องวงจรปิด HD',
+            'is_active' => true,
+        ]);
+
+        Brand::updateOrCreate(['brand_name' => 'Samcom'], [
+            'logo_url' => 'images/brands/samcom.png',
+            'description' => 'Samcom - AI Camera Solutions',
             'is_active' => true,
         ]);
     }

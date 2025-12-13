@@ -49,17 +49,17 @@
                             </div>
 
                             <div class="col-md-4">
-                                @if($brand->brand_logo)
+                                @if($brand->logo_url)
                                 <div class="mb-3">
                                     <label class="form-label">โลโก้ปัจจุบัน</label>
-                                    <img src="{{ asset('storage/' . $brand->brand_logo) }}" alt="{{ $brand->brand_name }}"
+                                    <img src="{{ asset($brand->logo_url) }}" alt="{{ $brand->brand_name }}"
                                          class="img-thumbnail mb-2" style="max-width: 200px;">
                                 </div>
                                 @endif
 
                                 <div class="mb-3">
-                                    <label for="brand_logo" class="form-label">{{ $brand->brand_logo ? 'เปลี่ยน' : 'เพิ่ม' }}โลโก้แบรนด์</label>
-                                    <input type="file" class="form-control" id="brand_logo" name="brand_logo" accept="image/*">
+                                    <label for="logo_url" class="form-label">{{ $brand->logo_url ? 'เปลี่ยน' : 'เพิ่ม' }}โลโก้แบรนด์</label>
+                                    <input type="file" class="form-control" id="logo_url" name="logo_url" accept="image/*">
                                     <div class="form-text">รองรับไฟล์ JPG, PNG, GIF ขนาดไม่เกิน 2MB</div>
                                     <div id="logoPreview" class="mt-3" style="display: none;">
                                         <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
@@ -86,7 +86,7 @@
 
 @section('scripts')
 <script>
-document.getElementById('brand_logo').addEventListener('change', function(e) {
+document.getElementById('logo_url').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();

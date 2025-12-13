@@ -52,8 +52,8 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="brand_logo" class="form-label">โลโก้แบรนด์</label>
-                                    <input type="file" class="form-control" id="brand_logo" name="brand_logo" accept="image/*">
+                                    <label for="logo_url" class="form-label">โลโก้แบรนด์</label>
+                                    <input type="file" class="form-control" id="logo_url" name="logo_url" accept="image/*">
                                     <div class="form-text">รองรับไฟล์ JPG, PNG, GIF ขนาดไม่เกิน 2MB</div>
                                     <div id="logoPreview" class="mt-3" style="display: none;">
                                         <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
@@ -80,7 +80,7 @@
 
 @section('scripts')
 <script>
-document.getElementById('brand_logo').addEventListener('change', function(e) {
+document.getElementById('logo_url').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
