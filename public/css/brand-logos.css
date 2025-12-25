@@ -1,0 +1,262 @@
+/* ================================
+   Brand Logos Section Styles
+================================ */
+
+.brand-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.brand-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Brand Logos Grid */
+.brand-logos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+/* Brand Logo Link */
+.brand-logo-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+}
+
+.brand-logo-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.5s;
+}
+
+.brand-logo-link:hover::before {
+    left: 100%;
+}
+
+.brand-logo-link:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Brand Logo Image - นี่คือส่วนสำคัญที่ทำให้ภาพเท่ากัน */
+.brand-logo-link img {
+    max-width: 100%;
+    max-height: 80px;        /* กำหนดความสูงสูงสุด */
+    width: auto;             /* ให้ width ปรับตามอัตราส่วน */
+    height: auto;            /* ให้ height ปรับตามอัตราส่วน */
+    object-fit: contain;     /* ไม่ให้ภาพบิดเบี้ยว */
+    object-position: center; /* จัดกึ่งกลาง */
+    opacity: 0.75;
+    transition: all 0.3s ease;
+    filter: grayscale(30%);  /* ทำให้ดูสีซีดเล็กน้อย */
+}
+
+.brand-logo-link:hover img {
+    opacity: 1;
+    filter: grayscale(0%);   /* เมื่อ hover จะมีสีเต็ม */
+    transform: scale(1.05);
+}
+
+/* Loading Animation */
+.brand-logo-link img[loading="lazy"] {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 0.75;
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .brand-logos {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .brand-logos {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+    
+    .brand-logo-link {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    .brand-logo-link img {
+        max-height: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-logos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .brand-logo-link {
+        padding: 0.75rem;
+        min-height: 80px;
+        border-radius: 8px;
+    }
+    
+    .brand-logo-link img {
+        max-height: 50px;
+    }
+}
+
+/* ================================
+   Alternative Styles (Optional)
+================================ */
+
+/* Style 1: Border on Hover */
+.brand-logo-link.style-border {
+    border: 2px solid transparent;
+}
+
+.brand-logo-link.style-border:hover {
+    border-color: #007bff;
+}
+
+/* Style 2: Background Gradient on Hover */
+.brand-logo-link.style-gradient:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.brand-logo-link.style-gradient:hover img {
+    filter: brightness(0) invert(1);
+}
+
+/* Style 3: Circular */
+.brand-logo-link.style-circle {
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+    padding: 1.5rem;
+}
+
+/* Style 4: Monochrome Theme */
+.brand-logo-link.style-mono img {
+    filter: grayscale(100%);
+}
+
+.brand-logo-link.style-mono:hover img {
+    filter: grayscale(0%);
+}
+
+/* ================================
+   Services Section Enhancement
+================================ */
+.services-section {
+    background: #ffffff;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.service-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.service-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.service-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Service Card Color Variants */
+.service-card:nth-child(1) {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+}
+
+.service-card:nth-child(2) {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+}
+
+.service-card:nth-child(3) {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+}
+
+.service-card:nth-child(4) {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+}

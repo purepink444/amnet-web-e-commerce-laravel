@@ -104,6 +104,75 @@
     </div>
 </div>
 
+<!-- Logo Showcase Section -->
+<div class="logo-showcase-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-2">🏆 แบรนด์ชั้นนำที่ไว้วางใจเรา</h3>
+            <p class="text-muted">พาร์ทเนอร์และสินค้าคุณภาพจากแบรนด์ดัง</p>
+        </div>
+        
+        <!-- Logo Grid -->
+        <div class="logo-grid">
+            <div class="row g-4 align-items-center justify-content-center">
+                <!-- Logo Slot 1 -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Slot 2 -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Slot 3 -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Slot 4 -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Slot 5 -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo Slot 6 -->
+                <<div class="col-6 col-md-4 col-lg-2">
+                    <div class="logo-box">
+                        <div class="logo-content">
+                            <img src="path/to/logo.png" alt="Brand Logo" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Features Section -->
 <div class="features-section py-5">
     <div class="container py-5">
@@ -237,6 +306,7 @@
     background: linear-gradient(135deg, var(--black-primary) 0%, var(--black-secondary) 50%, var(--orange-dark) 100%);
     position: relative;
     overflow: hidden;
+    min-height: 100vh;
 }
 
 .hero-overlay {
@@ -261,6 +331,7 @@
 .text-orange {
     color: var(--orange-primary);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .hero-image-wrapper {
@@ -288,11 +359,6 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-/* Enhanced Hero Section Styles */
-.hero-section {
-    min-height: 100vh;
 }
 
 .hero-bg-elements {
@@ -355,10 +421,6 @@
     50% { transform: scale(1.05); }
 }
 
-.text-orange {
-    position: relative;
-}
-
 .hero-underline {
     position: absolute;
     bottom: -5px;
@@ -405,6 +467,11 @@
     position: relative;
     overflow: hidden;
     z-index: 1;
+    background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btn-text {
@@ -428,6 +495,18 @@
 .btn-orange:hover .btn-hover-effect {
     width: 300px;
     height: 300px;
+}
+
+.btn-orange:hover {
+    background: linear-gradient(135deg, var(--orange-dark) 0%, var(--orange-primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 107, 53, 0.4);
+    color: white;
+}
+
+.btn-outline-light:hover {
+    background-color: white;
+    color: var(--orange-primary);
 }
 
 .hero-main-icon {
@@ -485,26 +564,75 @@
     50% { transform: translateY(-10px) rotate(2deg); }
 }
 
-/* Buttons */
-.btn-orange {
-    background: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-dark) 100%);
-    border: none;
-    color: white;
-    font-weight: 600;
+/* ===== LOGO SHOWCASE SECTION ===== */
+.logo-showcase-section {
+    background: white;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.logo-box {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem 1rem;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 2px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.logo-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(255, 107, 53, 0.2);
+    border-color: var(--orange-primary);
+}
+
+.logo-content {
+    text-align: center;
+    width: 100%;
+}
+
+.brand-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.logo-box:hover .brand-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.brand-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #333;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.logo-box:hover .brand-name {
+    color: var(--orange-primary);
+}
+
+/* For real images */
+.logo-box img {
+    max-height: 60px;
+    max-width: 100%;
+    filter: grayscale(100%);
+    opacity: 0.7;
     transition: all 0.3s ease;
 }
 
-.btn-orange:hover {
-    background: linear-gradient(135deg, var(--orange-dark) 0%, var(--orange-primary) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(255, 107, 53, 0.4);
-    color: white;
+.logo-box:hover img {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.1);
 }
-
-.btn-outline-light:hover {
-    background-color: white;
-    color: var(--orange-primary);
-}
+/* ===== END LOGO SECTION ===== */
 
 /* Features Section */
 .features-section {
@@ -571,6 +699,39 @@
     }
     
     .stat-item h2 {
+        font-size: 2rem;
+    }
+    
+    /* Logo Section Mobile */
+    .logo-box {
+        height: 110px;
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .brand-icon {
+        font-size: 2.5rem;
+    }
+
+    .brand-name {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .logo-showcase-section h3 {
+        font-size: 1.3rem;
+    }
+    
+    .logo-showcase-section p {
+        font-size: 0.9rem;
+    }
+    
+    .logo-box {
+        height: 100px;
+        padding: 1rem 0.5rem;
+    }
+    
+    .brand-icon {
         font-size: 2rem;
     }
 }
